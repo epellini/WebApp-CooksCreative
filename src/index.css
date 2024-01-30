@@ -12,6 +12,10 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+/* When a link is active it changes color */
+.active {
+  color: lightblue;
+}
 
 a {
   font-weight: 500;
