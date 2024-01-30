@@ -7,10 +7,12 @@ const NotFound = () => {
     useEffect(() => {
         setTimeout(() => {
             navigate('/') // if we use (-1) it will go back to the previous page (useful for new client)
-        }, 2000)
+        }, 3000)
     }, [])
     return (
-    <div>NotFound</div>
+      <div>
+      <h1>404 PAGE NOT FOUND - REDIRECTING IN 3 SECONDS</h1>
+    </div>
   )
 }
 

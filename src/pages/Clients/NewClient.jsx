@@ -1,9 +1,11 @@
-import React from 'react'
+import React from "react";
 
 const NewClient = () => {
   return (
-    <div>Create New Client</div>
-  )
-}
+    <div>
+      <h1>Create New Client Page</h1>
+    </div>
+  );
+};
 
-export default NewClient
+export default NewClient;

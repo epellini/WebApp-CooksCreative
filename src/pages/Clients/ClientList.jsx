@@ -1,10 +1,10 @@
-import React from 'react'
-
-
+import React from "react";
 const ClientList = () => {
   return (
-    <div>Client List</div>
-  )
-}
+    <div>
+      <h1>Client List Page</h1>
+    </div>
+  );
+};
 
-export default ClientList
+export default ClientList;
