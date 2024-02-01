@@ -5,6 +5,8 @@ import List from '@mui/joy/List';
 import ListItemButton from '@mui/joy/ListItemButton';
 import Grid from '@mui/joy/Grid';
 import Stack from '@mui/joy/Stack';
+import Button from '@mui/joy/Button';
+import { Link } from "react-router-dom";
 
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
@@ -22,6 +24,15 @@ const ProjectsList = () => {
   async function getProjects() {
     const { data } = await supabase.from("projects").select("*"); // Get all projects
     setProjects(data);
+  }
+
+  async function deleteProject(id) {
+    const { error } = await supabase.from("projects").delete().match({ id });
+    if (error) {
+      console.error("Error deleting project:", error);
+    } else {
+      setProjects(projects.filter((project) => project.id !== id));
+    }
   }
 
   async function addProject() {
@@ -54,6 +65,9 @@ const ProjectsList = () => {
               <ListItemButton key={project.id}>
                 ID: {project.id} <br />
                 Name: {project.project_name}
+                <Link to={`/projects/${project.id}`}>Details</Link>
+                <Link to={`/projects/edit/${project.id}`}>Edit</Link>
+                <Button onClick={() => deleteProject(project.id)}>Delete</Button>
               </ListItemButton>
             ))}
           </List>
