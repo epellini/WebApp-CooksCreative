@@ -7,8 +7,9 @@ import NewClient from "./pages/Clients/NewClient.jsx";
 import Client from "./pages/Clients/Client.jsx";
 import ClientList from "./pages/Clients/ClientList.jsx";
 import NotFound from "./pages/NotFound.jsx";
-import Projects from "./pages/Projects.jsx";
-
+import Projects from "./pages/Projects/Projects.jsx";
+import Project from "./pages/Projects/Project.jsx"; // Import the Project component
+import EditProject from "./pages/Projects/EditProject.jsx"; // Import the Edit component
 function App() {
   return (
     <div style={{ display: 'flex' }}>
@@ -17,7 +18,11 @@ function App() {
       <main style={{ flexGrow: 1 }}>
         <Routes>
           <Route path="/" element={<Home/>} />
-          <Route path="/projects" element={<Projects/>} />
+          <Route path="/projects">
+            <Route index element={<Projects/>}/>
+            <Route path=":id" element={<Project/>} />
+            <Route path="edit/:id" element={<EditProject/>} />
+          </Route>
           <Route path="/clients">
             <Route index element={<ClientList/>}/>
             <Route path=":id" element={<Client/>}/>
