@@ -7,7 +7,8 @@ import NewClient from "./pages/Clients/NewClient.jsx";
 import Client from "./pages/Clients/Client.jsx";
 import ClientList from "./pages/Clients/ClientList.jsx";
 import NotFound from "./pages/NotFound.jsx";
-import Projects from "./pages/Projects.jsx";
+import Projects from "./pages/Projects/Projects.jsx";
+import Project from "./pages/Projects/Project.jsx"; // Import the Project component
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home/>} />
           <Route path="/projects" element={<Projects/>} />
+          <Route path="/projects/:id" element={<Project/>} />
           <Route path="/clients">
             <Route index element={<ClientList/>}/>
             <Route path=":id" element={<Client/>}/>
