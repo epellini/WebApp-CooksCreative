@@ -29,6 +29,9 @@ import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 import BrightnessAutoRoundedIcon from '@mui/icons-material/BrightnessAutoRounded';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import { useSupabase } from '../hooks/useSupabase';
+import { useNavigate } from 'react-router-dom';
+
 
 import { Link } from 'react-router-dom';
 
@@ -69,6 +72,7 @@ function Toggler({
 }
 
 export default function Sidebar() {
+  const { supabase } = useSupabase();
   return (
     <Sheet
     className="Sidebar"
@@ -189,7 +193,14 @@ export default function Sidebar() {
         <Typography level="title-sm">Dustin C.</Typography>
         <Typography level="body-xs">dustin@test.com</Typography>
       </Box>
-      <IconButton size="sm" variant="plain" color="neutral">
+      <IconButton
+       size="sm" 
+       variant="plain" 
+       color="neutral"
+       onClick={() => {
+         supabase.auth.signOut({ scope: 'local' });
+        }}
+        component={Link} to="/login" >
         <LogoutRoundedIcon />
       </IconButton>
     </Box>
