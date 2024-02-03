@@ -7,7 +7,9 @@ import NewClient from "./pages/Clients/NewClient.jsx";
 import Client from "./pages/Clients/Client.jsx";
 import ClientList from "./pages/Clients/ClientList.jsx";
 import NotFound from "./pages/NotFound.jsx";
-import Projects from "./pages/Projects.jsx";
+import Projects from "./pages/Projects/Projects.jsx";
+import Project from "./pages/Projects/Project.jsx"; // Import the Project component
+import EditProject from "./pages/Projects/EditProject.jsx"; // Import the Edit component
 
 function App() {
   return (
