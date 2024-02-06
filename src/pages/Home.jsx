@@ -1,17 +1,14 @@
 import * as React from "react";
 import Button from "@mui/joy/Button";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../pages/Auth/Auth";
 
 const Home = () => {
+  const {user} = useAuth();
+  const {signout} = useAuth();
 
-  const navigate = useNavigate();
-
-  const handleLogout = async () => {
-    await signOut(auth);
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    console.log('Logged out successfully');
-    navigate('/login');
+  const handleLogout = () => {
+    signout();
   }
 
   return (

@@ -9,3 +9,19 @@
 body {
   text-align: center;
 }
+
+/* In your index.css or a relevant CSS file */
+.layout {
+  display: flex;
+}
+
+.sidebar {
+  /* Adjust the width as necessary */
+  width: 250px;
+  /* More styling for the sidebar */
+}
+
+.main-content {
+  flex-grow: 1;
+  /* More styling for the main content area */
+}
