@@ -6,6 +6,7 @@ import Grid from '@mui/joy/Grid';
 import Stack from '@mui/joy/Stack';
 import Button from '@mui/joy/Button';
 import { Link } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -26,6 +27,7 @@ const ProjectDetails = () => {
       } else {
         console.log("Project deleted successfully");
         // setProjects(projects.filter((project) => project.project_id !== project_id));
+        
       }
     }
 
@@ -48,7 +50,7 @@ const ProjectDetails = () => {
 
             <div>Client Number: {project.client_id}</div>
 
-            <Button onClick={() => deleteProject(project.project_id)}>Delete</Button>
+            <Button onClick={() => deleteProject(project.project_id)} href="/projects">Delete</Button>
 
           </div>
         ))}
