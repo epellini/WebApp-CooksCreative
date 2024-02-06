@@ -1,17 +1,13 @@
 import React, { useState } from "react";
 import { useEffect } from "react";
-import { createClient } from "@supabase/supabase-js";
 import List from '@mui/joy/List';
 import ListItemButton from '@mui/joy/ListItemButton';
 import Grid from '@mui/joy/Grid';
 import Stack from '@mui/joy/Stack';
 import Button from '@mui/joy/Button';
 import { Link } from "react-router-dom";
-
-
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+import { Textarea } from "@mui/joy";
+import { Input } from "@mui/joy";
 
 const ProjectsList = () => {
   const [projects, setProjects] = useState([]);
@@ -49,6 +45,8 @@ const ProjectsList = () => {
       }
     }
   }
+  const [newName, setNewName] = useState(""); // This state will hold the new project name
+  const [newDescription, setNewDescription] = useState(""); // This state will hold the new project description
 
   return (
     <div>
@@ -75,16 +73,6 @@ const ProjectsList = () => {
           </List>
         </Stack>
       </Grid>
-
-      <form onSubmit={addProject}>
-        <input
-          type="text"
-          value={projectName}
-          onChange={(e) => setProjectName(e.target.value)}
-          placeholder="Enter project name"
-        />
-        <button type="submit">Add Project</button>
-      </form>
     </div>
   );
 };
