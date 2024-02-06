@@ -1,8 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { db } from '../../firebase';
-import { doc, setDoc, getDoc, collection } from 'firebase/firestore';
 import { useNavigate, useParams } from 'react-router-dom';
-
 import Input from '@mui/joy/Input';
 import FormLabel from '@mui/joy/FormLabel';
 import Button from '@mui/joy/Button';

@@ -9,7 +9,6 @@ import Projects from "./pages/Projects/Projects.jsx";
 import ProjectDetails from "./pages/Projects/ProjectDetails"; // Import the Project component
 import EditProject from "./pages/Projects/EditProject.jsx"; // Import the Edit component
 
-
 // Auth Pages:
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';

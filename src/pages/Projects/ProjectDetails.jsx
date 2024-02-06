@@ -3,8 +3,6 @@ import { useParams } from "react-router-dom"; // Import useParams
 import Grid from "@mui/joy/Grid";
 import Stack from "@mui/joy/Stack";
 import Button from "@mui/joy/Button";
-import { db } from "../../firebase";
-import { doc, getDoc } from "firebase/firestore"; // Import getDoc for fetching single document
 
 const ProjectDetails = () => {
   const [project, setProject] = useState(null); // Use singular since we're dealing with a single project

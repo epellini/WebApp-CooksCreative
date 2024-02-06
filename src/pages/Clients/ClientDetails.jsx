@@ -3,8 +3,6 @@ import { useParams } from "react-router-dom";
 import Grid from "@mui/joy/Grid";
 import Stack from "@mui/joy/Stack";
 import Button from "@mui/joy/Button";
-import {db} from "../../firebase";
-import {doc, getDoc} from "firebase/firestore";
 
 const ClientDetails = () => {
   // Extract the client ID from the URL parameters
