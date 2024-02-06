@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import Grid from "@mui/joy/Grid";
 import Stack from "@mui/joy/Stack";
 import Button from "@mui/joy/Button";
-
+import {useSupabase}  from "../../supabase";
 const ClientDetails = () => {
   // Extract the client ID from the URL parameters
   const { id } = useParams();
@@ -11,24 +11,30 @@ const ClientDetails = () => {
   // State to store the client's details
   const [client, setClient] = useState(null);
 
+
+  const { supabase } = useSupabase();
   // Fetch the client's details from Firestore when the component mounts or the ID changes
-  
   useEffect(() => {
     const getClient = async () => {
-      const docRef = doc(db, 'clients', id); // Create a reference to the specific client document in Firestore
-      const docSnap = await getDoc(docRef) // Fetch the document data
-
-      // Check if the document exists
-      if(docSnap.exists()){
-        // If the document exists, update the state with the client's details
-        setClient({id: docSnap.id, ...docSnap.data()});
-      } else{
-        // Log an error if the document does not exist
-        console.log("No such document");
+      if (id) { // Use 'id' here
+        const { data, error } = await supabase
+          .from('clients')
+          .select("*")
+          .eq('client_id', id) // Assuming your column in Supabase is named 'client_id'
+          .single(); 
+  
+        if (error) {
+          console.log("Error fetching client details:", error.message);
+        } else {
+          setClient(data);
+        }
       }
     };
+  
     getClient();
-  }, [id])
+  }, [id]); // Use 'id' in the dependency array
+
+  
 
   // Display a loading message if the client's details haven't been fetched yet
   if (!client) {
@@ -41,13 +47,15 @@ const ClientDetails = () => {
       <h1>Client Details</h1>
       <Grid container direction="column" justifyContent="center" alignItems="center">
         <Stack spacing={2}>
-          <div>ID: {client.id}</div>
-          <div>Name: {client.firstName} {client.lastName}</div>
+        <div>ID: {client.client_id}</div>
+          <div>Name: {client.first_name} {client.last_name}</div>
           <div>Address: {client.address}</div>
           <div>Email: {client.email}</div>
-          <div>Phone Number: {client.phoneNumber}</div>
+          <div>Phone Number: {client.phone_number}</div>
+          <div>Notes: {client.notes}</div>
+          <div>Tag: {client.tag}</div>
           {/* Implement Delete function  here if needed*/}
-          {/* <Button onClick={() => deleteClient(client.id)}>Delete</Button> */}
+          {/* <Button onClick={() => deleteClient(client.client_id)}>Delete</Button> */}
         </Stack>
       </Grid>
     </div>
