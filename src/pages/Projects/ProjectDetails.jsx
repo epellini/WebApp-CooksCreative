@@ -1,50 +1,60 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom"; // Import useParams
-import Grid from "@mui/joy/Grid";
-import Stack from "@mui/joy/Stack";
-import Button from "@mui/joy/Button";
+import { createClient } from "@supabase/supabase-js";
+import List from '@mui/joy/List';
+import ListItemButton from '@mui/joy/ListItemButton';
+import Grid from '@mui/joy/Grid';
+import Stack from '@mui/joy/Stack';
+import Button from '@mui/joy/Button';
+import { Link } from "react-router-dom";
+
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 const ProjectDetails = () => {
-  const [project, setProject] = useState(null); // Use singular since we're dealing with a single project
-  const { id } = useParams(); // Use useParams to get the project ID from the URL
+  const [project, setProject] = useState([]);
 
   useEffect(() => {
-    const fetchProject = async () => {
-      const docRef = doc(db, "projects", id); // Create a reference to the specific project document
-      const docSnap = await getDoc(docRef); // Fetch the document
-      if (docSnap.exists()) {
-        setProject({ ...docSnap.data(), id: docSnap.id }); // If the document exists, set the project state
+    getProject();
+  }, []);
+
+    // This function will delete a project from the database
+    async function deleteProject(project_id) {
+      const { error } = await supabase.from("projects").delete().match({ project_id });
+      if (error) {
+        console.error("Error deleting project:", error);
       } else {
-        console.log("No such document!");
+        console.log("Project deleted successfully");
+        // setProjects(projects.filter((project) => project.project_id !== project_id));
       }
-    };
+    }
 
-    fetchProject();
-  }, [id]); // Dependency array includes id to re-fetch if the id changes
-
-  if (!project) {
-    return <div>Loading...</div>; // Display a loading message or spinner while fetching
+  // Get specific project using id from the url
+  async function getProject() {
+    const id = window.location.pathname.split("/")[2];
+    const { data } = await supabase.from("projects").select("*").eq("project_id", id);
+    setProject(data);
   }
 
   return (
     <div>
       <h1>Project Details</h1>
-      <Grid
-        container
-        direction="column"
-        justifyContent="center"
-        alignItems="center"
-      >
-        <Stack spacing={2}> {/* Adjusted for visual structure */}
-          <div>ID: {project.id}</div>
-          <div>Name: {project.name}</div>
-          <div>Description: {project.description}</div>
-          {/* Removed the loop and links not relevant to a detail view */}
-          <Button onClick={() => {/* Place delete function here */}}>Delete</Button>
-        </Stack>
-      </Grid>
+      <ul>
+        {project.map((project) => (
+          <div key={project.project_id}>
+            <div>Project ID: {project.project_id}</div>
+
+            <div>Project Name: {project.project_name}</div>
+
+            <div>Client Number: {project.client_id}</div>
+
+            <Button onClick={() => deleteProject(project.project_id)}>Delete</Button>
+
+          </div>
+        ))}
+      </ul>
     </div>
   );
-};
+}
 
 export default ProjectDetails;

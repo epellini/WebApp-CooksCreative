@@ -21,6 +21,8 @@ import ClientForm from './pages/Clients/ClientForm.jsx';
 function App() {
   return (
     <div style={{ display: 'flex' }}>
+      <Sidebar /> {/* This will render the Sidebar component */}
+      <Header />
       <main style={{ flexGrow: 1 }}>
 
         <Routes>
@@ -30,7 +32,6 @@ function App() {
           {/* END OF AUTH ROUTES */}
 
         {/* ALL THE PROTECTED ROUTES GO BELOW */}
-          <Route path="/" element={<Protected/>} >
             <Route path='/' element={<Home/>} /> {/* HOME ROUTE */}
           
             {/* PROJECTS ROUTES */}
@@ -47,7 +48,6 @@ function App() {
             <Route path="/clients/new" element={<ClientForm/>}/>
             <Route path="/clients/edit/:clientId" element={<ClientForm />} />
             </Route>
-          </Route> {/* END OF PROTECTED ROUTES */}
           
           <Route path="*" element={<NotFound/>}/> {/* NOT FOUND ROUTE */}
         </Routes>

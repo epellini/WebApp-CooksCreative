@@ -11,7 +11,7 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-const EditProject = () => {
+const ProjectDetails = () => {
   const [project, setProject] = useState([]);
 
   useEffect(() => {
@@ -20,30 +20,27 @@ const EditProject = () => {
 
   // Get specific project using id from the url
   async function getProject() {
-    const id = window.location.pathname.split("/")[3];
+    const id = window.location.pathname.split("/")[2];
     const { data } = await supabase.from("projects").select("*").eq("project_id", id);
     setProject(data);
   }
 
-  // Edit project
-  async function editProject(e) {
-    e.preventDefault();
-    const id = window.location.pathname.split("/")[3];
-    const { data, error } = await supabase
-      .from("projects")
-      .update({ project_name: project })
-      .eq("id", id);
-    if (error) {
-      console.error("Error updating project:", error);
-    } else {
-      console.log("Project updated successfully");
-    }
-  }
-
   return (
-    <h1>Edit Project (WIP)</h1>
-  )
+    <div>
+      <h1>Project Details</h1>
+      <ul>
+        {project.map((project) => (
+          <div key={project.project_id}>
+            <div>Project ID: {project.project_id}</div>
 
+            <div>Project Name: {project.project_name}</div>
+
+            <div>Client Number: {4}</div>
+          </div>
+        ))}
+      </ul>
+    </div>
+  );
 }
 
-export default EditProject;
+export default ProjectDetails;
