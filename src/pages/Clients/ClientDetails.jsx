@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import Grid from "@mui/joy/Grid";
 import Stack from "@mui/joy/Stack";
 import Button from "@mui/joy/Button";
-import {useSupabase}  from "../../supabase";
+import {supabaseClient}  from "../../supabase-client";
 const ClientDetails = () => {
   // Extract the client ID from the URL parameters
   const { id } = useParams();
@@ -12,7 +12,7 @@ const ClientDetails = () => {
   const [client, setClient] = useState(null);
 
 
-  const { supabase } = useSupabase();
+  const supabase = supabaseClient;
   // Fetch the client's details from Firestore when the component mounts or the ID changes
   useEffect(() => {
     const getClient = async () => {

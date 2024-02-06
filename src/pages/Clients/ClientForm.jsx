@@ -4,7 +4,7 @@ import Input from '@mui/joy/Input';
 import FormLabel from '@mui/joy/FormLabel';
 import Button from '@mui/joy/Button';
 import Box from '@mui/joy/Box'
-import { useSupabase } from '../../supabase';
+import { supabaseClient } from '../../supabase-client';
 
 const ClientForm = () => {
     // State to hold client form data, initialized with empty strings for form fields
@@ -15,7 +15,7 @@ const ClientForm = () => {
     const navigate = useNavigate();
   
 
-    const { supabase } = useSupabase();
+    const supabase = supabaseClient;
     useEffect(() => {
       if (clientId) {
         const fetchClient = async () => {
@@ -73,13 +73,13 @@ const ClientForm = () => {
 
       if (clientId) {
         // Updating an existing client
-        result = await supabase
+        result = await supabaseClient
             .from('clients')
             .update(updates)
             .eq('client_id', clientId); // Ensure this uses the correct column name as per your table schema
       } else {
         // Inserting a new client
-        result = await supabase
+        result = await supabaseClient
             .from('clients')
             .insert([updates]);
       }

@@ -8,10 +8,10 @@ import Button from '@mui/joy/Button';
 import ListItem from '@mui/joy/ListItem'; 
 import Typography from '@mui/joy/Typography';
 import ListItemButton from '@mui/joy/ListItemButton';
-import { useSupabase } from "../../supabase";
+import { supabaseClient } from "../../supabase-client";
 const ClientsList = () => {
   const [clients, setClients] = useState([]);
-  const { supabase } = useSupabase(); // Use your Supabase client
+  const supabase = supabaseClient; // Use your Supabase client
   const navigate = useNavigate();
 
 
