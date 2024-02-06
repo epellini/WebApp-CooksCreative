@@ -21,7 +21,7 @@ const EditProject = () => {
   // Get specific project using id from the url
   async function getProject() {
     const id = window.location.pathname.split("/")[3];
-    const { data } = await supabase.from("projects").select("*").eq("id", id);
+    const { data } = await supabase.from("projects").select("*").eq("project_id", id);
     setProject(data);
   }
 

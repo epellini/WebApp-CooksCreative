@@ -21,7 +21,7 @@ const ProjectDetails = () => {
   // Get specific project using id from the url
   async function getProject() {
     const id = window.location.pathname.split("/")[2];
-    const { data } = await supabase.from("projects").select("*").eq("id", id);
+    const { data } = await supabase.from("projects").select("*").eq("project_id", id);
     setProject(data);
   }
 
@@ -30,10 +30,12 @@ const ProjectDetails = () => {
       <h1>Project Details</h1>
       <ul>
         {project.map((project) => (
-          <div key={project.id}>
-            <div>Project ID: {project.id}</div>
+          <div key={project.project_id}>
+            <div>Project ID: {project.project_id}</div>
 
             <div>Project Name: {project.project_name}</div>
+
+            <div>Client Number: {4}</div>
           </div>
         ))}
       </ul>

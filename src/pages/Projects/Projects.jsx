@@ -26,12 +26,13 @@ const ProjectsList = () => {
     setProjects(data);
   }
 
+  //this function will delete a project from the database
   async function deleteProject(id) {
     const { error } = await supabase.from("projects").delete().match({ id });
     if (error) {
       console.error("Error deleting project:", error);
     } else {
-      setProjects(projects.filter((project) => project.id !== id));
+      setProjects(projects.filter((project) => project.project_id !== id));
     }
   }
 
@@ -62,12 +63,13 @@ const ProjectsList = () => {
         <Stack>
           <List>
             {projects.map((project) => (
-              <ListItemButton key={project.id}>
-                ID: {project.id} <br />
+              <ListItemButton key={project.project_id}>
+                ID: {project.project_id} <br />
                 Name: {project.project_name}
-                <Link to={`/projects/${project.id}`}>Details</Link>
-                <Link to={`/projects/edit/${project.id}`}>Edit</Link>
-                <Button onClick={() => deleteProject(project.id)}>Delete</Button>
+                Client: {project.client_id}
+                <Link to={`/projects/${project.project_id}`}>Details</Link>
+                <Link to={`/projects/edit/${project.project_id}`}>Edit</Link>
+                <Button onClick={() => deleteProject(project.project_id)}>Delete</Button>
               </ListItemButton>
             ))}
           </List>
