@@ -18,6 +18,17 @@ const ProjectDetails = () => {
     getProject();
   }, []);
 
+    // This function will delete a project from the database
+    async function deleteProject(project_id) {
+      const { error } = await supabase.from("projects").delete().match({ project_id });
+      if (error) {
+        console.error("Error deleting project:", error);
+      } else {
+        console.log("Project deleted successfully");
+        // setProjects(projects.filter((project) => project.project_id !== project_id));
+      }
+    }
+
   // Get specific project using id from the url
   async function getProject() {
     const id = window.location.pathname.split("/")[2];
@@ -36,6 +47,9 @@ const ProjectDetails = () => {
             <div>Project Name: {project.project_name}</div>
 
             <div>Client Number: {project.client_id}</div>
+
+            <Button onClick={() => deleteProject(project.project_id)}>Delete</Button>
+
           </div>
         ))}
       </ul>

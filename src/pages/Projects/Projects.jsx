@@ -49,16 +49,7 @@ const ProjectsList = () => {
     }
   }
 
-  // This function will delete a project from the database
-  async function deleteProject(project_id) {
-    const { error } = await supabase.from("projects").delete().match({ project_id });
-    if (error) {
-      console.error("Error deleting project:", error);
-    } else {
-      console.log("Project deleted successfully");
-      setProjects(projects.filter((project) => project.project_id !== project_id));
-    }
-  }
+
 
   async function addProject(e) {
     e.preventDefault();
@@ -126,9 +117,7 @@ const ProjectsList = () => {
                 {/* **********Here we implement the client and project data together******* */}
                 Client Full Name: {project.client.first_name} {project.client.last_name} <br />
                 Client Email: {project.client.email} <br />
-                <Link to={`/projects/${project.project_id}`}>Details</Link> <br />
                 <Link to={`/projects/edit/${project.project_id}`}>Edit</Link> <br />
-                <Button onClick={() => deleteProject(project.project_id)}>Delete</Button>
               </ListItemButton>
             ))}
           </List>
