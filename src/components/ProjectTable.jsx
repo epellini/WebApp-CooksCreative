@@ -33,12 +33,15 @@ import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 import MoreHorizRoundedIcon from "@mui/icons-material/MoreHorizRounded";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
+import { useNavigate } from "react-router-dom";
 
 import { useEffect, useState } from "react";
 import { supabaseClient } from "../supabase-client"; // Import the supabase client
 import { Skeleton } from "@mui/joy";
 
-function RowMenu() {
+function RowMenu({ projectId }) {
+  const navigate = useNavigate();
+
   return (
     <Dropdown>
       <MenuButton
@@ -48,9 +51,14 @@ function RowMenu() {
         <MoreHorizRoundedIcon />
       </MenuButton>
       <Menu size="sm" sx={{ minWidth: 140 }}>
-        <MenuItem>Edit</MenuItem>
-        <MenuItem>Rename</MenuItem>
-        <MenuItem>Move</MenuItem>
+        <MenuItem onClick={() => navigate(`/projects/edit/${projectId}`)}>
+          Edit
+        </MenuItem>
+
+        <Divider />
+        <MenuItem onClick={() => navigate(`/projects/${projectId}`)}>
+          Details
+        </MenuItem>
         <Divider />
         <MenuItem color="danger">Delete</MenuItem>
       </Menu>
@@ -251,7 +259,7 @@ export default function ProjectTable() {
         >
           {/* ADD CHANGES HERE MY BOY  */}
           <thead>
-            <tr>
+            <tr >
               <th
                 style={{ width: 48, textAlign: "center", padding: "12px 6px" }}
               >
@@ -312,7 +320,7 @@ export default function ProjectTable() {
               </tr>
             ) : (
               projects.map((project) => (
-                <tr key={project.project_id}>
+                <tr key={project.project_id} >
                   <td
                     style={{
                       textAlign: "center",
@@ -366,20 +374,20 @@ export default function ProjectTable() {
                       variant="soft"
                       size="sm"
                       startDecorator={
-                        project.status.name === "Completed" ? (
+                        project.status.name == "Completed" ? (
                           <CheckRoundedIcon />
-                        ) : project.status.name === "Cancelled" ? (
+                        ) : project.status.name == "Cancelled" ? (
                           <BlockIcon />
-                        ) : project.status.name === "Active" ? (
+                        ) : project.status.name == "Active" ? (
                           <AutorenewRoundedIcon />
                         ) : undefined // No icon for "N/A" or other statuses
                       }
                       color={
-                        project.status.name === "Completed"
+                        project.status.name =="Completed"
                           ? "success"
-                          : project.status.name === "Active"
+                          : project.status.name == "Active"
                           ? "neutral"
-                          : project.status.name === "Cancelled"
+                          : project.status.name == "Cancelled"
                           ? "danger"
                           : "default" // Use default color for "N/A" or other statuses
                       }
@@ -414,7 +422,7 @@ export default function ProjectTable() {
                       <Link level="body-xs" component="button">
                         Download
                       </Link>
-                      <RowMenu />
+                      <RowMenu projectId={project.project_id} />
                     </Box>
                   </td>
                 </tr>

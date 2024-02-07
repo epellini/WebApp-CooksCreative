@@ -189,9 +189,9 @@ const ProjectForm = () => {
           onChange={handleChange}
           required
         >
-          <Option value="2">Completed</Option>
+          <Option value="3">Completed</Option>
           <Option value="1">Cancelled</Option>
-          <Option value="3">Active</Option>
+          <Option value="2">Active</Option>
         </Select>
       </Box>
       <Button type="submit" variant="solid" color="primary" size="lg">

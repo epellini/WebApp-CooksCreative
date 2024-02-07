@@ -17,7 +17,7 @@ const ProjectDetails = () => {
 
 
   useEffect(() => {
-    getProjects();
+    getProject();
   }, []); // Fetch projects when the component mounts
 
   async function deleteProject(project_id) {
@@ -59,4 +59,4 @@ const ProjectDetails = () => {
   );
 }
 
-export default ProjectsList;
+export default ProjectDetails;
