@@ -1,6 +1,5 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import * as React from "react";
-//import { ColorPaletteProp } from '@mui/joy/styles';
 import Avatar from "@mui/joy/Avatar";
 import Box from "@mui/joy/Box";
 import Button from "@mui/joy/Button";
@@ -36,7 +35,6 @@ import MoreHorizRoundedIcon from "@mui/icons-material/MoreHorizRounded";
 
 import { useEffect, useState } from "react";
 import { supabaseClient } from "../supabase-client"; // Import the supabase client
-//import { Session } from "@supabase/supabase-js"; // Import the Session type
 
 function RowMenu() {
   return (
@@ -61,7 +59,7 @@ function RowMenu() {
 export default function ProjectTable() {
   const [projects, setProjects] = useState([]);
   const [selected, setSelected] = useState([]);
-  //const [selected, setSelected] = React.useState<readonly string[]>([]); // SHould I use this instead?
+  const [status, setStatus] = useState([]);
   const [open, setOpen] = React.useState(false);
 
   useEffect(() => {
@@ -87,18 +85,18 @@ export default function ProjectTable() {
               return project;
             }
 
-            // const {data: statusData, error: statusError} = await supabaseClient
-            // .from("status")
-            // .select("*")
-            // .eq("status_id", project.status_id)
-            // .single();
-            // if (statusError) {
-            //   console.error("Error getting status:", statusError);
-            //   return project;
-            // }
+            const { data: statusData, error: statusError } =
+              await supabaseClient
+                .from("status")
+                .select("*")
+                .eq("status_id", project.status_id)
+                .single();
+            if (statusError) {
+              console.error("Error getting status:", statusError);
+              return { ...project, client: clientData };
+            }
 
-            //return { ...project, client: clientData, status: statusData };
-            return { ...project, client: clientData};
+            return { ...project, client: clientData, status: statusData };
           })
         );
         setProjects(projectInfo);
@@ -106,14 +104,6 @@ export default function ProjectTable() {
     }
     getProjects();
   }, []);
-
-  // interface Project {
-  //   project_id: number;
-  //   project_name: string;
-  //   client_id: number; // Assuming client_id is a number, adjust according to your data model
-  //   status: string; // And so on for other fields you use
-  //   // Add other fields as necessary
-  // }
 
   // FILTERS
   const renderFilters = () => (
@@ -304,7 +294,12 @@ export default function ProjectTable() {
           <tbody>
             {projects.map((project) => (
               <tr key={project.project_id}>
-                <td style={{ textAlign: "center", width: 120 }}>
+                <td
+                  style={{
+                    textAlign: "center",
+                    width: 120,
+                  }}
+                >
                   <Checkbox
                     size="sm"
                     checked={selected.includes(project.project_id.toString())}
@@ -326,7 +321,7 @@ export default function ProjectTable() {
                     sx={{ verticalAlign: "text-bottom" }}
                   />
                 </td>
-                <td style={{textAlign:'center'}}>
+                <td style={{ textAlign: "center"}}>
                   {project.client ? (
                     <Typography level="body-xs">{`${project.project_name}`}</Typography>
                   ) : (
@@ -348,7 +343,7 @@ export default function ProjectTable() {
                   <Typography level="body-xs">{project.client_id ? `${project.client_id.first_name} ${project.client_id.last_name}` : 'N/A' }</Typography>
                 </td>*/}
                 <td>
-                  {/* <Chip
+                  <Chip
                     variant="soft"
                     size="sm"
                     startDecorator={
@@ -356,31 +351,35 @@ export default function ProjectTable() {
                         Completed: <CheckRoundedIcon />,
                         Cancelled: <AutorenewRoundedIcon />,
                         Active: <BlockIcon />,
-                      }[project.status]
+                      }[project.status.name] // Assuming 'status.name' holds the status string.
                     }
                     color={
-                      project.status.name == "Completed"
+                      project.status.name === "Completed"
                         ? "success"
-                        : project.status.name == "Cancelled"
+                        : project.status.name === "Cancelled"
                         ? "neutral"
-                        : project.status.name =="Active"
+                        : project.status.name === "Active"
                         ? "danger"
-                        : console.log('error in the status')
-                      //Paid: 'success',
-                      //Refunded: 'neutral',
-                      //Cancelled: 'danger',
+                        : "default" // Adjust as necessary.
                     }
                   >
-                    {project.status}
-                  </Chip> */}
+                    {project.status.name}
+                  </Chip>
                 </td>
                 <td>
-                  <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      gap: 2,
+                      alignItems: "center",
+                    }}
+                  >
                     {/* <Avatar size="sm">{project.client.first_name}</Avatar> */}
-                    {/* <div>
-                      <Typography level="body-xs">{project.client_id }</Typography>
-                      <Typography level="body-xs">{row.customer.email}</Typography>
-                    </div> */}
+                    <div>
+                      {/* <Typography level="body-xs">{project.client_id }</Typography> */}
+
+                      <Typography level="body-xs">{status.name}</Typography>
+                    </div>
 
                     {project.client ? (
                       <Typography level="body-xs">{`${project.project_name}`}</Typography>
