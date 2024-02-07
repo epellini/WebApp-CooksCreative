@@ -16,6 +16,7 @@ import ProjectTable from "../../components/ProjectTable";
 import ProjectList from "../../components/ProjectList";
 import { CssVarsProvider } from "@mui/joy/styles";
 import CssBaseline from "@mui/joy/CssBaseline";
+import { useNavigate } from "react-router-dom";
 
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
@@ -24,13 +25,21 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 const ProjectsList = () => {
   const [projects, setProjects] = useState([]);
-  
+  const [projectName, setProjectName] = useState("");
+  const [client_id, setClient_id] = useState("");
+  const [project_description, setProject_description] = useState("");
+  const [start_date, setStart_date] = useState("");
+  const [end_date, setEnd_date] = useState("");
+  const navigate = useNavigate();
+  const [complete, setComplete] = useState(false);
+
   useEffect(() => {
     getProjects();
   }, []); // Fetch projects when the component mounts
 
   async function getProjects() {
     const { data, error } = await supabase.from("projects").select("*"); // Get all projects
+    
     if (error) {
       console.error("Error fetching projects:", error); // Log an error if there is one
     } else {
@@ -174,7 +183,8 @@ const ProjectsList = () => {
         <Typography level="h2" component="h1">
           Projects
         </Typography>
-        <Button
+        <Button 
+        onClick={() => navigate('/projects/new')}
           color="primary"
           startDecorator={<DownloadRoundedIcon />}
           size="sm"
