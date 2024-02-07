@@ -13,14 +13,7 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 const ProjectsList = () => {
   const [projects, setProjects] = useState([]);
-  const [projectName, setProjectName] = useState("");
-  const [client_id, setClient_id] = useState("");
-  const [project_description, setProject_description] = useState("");
-  const [start_date, setStart_date] = useState("");
-  const [end_date, setEnd_date] = useState("");
-  const [complete, setComplete] = useState(false);
-
-
+  
   useEffect(() => {
     getProjects();
   }, []); // Fetch projects when the component mounts
@@ -50,50 +43,6 @@ const ProjectsList = () => {
     }
   }
 
-
-
-  async function addProject(e) {
-    e.preventDefault();
-    if (projectName.trim() !== "") {
-      const { data, error } = await supabase
-        .from("projects")
-        .insert([{ 
-          project_name: projectName, 
-          client_id: client_id,
-          project_description: project_description,
-          start_date: start_date,
-          end_date: end_date,
-          complete: complete
-        }]);
-      if (error) {
-        console.error("Error adding project:", error);
-      } else {
-        if (data) {
-          console.log("we have data");
-          // Update the project list in the state without reloading the page
-          setProjects([...projects, data[0]]);
-          //can choose to do something with the data here if we need to in the future
-          // Clear the input fields
-          setProjectName("");
-          setClient_id("");
-          setProject_description("");
-          setStart_date("");
-          setEnd_date("");
-          setComplete(false);
-        } else {
-          console.log("Project added successfully");
-          // Clear the input fields
-          setProjectName("");
-          setClient_id("");
-          setProject_description("");
-          setStart_date("");
-          setEnd_date("");
-          setComplete(false);
-          getProjects(); // Reload the project list
-        }
-      }
-    }
-  }
 
   return (
     <div>
