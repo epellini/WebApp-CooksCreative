@@ -1,11 +1,22 @@
 import React, { useState, useEffect } from "react";
 import { createClient } from "@supabase/supabase-js";
-import List from '@mui/joy/List';
-import ListItemButton from '@mui/joy/ListItemButton';
-import Grid from '@mui/joy/Grid';
-import Stack from '@mui/joy/Stack';
-import Button from '@mui/joy/Button';
+import List from "@mui/joy/List";
+import ListItemButton from "@mui/joy/ListItemButton";
+import Grid from "@mui/joy/Grid";
+import Stack from "@mui/joy/Stack";
+import Button from "@mui/joy/Button";
 import { Link } from "react-router-dom";
+import Box from "@mui/joy/Box";
+import Typography from "@mui/joy/Typography";
+import Breadcrumbs from "@mui/joy/Breadcrumbs";
+import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
+import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
+import DownloadRoundedIcon from "@mui/icons-material/DownloadRounded";
+import ProjectTable from "../../components/ProjectTable";
+import ProjectList from "../../components/ProjectList";
+import { CssVarsProvider } from "@mui/joy/styles";
+import CssBaseline from "@mui/joy/CssBaseline";
+
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -27,8 +38,8 @@ const ProjectsList = () => {
       const projectsWithClients = await Promise.all(
         data.map(async (project) => {
           const { data: clientData, error: clientError } = await supabase
-            .from("clients") 
-            .select("*") 
+            .from("clients")
+            .select("*")
             .eq("client_id", project.client_id)
             .single();
           if (clientError) {
@@ -53,43 +64,129 @@ const ProjectsList = () => {
     }
   }
 
+  async function addProject(e) {
+    e.preventDefault();
+    if (projectName.trim() !== "") {
+      const { data, error } = await supabase.from("projects").insert([
+        {
+          project_name: projectName,
+          client_id: client_id,
+          project_description: project_description,
+          start_date: start_date,
+          end_date: end_date,
+          complete: complete,
+        },
+      ]);
+      if (error) {
+        console.error("Error adding project:", error);
+      } else {
+        if (data) {
+          console.log("we have data");
+          // Update the project list in the state without reloading the page
+          setProjects([...projects, data[0]]);
+          //can choose to do something with the data here if we need to in the future
+          // Clear the input fields
+          setProjectName("");
+          setClient_id("");
+          setProject_description("");
+          setStart_date("");
+          setEnd_date("");
+          setComplete(false);
+        } else {
+          console.log("Project added successfully");
+          // Clear the input fields
+          setProjectName("");
+          setClient_id("");
+          setProject_description("");
+          setStart_date("");
+          setEnd_date("");
+          setComplete(false);
+          getProjects(); // Reload the project list
+        }
+      }
+    }
+  }
 
   return (
-    <div>
-      <h1>Project List</h1>
-      <Grid
-        container
-        direction="column"
-        justifyContent="center"
-        alignItems="center"
+    <CssVarsProvider disableTransitionOnChange>
+        <CssBaseline />
+    <Box sx={{ display: "flex", minHeight: "100dvh" }}>
+      <Box
+        component="main"
+        className="MainContent"
+        sx={{
+          px: { xs: 2, md: 6 },
+          pt: {
+            xs: "calc(12px + var(--Header-height))",
+            sm: "calc(12px + var(--Header-height))",
+            md: 3,
+          },
+          pb: { xs: 2, sm: 2, md: 3 },
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          minWidth: 0,
+          height: "100dvh",
+          gap: 1,
+        }}
       >
-        <Stack>
-          <List>
-            {projects.map((project) => (
-              <ListItemButton key={project.project_id} component={Link} to={`/projects/${project.project_id}`}>
-                ID: {project.project_id} <br />
-                Name: {project.project_name} <br />
-                Client: {project.client_id} <br />
-                Description: {project.project_description} <br />
-                Start Date: {project.start_date} <br />
-                End Date: {project.end_date} <br />
-                Complete: {project.complete ? "Yes" : "No"} <br />
-                {/* **********Here we implement the client and project data together******* */}
-                Client Full Name: {project.client.first_name} {project.client.last_name} <br />
-                Client Email: {project.client.email} <br />
-                {/* **********Here we implement the status and project data together******* */}
-                Status: {project.status.name} <br />
-                Status ID: {project.status.status_id} <br />
-                
-                <Link to={`/projects/edit/${project.project_id}`}>Edit</Link> <br />
-              </ListItemButton>
-            ))}
-          </List>
-        </Stack>
-      </Grid>
-      <Link to={`/projects/new`}>Add New Project</Link> <br />
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          <Breadcrumbs
+            size="sm"
+            aria-label="breadcrumbs"
+            separator={<ChevronRightRoundedIcon fontSize="sm" />}
+            sx={{ pl: 0 }}
+          >
+            <Link
+              underline="none"
+              color="neutral"
+              href="#some-link"
+              aria-label="Home"
+            >
+              <HomeRoundedIcon />
+            </Link>
+            <Link
+              underline="hover"
+              color="neutral"
+              to={"/"}
+              fontSize={12}
+              fontWeight={500}
+            >
+              Dashboard
+            </Link>
 
-    </div>
+            <Typography color="primary" fontWeight={500} fontSize={12}>
+              Projects
+            </Typography>
+          </Breadcrumbs>
+        </Box>
+        <Box
+          sx={{
+            display: "flex",
+            mb: 1,
+            gap: 1,
+            flexDirection: { xs: "column", sm: "row" },
+            alignItems: { xs: "start", sm: "center" },
+            flexWrap: "wrap",
+            justifyContent: "space-between",
+          }}
+        >
+        <Typography level="h2" component="h1">
+          Projects
+        </Typography>
+        <Button
+          color="primary"
+          startDecorator={<DownloadRoundedIcon />}
+          size="sm"
+        >
+          New Project
+        </Button>
+      </Box>
+      <ProjectTable projects={projects}/>
+      <ProjectList projects={projects}/>
+    </Box>
+    </Box>
+    </CssVarsProvider>
   );
 };
 

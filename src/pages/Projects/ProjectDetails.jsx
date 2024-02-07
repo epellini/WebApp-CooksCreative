@@ -17,8 +17,8 @@ const ProjectDetails = () => {
 
 
   useEffect(() => {
-    getProject();
-  }, []);
+    getProjects();
+  }, []); // Fetch projects when the component mounts
 
   async function deleteProject(project_id) {
     const { error } = await supabase.from("projects").delete().match({ project_id });
@@ -59,4 +59,4 @@ const ProjectDetails = () => {
   );
 }
 
-export default ProjectDetails;
+export default ProjectsList;
