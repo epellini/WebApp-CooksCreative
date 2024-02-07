@@ -24,7 +24,6 @@ import Menu from '@mui/joy/Menu';
 import MenuButton from '@mui/joy/MenuButton';
 import MenuItem from '@mui/joy/MenuItem';
 import Dropdown from '@mui/joy/Dropdown';
-
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import SearchIcon from '@mui/icons-material/Search';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
@@ -35,228 +34,10 @@ import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import MoreHorizRoundedIcon from '@mui/icons-material/MoreHorizRounded';
 
-const rows = [
-  {
-    id: 'INV-1234',
-    date: 'Feb 3, 2023',
-    status: 'Refunded',
-    customer: {
-      initial: 'O',
-      name: 'Olivia Ryhe',
-      email: 'olivia@email.com',
-    },
-  },
-  {
-    id: 'INV-1233',
-    date: 'Feb 3, 2023',
-    status: 'Paid',
-    customer: {
-      initial: 'S',
-      name: 'Steve Hampton',
-      email: 'steve.hamp@email.com',
-    },
-  },
-  {
-    id: 'INV-1232',
-    date: 'Feb 3, 2023',
-    status: 'Refunded',
-    customer: {
-      initial: 'C',
-      name: 'Ciaran Murray',
-      email: 'ciaran.murray@email.com',
-    },
-  },
-  {
-    id: 'INV-1231',
-    date: 'Feb 3, 2023',
-    status: 'Refunded',
-    customer: {
-      initial: 'M',
-      name: 'Maria Macdonald',
-      email: 'maria.mc@email.com',
-    },
-  },
-  {
-    id: 'INV-1230',
-    date: 'Feb 3, 2023',
-    status: 'Cancelled',
-    customer: {
-      initial: 'C',
-      name: 'Charles Fulton',
-      email: 'fulton@email.com',
-    },
-  },
-  {
-    id: 'INV-1229',
-    date: 'Feb 3, 2023',
-    status: 'Cancelled',
-    customer: {
-      initial: 'J',
-      name: 'Jay Hooper',
-      email: 'hooper@email.com',
-    },
-  },
-  {
-    id: 'INV-1228',
-    date: 'Feb 3, 2023',
-    status: 'Refunded',
-    customer: {
-      initial: 'K',
-      name: 'Krystal Stevens',
-      email: 'k.stevens@email.com',
-    },
-  },
-  {
-    id: 'INV-1227',
-    date: 'Feb 3, 2023',
-    status: 'Paid',
-    customer: {
-      initial: 'S',
-      name: 'Sachin Flynn',
-      email: 's.flyn@email.com',
-    },
-  },
-  {
-    id: 'INV-1226',
-    date: 'Feb 3, 2023',
-    status: 'Cancelled',
-    customer: {
-      initial: 'B',
-      name: 'Bradley Rosales',
-      email: 'brad123@email.com',
-    },
-  },
-  {
-    id: 'INV-1225',
-    date: 'Feb 3, 2023',
-    status: 'Paid',
-    customer: {
-      initial: 'O',
-      name: 'Olivia Ryhe',
-      email: 'olivia@email.com',
-    },
-  },
-  {
-    id: 'INV-1224',
-    date: 'Feb 3, 2023',
-    status: 'Cancelled',
-    customer: {
-      initial: 'S',
-      name: 'Steve Hampton',
-      email: 'steve.hamp@email.com',
-    },
-  },
-  {
-    id: 'INV-1223',
-    date: 'Feb 3, 2023',
-    status: 'Paid',
-    customer: {
-      initial: 'C',
-      name: 'Ciaran Murray',
-      email: 'ciaran.murray@email.com',
-    },
-  },
-  {
-    id: 'INV-1221',
-    date: 'Feb 3, 2023',
-    status: 'Refunded',
-    customer: {
-      initial: 'M',
-      name: 'Maria Macdonald',
-      email: 'maria.mc@email.com',
-    },
-  },
-  {
-    id: 'INV-1220',
-    date: 'Feb 3, 2023',
-    status: 'Paid',
-    customer: {
-      initial: 'C',
-      name: 'Charles Fulton',
-      email: 'fulton@email.com',
-    },
-  },
-  {
-    id: 'INV-1219',
-    date: 'Feb 3, 2023',
-    status: 'Cancelled',
-    customer: {
-      initial: 'J',
-      name: 'Jay Hooper',
-      email: 'hooper@email.com',
-    },
-  },
-  {
-    id: 'INV-1218',
-    date: 'Feb 3, 2023',
-    status: 'Cancelled',
-    customer: {
-      initial: 'K',
-      name: 'Krystal Stevens',
-      email: 'k.stevens@email.com',
-    },
-  },
-  {
-    id: 'INV-1217',
-    date: 'Feb 3, 2023',
-    status: 'Paid',
-    customer: {
-      initial: 'S',
-      name: 'Sachin Flynn',
-      email: 's.flyn@email.com',
-    },
-  },
-  {
-    id: 'INV-1216',
-    date: 'Feb 3, 2023',
-    status: 'Cancelled',
-    customer: {
-      initial: 'B',
-      name: 'Bradley Rosales',
-      email: 'brad123@email.com',
-    },
-  },
-];
+import { useEffect, useState } from 'react';
+import { supabaseClient } from "../supabase-client"; // Import the supabase client
+import { Session } from "@supabase/supabase-js"; // Import the Session type
 
-function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
-  if (b[orderBy] < a[orderBy]) {
-    return -1;
-  }
-  if (b[orderBy] > a[orderBy]) {
-    return 1;
-  }
-  return 0;
-}
-
-type Order = 'asc' | 'desc';
-
-function getComparator<Key extends keyof any>(
-  order: Order,
-  orderBy: Key,
-): (
-  a: { [key in Key]: number | string },
-  b: { [key in Key]: number | string },
-) => number {
-  return order === 'desc'
-    ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a, b, orderBy);
-}
-
-// Since 2020 all major browsers ensure sort stability with Array.prototype.sort().
-// stableSort() brings sort stability to non-modern browsers (notably IE11). If you
-// only support modern browsers you can replace stableSort(exampleArray, exampleComparator)
-// with exampleArray.slice().sort(exampleComparator)
-function stableSort<T>(array: readonly T[], comparator: (a: T, b: T) => number) {
-  const stabilizedThis = array.map((el, index) => [el, index] as [T, number]);
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) {
-      return order;
-    }
-    return a[1] - b[1];
-  });
-  return stabilizedThis.map((el) => el[0]);
-}
 
 function RowMenu() {
   return (
@@ -278,35 +59,85 @@ function RowMenu() {
   );
 }
 
-export default function ProjectTable({ projects }) {
-  const [order, setOrder] = React.useState<Order>('desc');
-  const [selected, setSelected] = React.useState<readonly string[]>([]);
+export default function ProjectTable() {
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [selected, setSelected] = useState<string[]>([]);
+  //const [selected, setSelected] = React.useState<readonly string[]>([]); // SHould I use this instead?
   const [open, setOpen] = React.useState(false);
+
+
+
+  useEffect(() => {
+    async function getProjects() {
+      const { data, error } = await supabaseClient.from("projects").select("*").order('project_id', { ascending: true });
+      if (error) {
+        console.error("Error fetching projects:", error);
+      } else {
+        // Fetch clients for each project
+        const projectsWithClients = await Promise.all(
+          data.map(async (project) => {
+            const { data: clientData, error: clientError } = await supabaseClient
+              .from("clients")
+              .select("*")
+              .eq("client_id", project.client_id)
+              .single();
+            if (clientError) {
+              console.error("Error getting client:", clientError);
+              return project;
+            }
+            return { ...project, client: clientData };
+          })
+        );
+        setProjects(projectsWithClients as any);
+      }
+    }
+    getProjects();
+  }, []);
+
+
+
+  interface Project {
+    project_id: number;
+    project_name: string;
+    client_id: number; // Assuming client_id is a number, adjust according to your data model
+    status: string; // And so on for other fields you use
+    // Add other fields as necessary
+  }
+
+
+
+  
   const renderFilters = () => (
     <React.Fragment>
       <FormControl size="sm">
+          {/* WILL NEED TO POPULATE THIS WITH DB DATA */}
         <FormLabel>Status</FormLabel>
         <Select
           size="sm"
           placeholder="Filter by status"
           slotProps={{ button: { sx: { whiteSpace: 'nowrap' } } }}
         >
-          <Option value="paid">Paid</Option>
-          <Option value="pending">Pending</Option>
-          <Option value="refunded">Refunded</Option>
+          <Option value="completed">Completed</Option>
+          <Option value="in-progress">In Progress</Option>
+          <Option value="pending-approval">Pending Approval</Option>
           <Option value="cancelled">Cancelled</Option>
+          <Option value="refunded">Refunded</Option>
         </Select>
       </FormControl>
       <FormControl size="sm">
+        {/* WILL NEED TO POPULATE THIS WITH DB DATA */}
         <FormLabel>Category</FormLabel>
         <Select size="sm" placeholder="All">
           <Option value="all">All</Option>
-          <Option value="refund">Refund</Option>
-          <Option value="purchase">Purchase</Option>
-          <Option value="debit">Debit</Option>
+          <Option value="refund">General Home</Option>
+          <Option value="purchase">Tiny Homes</Option>
+          <Option value="debit">Additions</Option>
+          <Option value="debit">Basements</Option>
+          <Option value="debit">Bathrooms</Option>
         </Select>
       </FormControl>
       <FormControl size="sm">
+          {/* WILL NEED TO POPULATE THIS WITH DB DATA - ALSO NEED TO KNOW WHAT TO ADD HERE */}
         <FormLabel>Customer</FormLabel>
         <Select size="sm" placeholder="All">
           <Option value="all">All</Option>
@@ -374,7 +205,7 @@ export default function ProjectTable({ projects }) {
         }}
       >
         <FormControl sx={{ flex: 1 }} size="sm">
-          <FormLabel>Search for Project</FormLabel>
+          <FormLabel>Search for project</FormLabel>
           <Input size="sm" placeholder="Search" startDecorator={<SearchIcon />} />
         </FormControl>
         {renderFilters()}
@@ -384,7 +215,7 @@ export default function ProjectTable({ projects }) {
         variant="outlined"
         sx={{
           display: { xs: 'none', sm: 'initial' },
-          width: '100%',
+          width: '100%', // if you want to make the table full width <----- HERE
           borderRadius: 'sm',
           flexShrink: 1,
           overflow: 'auto',
@@ -410,16 +241,16 @@ export default function ProjectTable({ projects }) {
                 <Checkbox
                   size="sm"
                   indeterminate={
-                    selected.length > 0 && selected.length !== rows.length
+                    selected.length > 0 && selected.length !== projects.length
                   }
-                  checked={selected.length === rows.length}
+                  checked={selected.length === projects.length}
                   onChange={(event) => {
-                    setSelected(
-                      event.target.checked ? rows.map((row) => row.id) : [],
-                    );
+                    // setSelected(
+                    //   event.target.checked ? projects.map((project) => projects.project_id) : [],
+                    // );
                   }}
                   color={
-                    selected.length > 0 || selected.length === rows.length
+                    selected.length > 0 || selected.length === projects.length
                       ? 'primary'
                       : undefined
                   }
@@ -431,51 +262,53 @@ export default function ProjectTable({ projects }) {
                   underline="none"
                   color="primary"
                   component="button"
-                  onClick={() => setOrder(order === 'asc' ? 'desc' : 'asc')}
+                 // onClick={() => setOrder(order === 'asc' ? 'desc' : 'asc')}
                   fontWeight="lg"
                   endDecorator={<ArrowDropDownIcon />}
                   sx={{
                     '& svg': {
                       transition: '0.2s',
-                      transform:
-                        order === 'desc' ? 'rotate(0deg)' : 'rotate(180deg)',
+                     // transform:
+                   //     order === 'desc' ? 'rotate(0deg)' : 'rotate(180deg)',
                     },
                   }}
                 >
-                  Invoice
+                  Project
                 </Link>
               </th>
-              <th style={{ width: 140, padding: '12px 6px' }}>Date</th>
+              <th style={{ width: 140, padding: '12px 6px' }}>Client Name</th>
               <th style={{ width: 140, padding: '12px 6px' }}>Status</th>
-              <th style={{ width: 240, padding: '12px 6px' }}>Customer</th>
+              <th style={{ width: 240, padding: '12px 6px' }}>End Date</th>
               <th style={{ width: 140, padding: '12px 6px' }}> </th>
             </tr>
           </thead>
+
+
           <tbody>
-            {stableSort(rows, getComparator(order, 'id')).map((row) => (
-              <tr key={projects.project_id}>
+            {projects.map((project) => (
+              <tr key={project.project_id}>
                 <td style={{ textAlign: 'center', width: 120 }}>
                   <Checkbox
                     size="sm"
-                    checked={selected.includes(row.id)}
-                    color={selected.includes(row.id) ? 'primary' : undefined}
+                    checked={selected.includes(project.project_id.toString())}
+                    color={selected.includes(project.project_id.toString()) ? 'primary' : undefined}
                     onChange={(event) => {
-                      setSelected((ids) =>
+                      setSelected((prevSelected) =>
                         event.target.checked
-                          ? ids.concat(row.id)
-                          : ids.filter((itemId) => itemId !== row.id),
+                          ? prevSelected.concat(project.project_id.toString())
+                          : prevSelected.filter((id) => id !== project.project_id.toString()),
                       );
                     }}
                     slotProps={{ checkbox: { sx: { textAlign: 'left' } } }}
                     sx={{ verticalAlign: 'text-bottom' }}
                   />
                 </td>
-                <td>
-                  <Typography level="body-xs">{row.id}</Typography>
+                {/* <td>
+                  <Typography level="body-xs">{project.project_id}</Typography>
                 </td>
                 <td>
-                  <Typography level="body-xs">{row.date}</Typography>
-                </td>
+                  <Typography level="body-xs">{project.client_id ? `${project.client_id.first_name} ${project.client_id.last_name}` : 'N/A' }</Typography>
+                </td> */}
                 <td>
                   <Chip
                     variant="soft"
@@ -485,26 +318,26 @@ export default function ProjectTable({ projects }) {
                         Paid: <CheckRoundedIcon />,
                         Refunded: <AutorenewRoundedIcon />,
                         Cancelled: <BlockIcon />,
-                      }[row.status]
+                      }[project.status]
                     }
                     color={
                       {
                         Paid: 'success',
                         Refunded: 'neutral',
                         Cancelled: 'danger',
-                      }[row.status] as ColorPaletteProp
+                      }[project.status] as ColorPaletteProp
                     }
                   >
-                    {row.status}
+                    {project.status}
                   </Chip>
                 </td>
                 <td>
                   <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                    <Avatar size="sm">{row.customer.initial}</Avatar>
-                    <div>
-                      <Typography level="body-xs">{row.customer.name}</Typography>
+                    {/* <Avatar size="sm">{project.client.first_name}</Avatar> */}
+                    {/* <div>
+                      <Typography level="body-xs">{project.client_id }</Typography>
                       <Typography level="body-xs">{row.customer.email}</Typography>
-                    </div>
+                    </div> */}
                   </Box>
                 </td>
                 <td>
@@ -516,8 +349,12 @@ export default function ProjectTable({ projects }) {
                   </Box>
                 </td>
               </tr>
-            ))}
-          </tbody>
+              ))}
+            </tbody>
+
+
+
+
         </Table>
       </Sheet>
       <Box
