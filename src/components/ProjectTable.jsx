@@ -32,9 +32,11 @@ import AutorenewRoundedIcon from "@mui/icons-material/AutorenewRounded";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 import MoreHorizRoundedIcon from "@mui/icons-material/MoreHorizRounded";
+import CheckBoxIcon from "@mui/icons-material/CheckBox";
 
 import { useEffect, useState } from "react";
 import { supabaseClient } from "../supabase-client"; // Import the supabase client
+import { Skeleton } from "@mui/joy";
 
 function RowMenu() {
   return (
@@ -61,9 +63,11 @@ export default function ProjectTable() {
   const [selected, setSelected] = useState([]);
   const [status, setStatus] = useState([]);
   const [open, setOpen] = React.useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function getProjects() {
+      setLoading(true); // Start loading
       const { data, error } = await supabaseClient
         .from("projects")
         .select("*")
@@ -91,9 +95,14 @@ export default function ProjectTable() {
                 .select("*")
                 .eq("status_id", project.status_id)
                 .single();
-            if (statusError) {
+            if (statusError || !statusData) {
               console.error("Error getting status:", statusError);
-              return { ...project, client: clientData };
+              // Set default status object with placeholder "N/A" if status is not found
+              return {
+                ...project,
+                client: clientData,
+                status: { name: "N/A" },
+              };
             }
 
             return { ...project, client: clientData, status: statusData };
@@ -101,6 +110,7 @@ export default function ProjectTable() {
         );
         setProjects(projectInfo);
       }
+      setLoading(false); // End loading
     }
     getProjects();
   }, []);
@@ -292,112 +302,124 @@ export default function ProjectTable() {
 
           {/*  */}
           <tbody>
-            {projects.map((project) => (
-              <tr key={project.project_id}>
-                <td
-                  style={{
-                    textAlign: "center",
-                    width: 120,
-                  }}
-                >
-                  <Checkbox
-                    size="sm"
-                    checked={selected.includes(project.project_id.toString())}
-                    color={
-                      selected.includes(project.project_id.toString())
-                        ? "primary"
-                        : undefined
-                    }
-                    onChange={(event) => {
-                      setSelected((prevSelected) =>
-                        event.target.checked
-                          ? prevSelected.concat(project.project_id.toString())
-                          : prevSelected.filter(
-                              (id) => id !== project.project_id.toString()
-                            )
-                      );
-                    }}
-                    slotProps={{ checkbox: { sx: { textAlign: "left" } } }}
-                    sx={{ verticalAlign: "text-bottom" }}
-                  />
+            {loading ? (
+              <tr>
+                <td colSpan="6">
+                  {" "}
+                  <Skeleton variant="text" width="100%" height={50} />
+                  <Skeleton variant="text" width="100%" height={50} />
                 </td>
-                <td style={{ textAlign: "center"}}>
-                  {project.client ? (
-                    <Typography level="body-xs">{`${project.project_name}`}</Typography>
-                  ) : (
-                    <Typography level="body-xs">N/A</Typography>
-                  )}
-                </td>
-                <td>
-                  {/* Displaying client's first name and last name if available */}
-                  {project.client ? (
-                    <Typography level="body-xs">{`${project.client.first_name} ${project.client.last_name}`}</Typography>
-                  ) : (
-                    <Typography level="body-xs">N/A</Typography>
-                  )}
-                </td>
-                {/* <td>
-                  <Typography level="body-xs">{project.project_id}</Typography>
-                </td>
-                <td>
-                  <Typography level="body-xs">{project.client_id ? `${project.client_id.first_name} ${project.client_id.last_name}` : 'N/A' }</Typography>
-                </td>*/}
-                <td>
-                  <Chip
-                    variant="soft"
-                    size="sm"
-                    startDecorator={
-                      {
-                        Completed: <CheckRoundedIcon />,
-                        Cancelled: <AutorenewRoundedIcon />,
-                        Active: <BlockIcon />,
-                      }[project.status.name] // Assuming 'status.name' holds the status string.
-                    }
-                    color={
-                      project.status.name === "Completed"
-                        ? "success"
-                        : project.status.name === "Active"
-                        ? "neutral"
-                        : project.status.name === "Cancelled"
-                        ? "danger"
-                        : "default" // Adjust as necessary.
-                    }
-                  >
-                    {project.status.name}
-                  </Chip>
-                </td>
-                <td>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      gap: 2,
-                      alignItems: "center",
+              </tr>
+            ) : (
+              projects.map((project) => (
+                <tr key={project.project_id}>
+                  <td
+                    style={{
+                      textAlign: "center",
+                      width: 120,
                     }}
                   >
-                    {/* <Avatar size="sm">{project.client.first_name}</Avatar> */}
-                    <div>
-                      {/* <Typography level="body-xs">{project.client_id }</Typography> */}
-
-                      <Typography level="body-xs">{status.name}</Typography>
-                    </div>
-
+                    <Checkbox
+                      size="sm"
+                      checked={selected.includes(project.project_id.toString())}
+                      color={
+                        selected.includes(project.project_id.toString())
+                          ? "primary"
+                          : undefined
+                      }
+                      onChange={(event) => {
+                        setSelected((prevSelected) =>
+                          event.target.checked
+                            ? prevSelected.concat(project.project_id.toString())
+                            : prevSelected.filter(
+                                (id) => id !== project.project_id.toString()
+                              )
+                        );
+                      }}
+                      slotProps={{ checkbox: { sx: { textAlign: "left" } } }}
+                      sx={{ verticalAlign: "text-bottom" }}
+                    />
+                  </td>
+                  <td style={{ textAlign: "center" }}>
                     {project.client ? (
                       <Typography level="body-xs">{`${project.project_name}`}</Typography>
                     ) : (
                       <Typography level="body-xs">N/A</Typography>
                     )}
-                  </Box>
+                  </td>
+                  <td>
+                    {/* Displaying client's first name and last name if available */}
+                    {project.client ? (
+                      <Typography level="body-xs">{`${project.client.first_name} ${project.client.last_name}`}</Typography>
+                    ) : (
+                      <Typography level="body-xs">N/A</Typography>
+                    )}
+                  </td>
+                  {/* <td>
+                  <Typography level="body-xs">{project.project_id}</Typography>
                 </td>
                 <td>
-                  <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
-                    <Link level="body-xs" component="button">
-                      Download
-                    </Link>
-                    <RowMenu />
-                  </Box>
-                </td>
-              </tr>
-            ))}
+                  <Typography level="body-xs">{project.client_id ? `${project.client_id.first_name} ${project.client_id.last_name}` : 'N/A' }</Typography>
+                </td>*/}
+                  <td>
+                    <Chip
+                      variant="soft"
+                      size="sm"
+                      startDecorator={
+                        project.status.name === "Completed" ? (
+                          <CheckRoundedIcon />
+                        ) : project.status.name === "Cancelled" ? (
+                          <BlockIcon />
+                        ) : project.status.name === "Active" ? (
+                          <AutorenewRoundedIcon />
+                        ) : undefined // No icon for "N/A" or other statuses
+                      }
+                      color={
+                        project.status.name === "Completed"
+                          ? "success"
+                          : project.status.name === "Active"
+                          ? "neutral"
+                          : project.status.name === "Cancelled"
+                          ? "danger"
+                          : "default" // Use default color for "N/A" or other statuses
+                      }
+                    >
+                      {project.status.name}
+                    </Chip>
+                  </td>
+                  <td>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        gap: 2,
+                        alignItems: "center",
+                      }}
+                    >
+                      {/* <Avatar size="sm">{project.client.first_name}</Avatar> */}
+                      <div>
+                        {/* <Typography level="body-xs">{project.client_id }</Typography> */}
+
+                        <Typography level="body-xs">{status.name}</Typography>
+                      </div>
+
+                      {project.client ? (
+                        <Typography level="body-xs">{`${project.project_name}`}</Typography>
+                      ) : (
+                        <Typography level="body-xs">N/A</Typography>
+                      )}
+                    </Box>
+                  </td>
+                  <td>
+                    <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+                      <Link level="body-xs" component="button">
+                        Download
+                      </Link>
+                      <RowMenu />
+                    </Box>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </Table>
       </Sheet>
