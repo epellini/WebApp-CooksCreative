@@ -356,9 +356,9 @@ export default function ProjectTable() {
                     color={
                       project.status.name === "Completed"
                         ? "success"
-                        : project.status.name === "Cancelled"
-                        ? "neutral"
                         : project.status.name === "Active"
+                        ? "neutral"
+                        : project.status.name === "Cancelled"
                         ? "danger"
                         : "default" // Adjust as necessary.
                     }
