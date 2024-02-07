@@ -12,30 +12,36 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-const ProjectDetails = () => {
-  const [project, setProject] = useState([]);
-
+const ProjectsList = () => {
+  const [projects, setProjects] = useState([]);
+  
   useEffect(() => {
-    getProject();
-  }, []);
+    getProjects();
+  }, []); // Fetch projects when the component mounts
 
-    // This function will delete a project from the database
-    async function deleteProject(project_id) {
-      const { error } = await supabase.from("projects").delete().match({ project_id });
-      if (error) {
-        console.error("Error deleting project:", error);
-      } else {
-        console.log("Project deleted successfully");
-        // setProjects(projects.filter((project) => project.project_id !== project_id));
-        
-      }
+  async function getProjects() {
+    const { data, error } = await supabase.from("projects").select("*"); // Get all projects
+    if (error) {
+      console.error("Error fetching projects:", error); // Log an error if there is one
+    } else {
+      // Get all clients, with the clients return all of their data where their information matches the client id on the project
+      const projectsWithClients = await Promise.all(
+        data.map(async (project) => {
+          const { data: clientData, error: clientError } = await supabase
+            .from("clients") 
+            .select("*") 
+            .eq("client_id", project.client_id)
+            .single();
+          if (clientError) {
+            console.error("Error getting client:", clientError); //if there is an issue getting the client information
+            return project;
+          }
+
+          return { ...project, client: clientData }; // create a client variable that includes all of the client data
+        })
+      );
+      setProjects(projectsWithClients);
     }
-
-  // Get specific project using id from the url
-  async function getProject() {
-    const id = window.location.pathname.split("/")[2];
-    const { data } = await supabase.from("projects").select("*").eq("project_id", id);
-    setProject(data);
   }
 
   return (
@@ -59,4 +65,4 @@ const ProjectDetails = () => {
   );
 }
 
-export default ProjectDetails;
+export default ProjectsList;
