@@ -36,7 +36,17 @@ const ProjectsList = () => {
             return project;
           }
 
-          return { ...project, client: clientData }; // create a client variable that includes all of the client data
+          const { data: statusData, error: statusError } = await supabase
+            .from("status")
+            .select("*")
+            .eq("status_id", project.status_id)
+            .single();
+          if (statusError) {
+            console.error("Error getting status:", statusError);
+            return project;
+          }
+
+          return { ...project, client: clientData, status: statusData }; // create a client variable that includes all of the client data
         })
       );
       setProjects(projectsWithClients);
@@ -67,6 +77,10 @@ const ProjectsList = () => {
                 {/* **********Here we implement the client and project data together******* */}
                 Client Full Name: {project.client.first_name} {project.client.last_name} <br />
                 Client Email: {project.client.email} <br />
+                {/* **********Here we implement the status and project data together******* */}
+                Status: {project.status.name} <br />
+                Status ID: {project.status.status_id} <br />
+                
                 <Link to={`/projects/edit/${project.project_id}`}>Edit</Link> <br />
               </ListItemButton>
             ))}
