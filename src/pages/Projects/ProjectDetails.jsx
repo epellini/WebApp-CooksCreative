@@ -5,8 +5,7 @@ import ListItemButton from '@mui/joy/ListItemButton';
 import Grid from '@mui/joy/Grid';
 import Stack from '@mui/joy/Stack';
 import Button from '@mui/joy/Button';
-import { Link } from "react-router-dom";
-import { Navigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -14,22 +13,23 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 const ProjectDetails = () => {
   const [project, setProject] = useState([]);
+  const navigate = useNavigate();
+
 
   useEffect(() => {
     getProject();
   }, []);
 
-    // This function will delete a project from the database
-    async function deleteProject(project_id) {
-      const { error } = await supabase.from("projects").delete().match({ project_id });
-      if (error) {
-        console.error("Error deleting project:", error);
-      } else {
-        console.log("Project deleted successfully");
-        // setProjects(projects.filter((project) => project.project_id !== project_id));
-        
-      }
+  async function deleteProject(project_id) {
+    const { error } = await supabase.from("projects").delete().match({ project_id });
+    if (error) {
+      console.error("Error deleting project:", error);
+    } else {
+      console.log("Project deleted successfully");
+      // navigate back to the projects page
+      navigate("/projects");
     }
+  }
 
   // Get specific project using id from the url
   async function getProject() {
@@ -50,7 +50,7 @@ const ProjectDetails = () => {
 
             <div>Client Number: {project.client_id}</div>
 
-            <Button onClick={() => deleteProject(project.project_id)} href="/projects">Delete</Button>
+            <Button  onClick={() => deleteProject(project.project_id)} component={Link} to="/projects" >Delete</Button>
 
           </div>
         ))}

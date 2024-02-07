@@ -20,9 +20,10 @@ const ProjectsList = () => {
   const [end_date, setEnd_date] = useState("");
   const [complete, setComplete] = useState(false);
 
+
   useEffect(() => {
     getProjects();
-  }, []);
+  }, []); // Fetch projects when the component mounts
 
   async function getProjects() {
     const { data, error } = await supabase.from("projects").select("*"); // Get all projects
@@ -123,36 +124,8 @@ const ProjectsList = () => {
           </List>
         </Stack>
       </Grid>
-      <form onSubmit={addProject}>
-        <input id="projectname" type="text" value={projectName} placeholder="Enter project name"
-          onChange={(e) => setProjectName(e.target.value)}
-        />
-        <br />
-        <input id="clientid" type="number" value={client_id} placeholder="Enter client id"
-          onChange={(e) => setClient_id(e.target.value)}
-        />
-        <br />
-        <input id="projectdescription" type="text" value={project_description} placeholder="Enter project description"
-          onChange={(e) => setProject_description(e.target.value)}
-        />
-        <br />
-        <input type="date" value={start_date} 
-          onChange={(e) => setStart_date(e.target.value)}
-        />
-        <br />
-        <input type="date" value={end_date} 
-          onChange={(e) => setEnd_date(e.target.value)}
-        />
-        <br />
-        <label>
-          <input type="checkbox" checked={complete} 
-            onChange={(e) => setComplete(e.target.checked)}
-          />
-          Complete
-        </label>
-        <br />
-        <button type="submit">Add Project</button>
-      </form>
+      <Link to={`/projects/new`}>Add New Project</Link> <br />
+
     </div>
   );
 };

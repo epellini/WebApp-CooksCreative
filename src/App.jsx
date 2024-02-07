@@ -7,7 +7,7 @@ import Clients from "./pages/Clients/Clients.jsx";
 import NotFound from "./pages/NotFound.jsx";
 import Projects from "./pages/Projects/Projects.jsx";
 import ProjectDetails from "./pages/Projects/ProjectDetails"; // Import the Project component
-import EditProject from "./pages/Projects/EditProject.jsx"; // Import the Edit component
+import ProjectForm from "./pages/Projects/ProjectForm.jsx"; // Import the project form component
 
 // Auth Pages:
 import Login from './pages/Auth/Login';
@@ -22,38 +22,41 @@ function App() {
   return (
     <div style={{ display: 'flex' }}>
       <main style={{ flexGrow: 1 }}>
-
         <Routes>
           {/* AUTH ROUTES */}
           <Route path="/login" element={<Login/>} /> 
           <Route path="/register" element={<Register/>} /> 
           {/* END OF AUTH ROUTES */}
 
-        {/* ALL THE PROTECTED ROUTES GO BELOW */}
+          {/* PROTECTED ROUTE */}
           <Route path="/" element={<Protected/>} >
-            <Route path='/' element={<Home/>} /> {/* HOME ROUTE */}
-          
+            {/* HOME ROUTE */}
+            <Route index element={<Home/>} />
+
             {/* PROJECTS ROUTES */}
             <Route path="/projects">
-            <Route index element={<Projects/>}/>
-            <Route path=":id" element={<ProjectDetails/>} />
-            <Route path="edit/:id" element={<EditProject/>} />
+              <Route index element={<Projects/>}/>
+              <Route path=":id" element={<ProjectDetails/>} />
+              <Route path="new" element={<ProjectForm/>} />
+              <Route path="edit/:projectid" element={<ProjectForm/>} />
             </Route>
             
             {/* CLIENTS ROUTES */}
             <Route path="/clients"> 
-            <Route index element={<Clients/>}/>
-            <Route path=":id" element={<ClientDetails/>}/>
-            <Route path="/clients/new" element={<ClientForm/>}/>
-            <Route path="/clients/edit/:clientId" element={<ClientForm />} />
+              <Route index element={<Clients/>}/>
+              <Route path=":id" element={<ClientDetails/>}/>
+              <Route path="new" element={<ClientForm/>}/>
+              <Route path="edit/:clientId" element={<ClientForm />} />
             </Route>
-          </Route> {/* END OF PROTECTED ROUTES */}
+          </Route> {/* END OF PROTECTED ROUTE */}
           
-          <Route path="*" element={<NotFound/>}/> {/* NOT FOUND ROUTE */}
+          {/* NOT FOUND ROUTE */}
+          <Route path="*" element={<NotFound/>}/> 
         </Routes>
       </main>
     </div>
   );
 }
+
 
 export default App;

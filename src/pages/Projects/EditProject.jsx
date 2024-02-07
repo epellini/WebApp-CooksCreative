@@ -41,8 +41,21 @@ const EditProject = () => {
   }
 
   return (
-    <h1>Edit Project (WIP)</h1>
-  )
+    <div>
+      <h1>Project Details</h1>
+      <ul>
+        {project.map((project) => (
+          <div key={project.project_id}>
+            <div>Project ID: {project.project_id}</div>
+
+            <div>Project Name: {project.project_name}</div>
+
+            <div>Client Number: {4}</div>
+          </div>
+        ))}
+      </ul>
+    </div>
+  );
 
 }
 
