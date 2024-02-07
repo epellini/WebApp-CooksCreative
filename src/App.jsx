@@ -8,6 +8,7 @@ import NotFound from "./pages/NotFound.jsx";
 import Projects from "./pages/Projects/Projects.jsx";
 import ProjectDetails from "./pages/Projects/ProjectDetails"; // Import the Project component
 import EditProject from "./pages/Projects/EditProject.jsx"; // Import the Edit component
+import AddProject from './pages/Projects/AddProject.jsx';
 
 // Auth Pages:
 import Login from './pages/Auth/Login';
@@ -38,6 +39,7 @@ function App() {
             <Route index element={<Projects/>}/>
             <Route path=":id" element={<ProjectDetails/>} />
             <Route path="edit/:id" element={<EditProject/>} />
+            <Route path="/projects/new" element={<AddProject/>} />
             </Route>
             
             {/* CLIENTS ROUTES */}
