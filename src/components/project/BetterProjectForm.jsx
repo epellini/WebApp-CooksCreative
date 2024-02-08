@@ -26,17 +26,14 @@ import VideocamRoundedIcon from "@mui/icons-material/VideocamRounded";
 import InsertDriveFileRoundedIcon from "@mui/icons-material/InsertDriveFileRounded";
 import EditRoundedIcon from "@mui/icons-material/EditRounded";
 
+import Autocomplete from "@mui/joy/Autocomplete";
+
 import DropZone from "../DropZone";
 import FileUpload from "../FileUpload";
 
 //Thomas added imports
 import { useNavigate, useParams } from "react-router-dom";
 import { supabaseClient } from "../../supabase-client";
-
-const films = [
-  { label: "The Godfather", id: 1 },
-  { label: "Pulp Fiction", id: 2 },
-];
 
 const BetterProjectForm = () => {
   const [project, setProject] = useState({
@@ -46,18 +43,27 @@ const BetterProjectForm = () => {
     start_date: "",
     end_date: "",
     status_id: "",
-    type: "",
+    category_id: "",
   });
+
   const [status, setStatus] = useState({ name: "" });
+  const [clients, setClients] = useState([]);
   const { projectid } = useParams();
   const navigate = useNavigate();
   const supabase = supabaseClient;
 
-  useEffect(() => {
-    if (projectid) {
-      fetchProject(projectid);
-    }
-  }, [projectid]);
+  useEffect(
+    () => {
+      if (projectid) {
+        fetchProject(projectid);
+      }
+      fetchClients();
+    },
+    [projectid],
+    [clients]
+  );
+
+
 
   const fetchProject = async (projectId) => {
     try {
@@ -81,6 +87,26 @@ const BetterProjectForm = () => {
     }
   };
 
+  const fetchClients = async () => {
+    try {
+      const { data: clientData, error } = await supabase
+        .from("clients")
+        .select("*")
+        .order("first_name", { ascending: true });
+      console.log("Fetched clients:", clientData);
+      console.log("Fetch clients error:", error);
+
+      if (error) {
+        console.error("Error fetching clients:", error);
+      } else {
+        setClients(clientData);
+        console.log("Clients:", clientData);
+      }
+    } catch (error) {
+      console.error("Error fetching clients:", error);
+    }
+  };
+
   const fetchStatus = async (statusId) => {
     try {
       const { data: statusData, error } = await supabase
@@ -98,27 +124,31 @@ const BetterProjectForm = () => {
       console.error("Error fetching status:", error);
     }
   };
-const handleChange = (e, value) => {
-  // Check if e is null or undefined
-  if (!e) {
-    return;
-  }
-  // Check if value is null or undefined before updating the state
-  if (value !== null && value !== undefined) {
-    // Handle select change
-    setProject((prevState) => ({
-      ...prevState,
-      status_id: value,
-    }));
-  } else if (e.target) {
-    // Handle input change
-    const { name, value } = e.target;
-    setProject((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
-  }
-};
+  const handleChange = (e, value, name) => {
+    // Check if e is null or undefined
+    console.log("value", value);
+    console.log("e", e);
+    console.log("name", name);
+
+    if (!e) {
+      return;
+    }
+    // Check if value is null or undefined before updating the state
+    if (value !== null && value !== undefined) {
+      // Handle select change
+      setProject((prevState) => ({
+        ...prevState,
+        [name]: value, // Use the name parameter to dynamically set the state key
+      }));
+    } else if (e.target) {
+      // Handle input change
+      const { name, value } = e.target;
+      setProject((prevState) => ({
+        ...prevState,
+        [name]: value,
+      }));
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -228,16 +258,22 @@ const handleChange = (e, value) => {
 
                   <FormControl sx={{ flexGrow: 1 }}>
                     <FormLabel>Client Name</FormLabel>
-                    {/* <Autocomplete
-                      size="sm"
-                      startDecorator={<Search />}
-                      sx={{ flexGrow: 1 }}
-                      placeholder="Type to search for a client"
-                      type="text"
-                      options={films}
-                      value={"The Godfather"} // Use the value from the parent component
-                      onChange={(event, newValue) => handleChange(newValue)} // Update the value in the parent component
-                    /> */}
+                    <Select
+                      placeholder="Select Client"
+                      id="client_id"
+                      name="client_id"
+                      value={project.client_id}
+                      onChange={(e, value) =>
+                        handleChange(e, value, "client_id")
+                      }
+                      required
+                    >
+                      {clients.map((client) => (
+                        <Option key={client.client_id} value={client.client_id}>
+                          {client.first_name}
+                        </Option>
+                      ))}
+                    </Select>
                   </FormControl>
                 </Stack>
 
@@ -320,9 +356,11 @@ const handleChange = (e, value) => {
                     <Select
                       placeholder="Select Status"
                       id="status_id"
-                      name="status_id"
+                      name="status_id" // Add the name attribute
                       value={project.status_id}
-                      onChange={handleChange}
+                      onChange={(e, value) =>
+                        handleChange(e, value, "status_id")
+                      } // Pass the name along with the value
                       required
                     >
                       <Option value="3">Completed</Option>
@@ -333,6 +371,20 @@ const handleChange = (e, value) => {
 
                   <FormControl sx={{ flexGrow: 1 }}>
                     <FormLabel>Project Type</FormLabel>
+                    <Select
+                      placeholder="Select Category"
+                      id="category_id"
+                      name="category_id" // Add the name attribute
+                      value={project.category_id}
+                      onChange={(e, value) =>
+                        handleChange(e, value, "category_id")
+                      } // Pass the name along with the value
+                      required
+                    >
+                      <Option value="1">Kitchen</Option>
+                      <Option value="2">Bathroom</Option>
+                      <Option value="3">Living Room</Option>
+                    </Select>
                   </FormControl>
                 </Stack>
 

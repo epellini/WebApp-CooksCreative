@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/anchor-is-valid */
 import * as React from "react";
 import Avatar from "@mui/joy/Avatar";
 import Box from "@mui/joy/Box";
@@ -41,6 +40,7 @@ import { Skeleton } from "@mui/joy";
 
 function RowMenu({ projectId }) {
   const navigate = useNavigate();
+  
 
   return (
     <Dropdown>
@@ -60,7 +60,7 @@ function RowMenu({ projectId }) {
           Details
         </MenuItem>
         <Divider />
-        <MenuItem color="danger">Delete</MenuItem>
+
       </Menu>
     </Dropdown>
   );
@@ -83,18 +83,21 @@ export default function ProjectTable() {
       if (error) {
         console.error("Error fetching projects:", error);
       } else {
-        // Fetch clients and status for each project
         const projectInfo = await Promise.all(
           data.map(async (project) => {
-            const { data: clientData, error: clientError } =
-              await supabaseClient
-                .from("clients")
-                .select("*")
-                .eq("client_id", project.client_id)
-                .single();
-            if (clientError) {
-              console.error("Error getting client:", clientError);
-              return project;
+            let clientData = null; // Declare clientData variable here
+            if (project.client_id) {
+              const { data: clientResult, error: clientError } =
+                await supabaseClient
+                  .from("clients")
+                  .select("*")
+                  .eq("client_id", project.client_id)
+                  .single();
+              if (clientError) {
+                console.error("Error getting client:", clientError);
+                return project;
+              }
+              clientData = clientResult; // Assign clientData only if clientResult is not null
             }
 
             const { data: statusData, error: statusError } =
@@ -108,12 +111,29 @@ export default function ProjectTable() {
               // Set default status object with placeholder "N/A" if status is not found
               return {
                 ...project,
-                client: clientData,
+                client: clientData, // Assign clientData to the project object
                 status: { name: "N/A" },
               };
             }
 
-            return { ...project, client: clientData, status: statusData };
+            const { data: categoryData, error: categoryError } =
+              await supabaseClient
+                .from("category")
+                .select("*")
+                .eq("category_id", project.category_id)
+                .single();
+            if (categoryError || !categoryData) {
+              console.error("Error getting category:", categoryError);
+              // Set default category object with placeholder "N/A" if category is not found
+              return {
+                ...project,
+                client: clientData, // Assign clientData to the project object
+                status: statusData,
+                category: { name: "N/A" },
+              };
+            }
+
+            return { ...project, client: clientData, status: statusData, category: categoryData }; // Assign clientData to the project object
           })
         );
         setProjects(projectInfo);
@@ -122,6 +142,8 @@ export default function ProjectTable() {
     }
     getProjects();
   }, []);
+
+  
 
   // FILTERS
   const renderFilters = () => (
@@ -259,7 +281,7 @@ export default function ProjectTable() {
         >
           {/* ADD CHANGES HERE MY BOY  */}
           <thead>
-            <tr >
+            <tr>
               <th
                 style={{ width: 48, textAlign: "center", padding: "12px 6px" }}
               >
@@ -301,10 +323,17 @@ export default function ProjectTable() {
                   Project
                 </Link>
               </th>
-              <th style={{ width: 140, padding: "12px 6px" }}>Client Name</th>
-              <th style={{ width: 140, padding: "12px 6px" }}>Status</th>
-              <th style={{ width: 240, padding: "12px 6px" }}>End Date</th>
-              <th style={{ width: 140, padding: "12px 6px" }}> </th>
+              <th style={{ width: 100, padding: "12px 6px" }}>Client Name</th>
+              <th
+                style={{ width: 140, padding: "12px 6px", textAlign: "center" }}>Status</th>
+              <th
+                style={{ width: 100, padding: "12px 6px", textAlign: "left" }}>Start Date</th>
+              <th
+                style={{ width: 140, padding: "12px 6px", textAlign: "left" }}>End Date</th>
+              <th
+                style={{ width: 140, padding: "12px 6px", textAlign: "left" }}>Category</th>
+                
+              <th style={{ width: 140, padding: "12px 6px", textAlign: "left" }}></th>
             </tr>
           </thead>
 
@@ -320,7 +349,7 @@ export default function ProjectTable() {
               </tr>
             ) : (
               projects.map((project) => (
-                <tr key={project.project_id} >
+                <tr key={project.project_id}>
                   <td
                     style={{
                       textAlign: "center",
@@ -348,14 +377,14 @@ export default function ProjectTable() {
                       sx={{ verticalAlign: "text-bottom" }}
                     />
                   </td>
-                  <td style={{ textAlign: "center" }}>
-                    {project.client ? (
+                  <td style={{ textAlign: "left" }}>
+                    {project ? (
                       <Typography level="body-xs">{`${project.project_name}`}</Typography>
                     ) : (
                       <Typography level="body-xs">N/A</Typography>
                     )}
                   </td>
-                  <td>
+                  <td style={{ textAlign: "left" }}>
                     {/* Displaying client's first name and last name if available */}
                     {project.client ? (
                       <Typography level="body-xs">{`${project.client.first_name} ${project.client.last_name}`}</Typography>
@@ -369,7 +398,7 @@ export default function ProjectTable() {
                 <td>
                   <Typography level="body-xs">{project.client_id ? `${project.client_id.first_name} ${project.client_id.last_name}` : 'N/A' }</Typography>
                 </td>*/}
-                  <td>
+                  <td style={{ textAlign: "center" }}>
                     <Chip
                       variant="soft"
                       size="sm"
@@ -383,7 +412,7 @@ export default function ProjectTable() {
                         ) : undefined // No icon for "N/A" or other statuses
                       }
                       color={
-                        project.status.name =="Completed"
+                        project.status.name == "Completed"
                           ? "success"
                           : project.status.name == "Active"
                           ? "neutral"
@@ -395,33 +424,39 @@ export default function ProjectTable() {
                       {project.status.name}
                     </Chip>
                   </td>
-                  <td>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        gap: 2,
-                        alignItems: "center",
-                      }}
-                    >
+
+                  <td style={{textAlign: "left"}}>
                       {/* <Avatar size="sm">{project.client.first_name}</Avatar> */}
-                      <div>
-                        {/* <Typography level="body-xs">{project.client_id }</Typography> */}
+                      {/* <div> */}
+                      {/* <Typography level="body-xs">{project.client_id }</Typography> */}
 
-                        <Typography level="body-xs">{status.name}</Typography>
-                      </div>
-
-                      {project.client ? (
-                        <Typography level="body-xs">{`${project.end_date}`}</Typography>
+                      {/* <Typography level="body-xs">{status.name}</Typography> */}
+                      {/* </div> */}
+                      {project ? (
+                        <Typography level="body-xs">{`${project.start_date}`}</Typography>
                       ) : (
                         <Typography level="body-xs">N/A</Typography>
                       )}
-                    </Box>
+                  </td>
+                  <td style={{textAlign: "left"}}>
+                    {project ? (
+                      <Typography level="body-xs">{`${project.end_date}`}</Typography>
+                    ) : (
+                      <Typography level="body-xs">N/A</Typography>
+                    )}
+                  </td>
+                  <td style={{textAlign: "left"}}>
+                    {project ? (
+                      <Typography level="body-xs">{`${project.category.name}`}</Typography>
+                    ) : (
+                      <Typography level="body-xs">N/A</Typography>
+                    )}
                   </td>
                   <td>
                     <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
-                      <Link level="body-xs" component="button">
+                      {/* <Link level="body-xs" component="button" >
                         Download
-                      </Link>
+                      </Link> */}
                       <RowMenu projectId={project.project_id} />
                     </Box>
                   </td>
