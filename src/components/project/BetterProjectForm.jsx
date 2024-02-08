@@ -26,12 +26,12 @@ import VideocamRoundedIcon from "@mui/icons-material/VideocamRounded";
 import InsertDriveFileRoundedIcon from "@mui/icons-material/InsertDriveFileRounded";
 import EditRoundedIcon from "@mui/icons-material/EditRounded";
 
-import DropZone from "./DropZone";
-import FileUpload from "./FileUpload";
+import DropZone from "../DropZone";
+import FileUpload from "../FileUpload";
 
 //Thomas added imports
 import { useNavigate, useParams } from "react-router-dom";
-import { supabaseClient } from "../supabase-client";
+import { supabaseClient } from "../../supabase-client";
 
 const films = [
   { label: "The Godfather", id: 1 },

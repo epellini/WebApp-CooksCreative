@@ -8,7 +8,7 @@ import NotFound from "./pages/NotFound.jsx";
 import Projects from "./pages/Projects/Projects.jsx";
 import ProjectDetails from "./pages/Projects/ProjectDetails"; // Import the Project component
 // import ProjectForm from "./pages/Projects/ProjectForm.jsx"; // Import the project form component
-import BetterProjectForm from './components/BetterProjectForm.jsx';
+import BetterProjectForm from './components/project/BetterProjectForm.jsx';
 
 // Auth Pages:
 import Login from './pages/Auth/Login';

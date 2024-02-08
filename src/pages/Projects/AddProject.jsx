@@ -1,5 +1,5 @@
 import React from 'react'
-import ProjectForm from '../../components/BetterProjectForm'
+import ProjectForm from '../../components/project/ProjectForm'
 
 const AddProject = () => {
   return (

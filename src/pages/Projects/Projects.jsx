@@ -12,16 +12,12 @@ import Breadcrumbs from "@mui/joy/Breadcrumbs";
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 import DownloadRoundedIcon from "@mui/icons-material/DownloadRounded";
-import ProjectTable from "../../components/ProjectTable";
-import ProjectList from "../../components/ProjectList";
+import ProjectTable from "../../components/project/ProjectTable";
+import ProjectList from "../../components/project/ProjectList";
 import { CssVarsProvider } from "@mui/joy/styles";
 import CssBaseline from "@mui/joy/CssBaseline";
 import { useNavigate } from "react-router-dom";
-
-
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+import { supabaseClient } from "../../supabase-client"; // Import the supabase client
 
 const ProjectsList = () => {
   const [projects, setProjects] = useState([]);
@@ -38,7 +34,7 @@ const ProjectsList = () => {
   }, []); // Fetch projects when the component mounts
 
   async function getProjects() {
-    const { data, error } = await supabase.from("projects").select("*"); // Get all projects
+    const { data, error } = await supabaseClient.from("projects").select("*"); // Get all projects
     
     if (error) {
       console.error("Error fetching projects:", error); // Log an error if there is one
@@ -46,7 +42,7 @@ const ProjectsList = () => {
       // Get all clients, with the clients return all of their data where their information matches the client id on the project
       const projectsWithClients = await Promise.all(
         data.map(async (project) => {
-          const { data: clientData, error: clientError } = await supabase
+          const { data: clientData, error: clientError } = await supabaseClient
             .from("clients")
             .select("*")
             .eq("client_id", project.client_id)
@@ -56,7 +52,7 @@ const ProjectsList = () => {
             return project;
           }
 
-          const { data: statusData, error: statusError } = await supabase
+          const { data: statusData, error: statusError } = await supabaseClient
             .from("status")
             .select("*")
             .eq("status_id", project.status_id)

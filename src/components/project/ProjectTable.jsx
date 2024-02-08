@@ -36,7 +36,7 @@ import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import { useNavigate } from "react-router-dom";
 
 import { useEffect, useState } from "react";
-import { supabaseClient } from "../supabase-client"; // Import the supabase client
+import { supabaseClient } from "../../supabase-client"; // Import the supabase client
 import { Skeleton } from "@mui/joy";
 
 function RowMenu({ projectId }) {
