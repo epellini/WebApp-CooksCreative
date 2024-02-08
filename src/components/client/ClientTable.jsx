@@ -34,6 +34,8 @@ import MoreHorizRoundedIcon from "@mui/icons-material/MoreHorizRounded";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import Grid from "@mui/joy/Grid";
 import Stack from "@mui/joy/Stack";
+import EmailIcon from '@mui/icons-material/Email';
+import LocalPhoneIcon from '@mui/icons-material/LocalPhone';
 import { useNavigate } from "react-router-dom";
 
 import { useEffect, useState } from "react";
@@ -75,58 +77,6 @@ export default function ClientTable() {
   const [open, setOpen] = React.useState(false);
   const [loading, setLoading] = useState(true);
 
-  // useEffect(() => {
-  //   async function getClients() {
-  //     setLoading(true); // Start loading
-  //     const { data: clientData, error } = await supabaseClient
-  //       .from("clients")
-  //       .select("*");
-
-  //     if (error) {
-  //       console.error("Error fetching clients:", error);
-  //       setLoading(false);
-  //       return;
-  //     }
-
-  //     // Fetch project for each client
-  //     const clientsWithProjects = await Promise.all(
-  //       clientData.map(async (client) => {
-  //         const { data: projectsData, error: projectError } =
-  //           await supabaseClient
-  //             .from("projects")
-  //             .select("*")
-  //             .eq("client_id", client.id); // Assuming 'client_id' is the correct column name in 'projects' table
-  //         if (projectError) {
-  //           console.error("Error getting projects for client:", projectError);
-  //           return client; // Return client without project data if error
-  //         }
-
-  //         return { ...client, projects: projectsData }; // Attach projects data to the client
-  //       })
-  //     );
-
-  //     setClients(clientsWithProjects); // Update state with clients and their projects
-  //     setLoading(false); // End loading
-  //   }
-  //   getClients();
-  // }, []);
-
-  // useEffect(() => {
-  //   async function getClients() {
-  //     setLoading(true);
-  //     const { data: clientData, error } = await supabaseClient
-  //       .from("clients")
-  //       .select(`*, projects(*)`);
-
-  //     if (error) {
-  //       console.error("Error fetching clients:", error);
-  //     } else {
-  //       setClients(clientData);
-  //     }
-  //     setLoading(false);
-  //   }
-  //   getClients();
-  // }, []);
 
   useEffect(() => {
     async function getClients() {
@@ -332,13 +282,14 @@ export default function ClientTable() {
                     },
                   }}
                 >
-                  Client
+                  Name
                 </Link>
               </th>
-              <th style={{ width: 140, padding: "12px 6px" }}>Client Name</th>
+              <th style={{ width: 280, padding: "12px 6px" }}>Contact</th> {/* the width used to be 140*/}
               <th style={{ width: 140, padding: "12px 6px" }}>Address</th>
-              <th style={{ width: 240, padding: "12px 6px" }}>Projects</th>
-              <th style={{ width: 140, padding: "12px 6px" }}> </th>
+              <th style={{ width: 240, padding: "12px 6px" }}>Tags</th>
+              <th style={{ width: 140, padding: "12px 6px" }}>Created at</th>
+              <th style={{ width: 140, padding: "12px 6px", textAlign: "left" }}></th>
             </tr>
           </thead>
 
@@ -382,29 +333,47 @@ export default function ClientTable() {
                       sx={{ verticalAlign: "text-bottom" }}
                     />
                   </td>
+                  {/* Displaying client's first and last names information if available */}
                   <td style={{ textAlign: "center" }}>
                     <Typography level="body-xs">{`${client.first_name} ${client.last_name}`}</Typography>
                   </td>
-                  
+                  {/* Displaying client's contact information if available */}
                   <td>
-                    {/* Displaying client's first name and last name if available */}
-                    {/* {project.client ? (
-                      <Typography level="body-xs">{`${project.client.first_name} ${project.client.last_name}`}</Typography>
+                    {/* This is working version with out icons */}
+                    {/* {client ? (
+                      <Typography level="body-xs">
+                        {`${client.phone_number} ${client.email}`}
+                        </Typography>
                     ) : (
                       <Typography level="body-xs">N/A</Typography>
                     )} */}
+                    <Box display="flex" flexDirection="column" alignItems="flex-start" gap={0.5}>
+                      <Box display="flex" alignItems="center" gap={1}>
+                        <Typography variant="body-xs" component="span">
+                          <LocalPhoneIcon fontSize="small" sx={{mr: 1}}/>
+                          {client.phone_number}
+                        </Typography>
+                      </Box>
+                      <Box display="flex" alignItems="center" gap={1}>
+                        <Typography variant="body-xs" component="span">
+                          <EmailIcon fontSize="small"  sx={{mr: 1}}/>
+                          {client.email}
+                        </Typography>
+                      </Box>
+                    </Box>
                   </td>
                   <td style={{ textAlign: "center" }}>
                       <Typography level="body-xs">{`${client.address}`}</Typography>
                   </td>
+
                   {/* <td>
                   <Typography level="body-xs">{project.project_id}</Typography>
                 </td>
                 <td>
                   <Typography level="body-xs">{project.client_id ? `${project.client_id.first_name} ${project.client_id.last_name}` : 'N/A' }</Typography>
                 </td>*/}
-                  <td>
-                    {/* <Chip
+                  {/* <td>
+                    <Chip
                       variant="soft"
                       size="sm"
                       startDecorator={
@@ -427,8 +396,8 @@ export default function ClientTable() {
                       }
                     >
                       {project.status.name}
-                    </Chip> */}
-                  </td>
+                    </Chip>
+                  </td> */}
                   <td>
                     <Box
                       sx={{
@@ -454,10 +423,13 @@ export default function ClientTable() {
                   <td>
                     <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
                       <Link level="body-xs" component="button">
-                        Download
+                        Email
                       </Link>
                       <RowMenu projectId={client.client_id} />
                     </Box>
+                  </td>
+                  <td>
+                    
                   </td>
                 </tr>
               ))
