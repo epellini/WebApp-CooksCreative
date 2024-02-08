@@ -209,11 +209,12 @@ const BetterProjectForm = () => {
                 Projects
               </Link>
               <Typography color="primary" fontWeight={500} fontSize={12}>
-                Add Project
+                {projectid ? "Update Project" : "Add Project"}
               </Typography>
+
             </Breadcrumbs>
             <Typography level="h2" component="h1" sx={{ mt: 1, mb: 2 }}>
-              Add New Project
+                {projectid ? "Update Project" : "Add Project"}
             </Typography>
           </Box>
         </Box>
