@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/anchor-is-valid */
 import * as React from "react";
 import Avatar from "@mui/joy/Avatar";
 import Box from "@mui/joy/Box";
@@ -33,6 +32,8 @@ import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 import MoreHorizRoundedIcon from "@mui/icons-material/MoreHorizRounded";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
+import Grid from "@mui/joy/Grid";
+import Stack from "@mui/joy/Stack";
 import { useNavigate } from "react-router-dom";
 
 import { useEffect, useState } from "react";
@@ -74,38 +75,85 @@ export default function ClientTable() {
   const [open, setOpen] = React.useState(false);
   const [loading, setLoading] = useState(true);
 
+  // useEffect(() => {
+  //   async function getClients() {
+  //     setLoading(true); // Start loading
+  //     const { data: clientData, error } = await supabaseClient
+  //       .from("clients")
+  //       .select("*");
+
+  //     if (error) {
+  //       console.error("Error fetching clients:", error);
+  //       setLoading(false);
+  //       return;
+  //     }
+
+  //     // Fetch project for each client
+  //     const clientsWithProjects = await Promise.all(
+  //       clientData.map(async (client) => {
+  //         const { data: projectsData, error: projectError } =
+  //           await supabaseClient
+  //             .from("projects")
+  //             .select("*")
+  //             .eq("client_id", client.id); // Assuming 'client_id' is the correct column name in 'projects' table
+  //         if (projectError) {
+  //           console.error("Error getting projects for client:", projectError);
+  //           return client; // Return client without project data if error
+  //         }
+
+  //         return { ...client, projects: projectsData }; // Attach projects data to the client
+  //       })
+  //     );
+
+  //     setClients(clientsWithProjects); // Update state with clients and their projects
+  //     setLoading(false); // End loading
+  //   }
+  //   getClients();
+  // }, []);
+
+  // useEffect(() => {
+  //   async function getClients() {
+  //     setLoading(true);
+  //     const { data: clientData, error } = await supabaseClient
+  //       .from("clients")
+  //       .select(`*, projects(*)`);
+
+  //     if (error) {
+  //       console.error("Error fetching clients:", error);
+  //     } else {
+  //       setClients(clientData);
+  //     }
+  //     setLoading(false);
+  //   }
+  //   getClients();
+  // }, []);
+
   useEffect(() => {
     async function getClients() {
-      setLoading(true); // Start loading
-      const { data: clientData, error } = await supabaseClient
-        .from("clients")
-        .select("*");
-      if (error) {
-        console.error("Error fetching clients:", error);
-        setLoading(false);
-        return;
+      setLoading(true); // Begin loading state
+
+      try {
+        // Replace 'projects(*)' with the actual relationship path if it differs
+        const { data: clientsData, error } = await supabaseClient.from(
+          "clients"
+        ).select(`
+          *,
+          projects(*) 
+        `);
+
+        if (error) {
+          throw error;
+        }
+
+        // Assuming 'clientsData' now contains each client with their related projects
+        setClients(clientsData);
+      } catch (error) {
+        console.error("Error fetching data: ", error.message);
+      } finally {
+        setLoading(false); // End loading state
       }
-
-      // Fetch project for each client
-      const clientsWithProjects = await Promise.all(
-        clientData.map(async (client) => {
-          const { data: projectsData, error: projectError } =
-            await supabaseClient
-              .from("projects")
-              .select("*")
-              .eq("client_id", client.id); // Assuming 'client_id' is the correct column name in 'projects' table
-          if (projectError) {
-            console.error("Error getting projects for client:", projectError);
-            return client; // Return client without project data if error
-          }
-
-          return { ...client, projects: projectsData }; // Attach projects data to the client
-        })
-      );
-
-      setClients(clientsWithProjects); // Update state with clients and their projects
-      setLoading(false); // End loading
     }
+
     getClients();
   }, []);
 
@@ -288,8 +336,8 @@ export default function ClientTable() {
                 </Link>
               </th>
               <th style={{ width: 140, padding: "12px 6px" }}>Client Name</th>
-              <th style={{ width: 140, padding: "12px 6px" }}>Status</th>
-              <th style={{ width: 240, padding: "12px 6px" }}>End Date</th>
+              <th style={{ width: 140, padding: "12px 6px" }}>Address</th>
+              <th style={{ width: 240, padding: "12px 6px" }}>Projects</th>
               <th style={{ width: 140, padding: "12px 6px" }}> </th>
             </tr>
           </thead>
@@ -305,7 +353,7 @@ export default function ClientTable() {
                 </td>
               </tr>
             ) : (
-              projects.map((client) => (
+              clients.map((client) => (
                 <tr key={client.client_id}>
                   <td
                     style={{
@@ -335,12 +383,9 @@ export default function ClientTable() {
                     />
                   </td>
                   <td style={{ textAlign: "center" }}>
-                    {project.client ? (
-                      <Typography level="body-xs">{`${client.first_name}`}</Typography>
-                    ) : (
-                      <Typography level="body-xs">N/A</Typography>
-                    )}
+                    <Typography level="body-xs">{`${client.first_name} ${client.last_name}`}</Typography>
                   </td>
+                  
                   <td>
                     {/* Displaying client's first name and last name if available */}
                     {/* {project.client ? (
@@ -349,6 +394,9 @@ export default function ClientTable() {
                       <Typography level="body-xs">N/A</Typography>
                     )} */}
                   </td>
+                  <td style={{ textAlign: "center" }}>
+                      <Typography level="body-xs">{`${client.address}`}</Typography>
+                  </td>
                   {/* <td>
                   <Typography level="body-xs">{project.project_id}</Typography>
                 </td>
@@ -356,7 +404,7 @@ export default function ClientTable() {
                   <Typography level="body-xs">{project.client_id ? `${project.client_id.first_name} ${project.client_id.last_name}` : 'N/A' }</Typography>
                 </td>*/}
                   <td>
-                    <Chip
+                    {/* <Chip
                       variant="soft"
                       size="sm"
                       startDecorator={
@@ -379,7 +427,7 @@ export default function ClientTable() {
                       }
                     >
                       {project.status.name}
-                    </Chip>
+                    </Chip> */}
                   </td>
                   <td>
                     <Box
@@ -396,11 +444,11 @@ export default function ClientTable() {
                         <Typography level="body-xs">{status.name}</Typography>
                       </div>
 
-                      {project.client ? (
+                      {/* {project.client ? (
                         <Typography level="body-xs">{`${project.end_date}`}</Typography>
                       ) : (
                         <Typography level="body-xs">N/A</Typography>
-                      )}
+                      )} */}
                     </Box>
                   </td>
                   <td>
@@ -408,7 +456,7 @@ export default function ClientTable() {
                       <Link level="body-xs" component="button">
                         Download
                       </Link>
-                      <RowMenu projectId={project.project_id} />
+                      <RowMenu projectId={client.client_id} />
                     </Box>
                   </td>
                 </tr>
