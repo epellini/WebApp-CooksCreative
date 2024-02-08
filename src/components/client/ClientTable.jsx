@@ -285,11 +285,12 @@ export default function ClientTable() {
                   Name
                 </Link>
               </th>
-              <th style={{ width: 280, padding: "12px 6px" }}>Contact</th> {/* the width used to be 140*/}
-              <th style={{ width: 140, padding: "12px 6px" }}>Address</th>
-              <th style={{ width: 240, padding: "12px 6px" }}>Tags</th>
-              <th style={{ width: 140, padding: "12px 6px" }}>Created at</th>
-              <th style={{ width: 140, padding: "12px 6px", textAlign: "left" }}></th>
+              <th style={{ width: 140, padding: "12px 6px", textAlign: "left" }}>Contact</th> {/* the width used to be 140*/}
+              <th style={{ width: 140, padding: "12px 6px", textAlign: "left"}}>Address</th>
+              <th style={{ width: 140, padding: "12px 6px", textAlign: "left" }}>Tags</th>
+              <th style={{ width: 40, padding: "12px 6px", textAlign: "left" }}>Created at</th>
+              <th style={{ width: 40, padding: "12px 6px", textAlign: "left" }}></th>
+              
             </tr>
           </thead>
 
@@ -334,7 +335,7 @@ export default function ClientTable() {
                     />
                   </td>
                   {/* Displaying client's first and last names information if available */}
-                  <td style={{ textAlign: "center" }}>
+                  <td style={{ textAlign: "left" }}>
                     <Typography level="body-xs">{`${client.first_name} ${client.last_name}`}</Typography>
                   </td>
                   {/* Displaying client's contact information if available */}
@@ -348,13 +349,13 @@ export default function ClientTable() {
                       <Typography level="body-xs">N/A</Typography>
                     )} */}
                     <Box display="flex" flexDirection="column" alignItems="flex-start" gap={0.5}>
-                      <Box display="flex" alignItems="center" gap={1}>
+                      <Box display="flex" alignItems="left" gap={1}>
                         <Typography variant="body-xs" component="span">
                           <LocalPhoneIcon fontSize="small" sx={{mr: 1}}/>
                           {client.phone_number}
                         </Typography>
                       </Box>
-                      <Box display="flex" alignItems="center" gap={1}>
+                      <Box display="flex" alignItems="left" gap={1}>
                         <Typography variant="body-xs" component="span">
                           <EmailIcon fontSize="small"  sx={{mr: 1}}/>
                           {client.email}
@@ -362,7 +363,7 @@ export default function ClientTable() {
                       </Box>
                     </Box>
                   </td>
-                  <td style={{ textAlign: "center" }}>
+                  <td style={{ textAlign: "left" }}>
                       <Typography level="body-xs">{`${client.address}`}</Typography>
                   </td>
 
@@ -421,7 +422,7 @@ export default function ClientTable() {
                     </Box>
                   </td>
                   <td>
-                    <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+                    <Box sx={{ display: "flex", gap: 2, alignItems: "left" }}>
                       <Link level="body-xs" component="button">
                         Email
                       </Link>
