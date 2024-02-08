@@ -33,6 +33,7 @@ import { Link } from 'react-router-dom';
 import ColorSchemeToggle from './ColorSchemeToggle';
 import { closeSidebar } from '../utils';
 import { useNavigate } from 'react-router-dom';
+import { supabaseClient } from '../supabase-client';
 
 function Toggler({
 
@@ -72,12 +73,18 @@ export default function Sidebar() {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
-    await signOut(auth);
+    // await signOut(auth);
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     console.log('Logged out successfully');
     navigate('/login');
   }
+
+
+  const Logout = async () => {
+    const { error } = await supabaseClient.auth.signOut();
+    if (error) throw error;
+  };
 
   return (
     <Sheet
@@ -199,7 +206,7 @@ export default function Sidebar() {
         <Typography level="title-sm">Dustin C.</Typography>
         <Typography level="body-xs">dustin@test.com</Typography>
       </Box>
-      <IconButton onClick={handleLogout} size="sm" variant="plain" color="neutral">
+      <IconButton onClick={Logout} size="sm" variant="plain" color="neutral">
         <LogoutRoundedIcon />
       </IconButton>
     </Box>

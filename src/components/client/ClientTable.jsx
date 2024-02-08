@@ -62,8 +62,6 @@ function RowMenu({ clientId }) {
         <MenuItem onClick={() => navigate(`/clients/${clientId}`)}>
           Details
         </MenuItem>
-        <Divider />
-        <MenuItem color="danger">Delete</MenuItem>
       </Menu>
     </Dropdown>
   );

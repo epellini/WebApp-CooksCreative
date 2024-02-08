@@ -118,7 +118,7 @@ const ClientsList = () => {
             }}
           >
             <Typography level="h2" component="h1">
-              Cleints
+              Clients
             </Typography>
             <Button
               onClick={() => navigate("/clients/new")}

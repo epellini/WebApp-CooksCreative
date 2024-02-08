@@ -30,7 +30,7 @@ function Login() {
         password,
       });
       if (error) throw error;
-      navigate("/clients");
+      navigate("/");
     } catch (err) {
       throw err;
     } finally {
