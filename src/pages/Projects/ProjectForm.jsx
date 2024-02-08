@@ -72,10 +72,13 @@ const ProjectForm = () => {
   };
 
   const handleChange = (e, value) => {
-    setProject((prevState) => ({
-      ...prevState,
-      status_id: value,
-    }));
+    // Check if value is null or undefined before updating the state
+    if (value !== null && value !== undefined) {
+      setProject((prevState) => ({
+        ...prevState,
+        status_id: value,
+      }));
+    }
   };
 
   const handleSubmit = async (e) => {

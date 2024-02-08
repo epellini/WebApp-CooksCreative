@@ -411,7 +411,7 @@ export default function ProjectTable() {
                       </div>
 
                       {project.client ? (
-                        <Typography level="body-xs">{`${project.project_name}`}</Typography>
+                        <Typography level="body-xs">{`${project.end_date}`}</Typography>
                       ) : (
                         <Typography level="body-xs">N/A</Typography>
                       )}

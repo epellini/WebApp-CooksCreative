@@ -7,7 +7,8 @@ import Clients from "./pages/Clients/Clients.jsx";
 import NotFound from "./pages/NotFound.jsx";
 import Projects from "./pages/Projects/Projects.jsx";
 import ProjectDetails from "./pages/Projects/ProjectDetails"; // Import the Project component
-import ProjectForm from "./pages/Projects/ProjectForm.jsx"; // Import the project form component
+// import ProjectForm from "./pages/Projects/ProjectForm.jsx"; // Import the project form component
+import BetterProjectForm from './components/BetterProjectForm.jsx';
 
 // Auth Pages:
 import Login from './pages/Auth/Login';
@@ -37,8 +38,8 @@ function App() {
             <Route path="/projects">
               <Route index element={<Projects/>}/>
               <Route path=":id" element={<ProjectDetails/>} />
-              <Route path="new" element={<ProjectForm/>} />
-              <Route path="edit/:projectid" element={<ProjectForm/>} />
+              <Route path="new" element={<BetterProjectForm/>} />
+              <Route path="edit/:projectid" element={<BetterProjectForm/>} />
             </Route>
             
             {/* CLIENTS ROUTES */}
