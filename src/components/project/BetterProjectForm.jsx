@@ -45,85 +45,68 @@ const BetterProjectForm = () => {
     status_id: "",
     category_id: "",
   });
-
-  const [status, setStatus] = useState({ name: "" });
   const [clients, setClients] = useState([]);
+  const [status, setStatus] = useState([{}]);
+  const [category, setCategory] = useState([{}]);
+  const [loading, setLoading] = useState(true);
   const { projectid } = useParams();
   const navigate = useNavigate();
   const supabase = supabaseClient;
 
-  useEffect(
-    () => {
-      if (projectid) {
-        fetchProject(projectid);
-      }
-      fetchClients();
-    },
-    [projectid],
-    [clients]
-  );
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        setLoading(true);
+        const { data: projectsData, error: projectsError } = await supabase
+          .from("projects")
+          .select("*")
+          .eq("project_id", projectid || "")
+          .single();
 
+        const { data: clientsData, error: clientsError } = await supabase
+          .from("clients")
+          .select("*")
+          .order("first_name", { ascending: true });
 
+        const { data: statusData, error: statusesError } = await supabase
+          .from("status")
+          .select("*")
+          .order("status_id", { ascending: true });
+        const { data: categoryData, error: categoryError } = await supabase
+          .from("category")
+          .select("*")
+          .order("category_id", { ascending: true });
 
-  const fetchProject = async (projectId) => {
-    try {
-      const { data: projectData, error } = await supabase
-        .from("projects")
-        .select("*")
-        .eq("project_id", projectId)
-        .single();
-
-      if (error) {
-        console.error("Error fetching project:", error);
-      } else {
-        setProject(projectData);
-        if (projectData.status_id) {
-          console.log("Project Data Status ID:", projectData.status_id);
-          fetchStatus(projectData.status_id);
+        if (projectsError) {
+          console.error("Error fetching project:", projectsError);
+        } else {
+          setProject(projectsData || {});
         }
+
+        if (clientsError) {
+          console.error("Error fetching clients:", clientsError);
+        } else {
+          setClients(clientsData || []);
+        }
+        if (statusesError) {
+          console.error("Error fetching statuses:", statusesError);
+        } else {
+          setStatus(statusData || []);
+        }
+        if (categoryError) {
+          console.error("Error fetching categories:", categoryError);
+        } else {
+          setCategory(categoryData || []);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error("Error fetching project:", error);
     }
-  };
 
-  const fetchClients = async () => {
-    try {
-      const { data: clientData, error } = await supabase
-        .from("clients")
-        .select("*")
-        .order("first_name", { ascending: true });
-      console.log("Fetched clients:", clientData);
-      console.log("Fetch clients error:", error);
-
-      if (error) {
-        console.error("Error fetching clients:", error);
-      } else {
-        setClients(clientData);
-        console.log("Clients:", clientData);
-      }
-    } catch (error) {
-      console.error("Error fetching clients:", error);
-    }
-  };
-
-  const fetchStatus = async (statusId) => {
-    try {
-      const { data: statusData, error } = await supabase
-        .from("status")
-        .select("*")
-        .eq("status_id", statusId)
-        .single();
-
-      if (error) {
-        console.error("Error fetching status:", error);
-      } else {
-        setStatus(statusData);
-      }
-    } catch (error) {
-      console.error("Error fetching status:", error);
-    }
-  };
+    fetchData();
+  }, [projectid]);
   const handleChange = (e, value, name) => {
     // Check if e is null or undefined
     console.log("value", value);
@@ -211,10 +194,9 @@ const BetterProjectForm = () => {
               <Typography color="primary" fontWeight={500} fontSize={12}>
                 {projectid ? "Update Project" : "Add Project"}
               </Typography>
-
             </Breadcrumbs>
             <Typography level="h2" component="h1" sx={{ mt: 1, mb: 2 }}>
-                {projectid ? "Update Project" : "Add Project"}
+              {projectid ? "Update Project" : "Add Project"}
             </Typography>
           </Box>
         </Box>
@@ -259,22 +241,33 @@ const BetterProjectForm = () => {
 
                   <FormControl sx={{ flexGrow: 1 }}>
                     <FormLabel>Client Name</FormLabel>
-                    <Select
-                      placeholder="Select Client"
+                    <Autocomplete
                       id="client_id"
                       name="client_id"
-                      value={project.client_id}
-                      onChange={(e, value) =>
-                        handleChange(e, value, "client_id")
+                      options={clients}
+                      getOptionLabel={(option) => option.first_name + " " + option.last_name}
+                      value={
+                        clients.find(
+                          (client) => client.client_id === project.client_id
+                        ) || null
                       }
-                      required
-                    >
-                      {clients.map((client) => (
-                        <Option key={client.client_id} value={client.client_id}>
-                          {client.first_name}
-                        </Option>
-                      ))}
-                    </Select>
+                      onChange={(e, value) =>
+                        handleChange(
+                          e,
+                          value ? value.client_id : null,
+                          "client_id"
+                        )
+                      }
+                      renderInput={(params) => (
+                        <Input
+                          {...params}
+                          size="sm"
+                          id="client_id"
+                          name="client_id"
+                          required
+                        />
+                      )}
+                    />
                   </FormControl>
                 </Stack>
 
@@ -364,14 +357,22 @@ const BetterProjectForm = () => {
                       } // Pass the name along with the value
                       required
                     >
-                      <Option value="3">Completed</Option>
-                      <Option value="1">Cancelled</Option>
-                      <Option value="2">Active</Option>
+                      {status.map((statusOption) => (
+                        <Option
+                          key={statusOption.status_id}
+                          value={statusOption.status_id}
+                          selected={
+                            statusOption.status_id === project.status_id
+                          } // Set selected attribute
+                        >
+                          {statusOption.name}
+                        </Option>
+                      ))}
                     </Select>
                   </FormControl>
 
                   <FormControl sx={{ flexGrow: 1 }}>
-                    <FormLabel>Project Type</FormLabel>
+                    <FormLabel>Project Category</FormLabel>
                     <Select
                       placeholder="Select Category"
                       id="category_id"
@@ -382,6 +383,17 @@ const BetterProjectForm = () => {
                       } // Pass the name along with the value
                       required
                     >
+                      {category.map((categoryOption) => (
+                        <Option
+                          key={categoryOption.category_id}
+                          value={categoryOption.category_id}
+                          selected={
+                            categoryOption.category_id === project.category_id
+                          } // Set selected attribute
+                        >
+                          {categoryOption.name}
+                        </Option>
+                      ))}
                       <Option value="1">Kitchen</Option>
                       <Option value="2">Bathroom</Option>
                       <Option value="3">Living Room</Option>
@@ -488,7 +500,12 @@ const BetterProjectForm = () => {
               sx={{ borderTop: "1px solid", borderColor: "divider" }}
             >
               <CardActions sx={{ alignSelf: "flex-end", pt: 2 }}>
-                <Button size="sm" variant="outlined" color="neutral">
+                <Button
+                  size="sm"
+                  variant="outlined"
+                  color="neutral"
+                  onClick={() => navigate(-1)}
+                >
                   Cancel
                 </Button>
                 <Button size="sm" variant="solid" type="submit">
