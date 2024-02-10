@@ -78,67 +78,19 @@ export default function ProjectTable() {
       setLoading(true); // Start loading
       const { data, error } = await supabaseClient
         .from("projects")
-        .select("*")
-        .order("project_id", { ascending: true });
+        .select(`
+          *,
+          clients(*),
+          status(*),
+          category(*)
+        `);
+  
       if (error) {
         console.error("Error fetching projects:", error);
       } else {
-        const projectInfo = await Promise.all(
-          data.map(async (project) => {
-            let clientData = null; // Declare clientData variable here
-            if (project.client_id) {
-              const { data: clientResult, error: clientError } =
-                await supabaseClient
-                  .from("clients")
-                  .select("*")
-                  .eq("client_id", project.client_id)
-                  .single();
-              if (clientError) {
-                console.error("Error getting client:", clientError);
-                return project;
-              }
-              clientData = clientResult; // Assign clientData only if clientResult is not null
-            }
-
-            const { data: statusData, error: statusError } =
-              await supabaseClient
-                .from("status")
-                .select("*")
-                .eq("status_id", project.status_id)
-                .single();
-            if (statusError || !statusData) {
-              console.error("Error getting status:", statusError);
-              // Set default status object with placeholder "N/A" if status is not found
-              return {
-                ...project,
-                client: clientData, // Assign clientData to the project object
-                status: { name: "N/A" },
-              };
-            }
-
-            const { data: categoryData, error: categoryError } =
-              await supabaseClient
-                .from("category")
-                .select("*")
-                .eq("category_id", project.category_id)
-                .single();
-            if (categoryError || !categoryData) {
-              console.error("Error getting category:", categoryError);
-              // Set default category object with placeholder "N/A" if category is not found
-              return {
-                ...project,
-                client: clientData, // Assign clientData to the project object
-                status: statusData,
-                category: { name: "N/A" },
-              };
-            }
-
-            return { ...project, client: clientData, status: statusData, category: categoryData }; // Assign clientData to the project object
-          })
-        );
-        setProjects(projectInfo);
+        setProjects(data);
+        setLoading(false); // Set loading to false when data is fetched
       }
-      setLoading(false); // End loading
     }
     getProjects();
   }, []);
