@@ -33,6 +33,7 @@ import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 import MoreHorizRoundedIcon from "@mui/icons-material/MoreHorizRounded";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import { useNavigate } from "react-router-dom";
+import Autocomplete from "@mui/joy/Autocomplete";
 
 import { useEffect, useState } from "react";
 import { supabaseClient } from "../../supabase-client"; // Import the supabase client
@@ -70,13 +71,12 @@ export default function ProjectTable() {
   const [status, setStatus] = useState([]);
   const [open, setOpen] = React.useState(false);
   const [loading, setLoading] = useState(true);
+  const [selectedProject, setSelectedProject] = useState(null);
 
   useEffect(() => {
     async function getProjects() {
       setLoading(true); // Start loading
-      const { data, error } = await supabaseClient
-        .from("projects")
-        .select(`
+      const { data, error } = await supabaseClient.from("projects").select(`
           *,
           clients(*),
           status(*),
@@ -87,12 +87,18 @@ export default function ProjectTable() {
         console.error("Error fetching projects:", error);
       } else {
         setProjects(data);
-        console.log()
+        console.log();
         setLoading(false); // Set loading to false when data is fetched
       }
     }
     getProjects();
   }, []);
+    // Filtered projects based on selected project name
+    const filteredProjects = selectedProject
+    ? projects.filter((project) =>
+        project.project_name.toLowerCase().includes(selectedProject.toLowerCase())
+      )
+    : projects;
 
   // FILTERS
   const renderFilters = () => (
@@ -149,12 +155,7 @@ export default function ProjectTable() {
           gap: 1,
         }}
       >
-        <Input
-          size="sm"
-          placeholder="Search"
-          startDecorator={<SearchIcon />}
-          sx={{ flexGrow: 1 }}
-        />
+      <input type="text" style={{ display: "none" }} />
         <IconButton
           size="sm"
           variant="outlined"
@@ -194,10 +195,12 @@ export default function ProjectTable() {
       >
         <FormControl sx={{ flex: 1 }} size="sm">
           <FormLabel>Search for project</FormLabel>
-          <Input
+          <Autocomplete
             size="sm"
-            placeholder="Search"
-            startDecorator={<SearchIcon />}
+            options={projects.map((project) => project.project_name)}
+            value={selectedProject}
+            onChange={(event, newValue) => setSelectedProject(newValue)}
+            renderInput={(params) => <Input {...params} />}
           />
         </FormControl>
         {renderFilters()}
@@ -274,15 +277,29 @@ export default function ProjectTable() {
               </th>
               <th style={{ width: 100, padding: "12px 6px" }}>Client Name</th>
               <th
-                style={{ width: 140, padding: "12px 6px", textAlign: "center" }}>Status</th>
+                style={{ width: 140, padding: "12px 6px", textAlign: "center" }}
+              >
+                Status
+              </th>
               <th
-                style={{ width: 100, padding: "12px 6px", textAlign: "left" }}>Start Date</th>
+                style={{ width: 100, padding: "12px 6px", textAlign: "left" }}
+              >
+                Start Date
+              </th>
               <th
-                style={{ width: 140, padding: "12px 6px", textAlign: "left" }}>End Date</th>
+                style={{ width: 140, padding: "12px 6px", textAlign: "left" }}
+              >
+                End Date
+              </th>
               <th
-                style={{ width: 140, padding: "12px 6px", textAlign: "left" }}>Category</th>
+                style={{ width: 140, padding: "12px 6px", textAlign: "left" }}
+              >
+                Category
+              </th>
 
-              <th style={{ width: 140, padding: "12px 6px", textAlign: "left" }}></th>
+              <th
+                style={{ width: 140, padding: "12px 6px", textAlign: "left" }}
+              ></th>
             </tr>
           </thead>
 
@@ -297,7 +314,7 @@ export default function ProjectTable() {
                 </td>
               </tr>
             ) : (
-              projects.map((project) => {
+              filteredProjects.map((project) => {
                 console.log("Project:", project); // Log the project object to inspect its structure
                 return (
                   <tr key={project.project_id}>
@@ -309,7 +326,9 @@ export default function ProjectTable() {
                     >
                       <Checkbox
                         size="sm"
-                        checked={selected.includes(project.project_id.toString())}
+                        checked={selected.includes(
+                          project.project_id.toString()
+                        )}
                         color={
                           selected.includes(project.project_id.toString())
                             ? "primary"
@@ -318,7 +337,9 @@ export default function ProjectTable() {
                         onChange={(event) => {
                           setSelected((prevSelected) =>
                             event.target.checked
-                              ? prevSelected.concat(project.project_id.toString())
+                              ? prevSelected.concat(
+                                  project.project_id.toString()
+                                )
                               : prevSelected.filter(
                                   (id) => id !== project.project_id.toString()
                                 )
@@ -407,7 +428,9 @@ export default function ProjectTable() {
                       )}
                     </td>
                     <td>
-                      <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+                      <Box
+                        sx={{ display: "flex", gap: 2, alignItems: "center" }}
+                      >
                         {/* <Link level="body-xs" component="button" >
                         Download
                       </Link> */}
