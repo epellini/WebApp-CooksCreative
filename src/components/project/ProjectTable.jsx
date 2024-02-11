@@ -305,15 +305,36 @@ export default function ProjectTable() {
 
           {/*  */}
           <tbody>
-            {loading ? (
-              <tr>
-                <td colSpan="6">
-                  {" "}
-                  <Skeleton variant="text" width="100%" height={50} />
-                  <Skeleton variant="text" width="100%" height={50} />
-                </td>
-              </tr>
-            ) : (
+          {loading ? (
+    Array.from(new Array(5)).map((_, index) => ( // Assuming 5 rows of skeletons
+    <tr key={index}>
+      <td style={{ textAlign: "center", width: 48 }}>
+        <Skeleton variant="rectangular" width={24} height={24} />
+      </td>
+      <td>
+        <Skeleton variant="text" width="100%" /> {/* Project */}
+      </td>
+      <td>
+        <Skeleton variant="text" width="100%" /> {/* Client Name */}
+      </td>
+      <td style={{ textAlign: "center" }}>
+        <Skeleton variant="rectangular" width="80%" height={20} /> {/* Status */}
+      </td>
+      <td>
+        <Skeleton variant="text" width="70%" /> {/* Start Date */}
+      </td>
+      <td>
+        <Skeleton variant="text" width="70%" /> {/* End Date */}
+      </td>
+      <td>
+        <Skeleton variant="text" width="100%" /> {/* Category */}
+      </td>
+      <td style={{ textAlign: "right" }}>
+        <Skeleton variant="circular" width={24} height={24} /> {/* Actions */}
+      </td>
+    </tr>
+  ))
+) : (
               filteredProjects.map((project) => {
                 console.log("Project:", project); // Log the project object to inspect its structure
                 return (
