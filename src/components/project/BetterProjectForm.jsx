@@ -245,7 +245,7 @@ const BetterProjectForm = () => {
                       id="client_id"
                       name="client_id"
                       options={clients}
-                      getOptionLabel={(option) => option.first_name + " " + option.last_name}
+                      getOptionLabel={(option) => option.first_name + " " + option.last_name + " "  + "(ID: " + option.client_id + ")"}
                       value={
                         clients.find(
                           (client) => client.client_id === project.client_id
