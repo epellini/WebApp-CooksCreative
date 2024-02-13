@@ -54,7 +54,7 @@ function RowMenu({ clientId }) {
         <MoreHorizRoundedIcon />
       </MenuButton>
       <Menu size="sm" sx={{ minWidth: 140 }}>
-        <MenuItem onClick={() => navigate(`/client/edit/${clientId}`)}>
+        <MenuItem onClick={() => navigate(`/clients/edit/${clientId}`)}>
           Edit
         </MenuItem>
 
@@ -84,10 +84,7 @@ export default function ClientTable() {
         // Replace 'projects(*)' with the actual relationship path if it differs
         const { data: clientsData, error } = await supabaseClient.from(
           "clients"
-        ).select(`
-          *,
-          projects(*) 
-        `);
+        ).select("*");
 
         if (error) {
           throw error;
@@ -204,7 +201,7 @@ export default function ClientTable() {
         }}
       >
         <FormControl sx={{ flex: 1 }} size="sm">
-          <FormLabel>Search for project</FormLabel>
+          <FormLabel>Search for client</FormLabel>
           <Input
             size="sm"
             placeholder="Search"
@@ -283,7 +280,7 @@ export default function ClientTable() {
                   Name
                 </Link>
               </th>
-              <th style={{ width: 140, padding: "12px 6px", textAlign: "left" }}>Contact</th> {/* the width used to be 140*/}
+              <th style={{ width: 180, padding: "12px 6px", textAlign: "left" }}>Contact</th> {/* the width used to be 140*/}
               <th style={{ width: 140, padding: "12px 6px", textAlign: "left"}}>Address</th>
               <th style={{ width: 140, padding: "12px 6px", textAlign: "left" }}>Tags</th>
               <th style={{ width: 40, padding: "12px 6px", textAlign: "left" }}>Created at</th>
