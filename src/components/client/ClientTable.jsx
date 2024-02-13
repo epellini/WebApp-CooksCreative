@@ -421,7 +421,7 @@ export default function ClientTable() {
                       <Link level="body-xs" component="button">
                         Email
                       </Link>
-                      <RowMenu projectId={client.client_id} />
+                      <RowMenu clientId={client.client_id} />
                     </Box>
                   </td>
                   <td>

@@ -30,6 +30,7 @@ const ClientForm = () => {
     tag: "",
   });
   const { clientId } = useParams(); // Used for edit mode
+  console.log("clientId: ", clientId);
 
   // Hook to programmatically navigate users
   const navigate = useNavigate();
