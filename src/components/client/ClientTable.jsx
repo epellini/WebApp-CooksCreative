@@ -34,8 +34,9 @@ import MoreHorizRoundedIcon from "@mui/icons-material/MoreHorizRounded";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import Grid from "@mui/joy/Grid";
 import Stack from "@mui/joy/Stack";
-import EmailIcon from '@mui/icons-material/Email';
-import LocalPhoneIcon from '@mui/icons-material/LocalPhone';
+import EmailIcon from "@mui/icons-material/Email";
+import LocalPhoneIcon from "@mui/icons-material/LocalPhone";
+import Autocomplete from "@mui/joy/Autocomplete";
 import { useNavigate } from "react-router-dom";
 
 import { useEffect, useState } from "react";
@@ -69,28 +70,29 @@ function RowMenu({ clientId }) {
 
 export default function ClientTable() {
   const [clients, setClients] = useState([]);
-  const [projects, setProjects] = useState([]);
+  //const [projects, setProjects] = useState([]);
   const [selected, setSelected] = useState([]);
   const [status, setStatus] = useState([]);
   const [open, setOpen] = React.useState(false);
   const [loading, setLoading] = useState(true);
 
+  // const [searchQuery, setSearchQuery] = useState("");
+  // const [filteredClients, setFilteredClients] = useState([]);
 
+  const [selectedClient, setSelectedClient] = useState(null);
   useEffect(() => {
     async function getClients() {
       setLoading(true); // Begin loading state
 
       try {
-        // Replace 'projects(*)' with the actual relationship path if it differs
-        const { data: clientsData, error } = await supabaseClient.from(
-          "clients"
-        ).select("*");
+        const { data: clientsData, error } = await supabaseClient
+          .from("clients")
+          .select("*");
 
         if (error) {
           throw error;
         }
 
-        // Assuming 'clientsData' now contains each client with their related projects
         setClients(clientsData);
       } catch (error) {
         console.error("Error fetching data: ", error.message);
@@ -101,6 +103,31 @@ export default function ClientTable() {
 
     getClients();
   }, []);
+
+  // useEffect(() => {
+  //   //Fliter(find) client based on a search query
+  //   if (typeof searchQuery === 'string') {
+  //     const lowercasedQuery = searchQuery.toLowerCase();
+  //     const filteredData = clients.filter(
+  //       client =>
+  //         client.first_name.toLowerCase().includes(lowercasedQuery) ||
+  //         client.last_name.toLowerCase().includes(lowercasedQuery) ||
+  //         client.email.toLowerCase().includes(lowercasedQuery)
+  //     );
+  //     setFilteredClients(filteredData);
+  //   }
+
+  // }, [searchQuery, clients]);
+
+  // const filteredClients = selectedClient
+  //   ? clients.filter((client) =>
+  //       `${client.first_name} ${client.last_name}`.toLowerCase().includes(selectedClient)
+  //     )
+  //   : clients;
+
+  const filteredClients = selectedClient
+    ? clients.filter((client) => client.client_id === selectedClient.client_id)
+    : clients;
 
   // FILTERS
   const renderFilters = () => (
@@ -202,10 +229,20 @@ export default function ClientTable() {
       >
         <FormControl sx={{ flex: 1 }} size="sm">
           <FormLabel>Search for client</FormLabel>
-          <Input
+          <Autocomplete
             size="sm"
             placeholder="Search"
-            startDecorator={<SearchIcon />}
+            options={clients}
+            getOptionLabel={(option) =>
+              `${option.first_name} ${option.last_name}`
+            }
+            // startDecorator={<SearchIcon />}
+            value={selectedClient}
+            onChange={(event, newValue) => {
+              setSelectedClient(newValue);
+              console.log("Selected client:", newValue);
+            }}
+            renderInput={(params) => <Input {...params} />}
           />
         </FormControl>
         {renderFilters()}
@@ -245,16 +282,16 @@ export default function ClientTable() {
                 <Checkbox
                   size="sm"
                   indeterminate={
-                    selected.length > 0 && selected.length !== projects.length
+                    selected.length > 0 && selected.length !== clients.length
                   }
-                  checked={selected.length === projects.length}
+                  checked={selected.length === clients.length}
                   onChange={(event) => {
                     // setSelected(
                     //   event.target.checked ? projects.map((project) => projects.project_id) : [],
                     // );
                   }}
                   color={
-                    selected.length > 0 || selected.length === projects.length
+                    selected.length > 0 || selected.length === clients.length
                       ? "primary"
                       : undefined
                   }
@@ -280,12 +317,28 @@ export default function ClientTable() {
                   Name
                 </Link>
               </th>
-              <th style={{ width: 180, padding: "12px 6px", textAlign: "left" }}>Contact</th> {/* the width used to be 140*/}
-              <th style={{ width: 140, padding: "12px 6px", textAlign: "left"}}>Address</th>
-              <th style={{ width: 140, padding: "12px 6px", textAlign: "left" }}>Tags</th>
-              <th style={{ width: 40, padding: "12px 6px", textAlign: "left" }}>Created at</th>
-              <th style={{ width: 40, padding: "12px 6px", textAlign: "left" }}></th>
-              
+              <th
+                style={{ width: 180, padding: "12px 6px", textAlign: "left" }}
+              >
+                Contact
+              </th>{" "}
+              {/* the width used to be 140*/}
+              <th
+                style={{ width: 140, padding: "12px 6px", textAlign: "left" }}
+              >
+                Address
+              </th>
+              <th
+                style={{ width: 140, padding: "12px 6px", textAlign: "left" }}
+              >
+                Tags
+              </th>
+              <th style={{ width: 40, padding: "12px 6px", textAlign: "left" }}>
+                Created at
+              </th>
+              <th
+                style={{ width: 40, padding: "12px 6px", textAlign: "left" }}
+              ></th>
             </tr>
           </thead>
 
@@ -300,75 +353,82 @@ export default function ClientTable() {
                 </td>
               </tr>
             ) : (
-              clients.map((client) => (
-                <tr key={client.client_id}>
-                  <td
-                    style={{
-                      textAlign: "center",
-                      width: 120,
-                    }}
-                  >
-                    <Checkbox
-                      size="sm"
-                      checked={selected.includes(client.client_id.toString())}
-                      color={
-                        selected.includes(client.client_id.toString())
-                          ? "primary"
-                          : undefined
-                      }
-                      onChange={(event) => {
-                        setSelected((prevSelected) =>
-                          event.target.checked
-                            ? prevSelected.concat(client.client_id.toString())
-                            : prevSelected.filter(
-                                (id) => id !== client.client_id.toString()
-                              )
-                        );
+              filteredClients.map((client) => {
+                console.log("Clients:", client);
+                return (
+                  <tr key={client.client_id}>
+                    <td
+                      style={{
+                        textAlign: "center",
+                        width: 120,
                       }}
-                      slotProps={{ checkbox: { sx: { textAlign: "left" } } }}
-                      sx={{ verticalAlign: "text-bottom" }}
-                    />
-                  </td>
-                  {/* Displaying client's first and last names information if available */}
-                  <td style={{ textAlign: "left" }}>
-                    <Typography level="body-xs">{`${client.first_name} ${client.last_name}`}</Typography>
-                  </td>
-                  {/* Displaying client's contact information if available */}
-                  <td>
-                    {/* This is working version with out icons */}
-                    {/* {client ? (
+                    >
+                      <Checkbox
+                        size="sm"
+                        checked={selected.includes(client.client_id.toString())}
+                        color={
+                          selected.includes(client.client_id.toString())
+                            ? "primary"
+                            : undefined
+                        }
+                        onChange={(event) => {
+                          setSelected((prevSelected) =>
+                            event.target.checked
+                              ? prevSelected.concat(client.client_id.toString())
+                              : prevSelected.filter(
+                                  (id) => id !== client.client_id.toString()
+                                )
+                          );
+                        }}
+                        slotProps={{ checkbox: { sx: { textAlign: "left" } } }}
+                        sx={{ verticalAlign: "text-bottom" }}
+                      />
+                    </td>
+                    {/* Displaying client's first and last names information if available */}
+                    <td style={{ textAlign: "left" }}>
+                      <Typography level="body-xs">{`${client.first_name} ${client.last_name}`}</Typography>
+                    </td>
+                    {/* Displaying client's contact information if available */}
+                    <td>
+                      {/* This is working version with out icons */}
+                      {/* {client ? (
                       <Typography level="body-xs">
                         {`${client.phone_number} ${client.email}`}
                         </Typography>
                     ) : (
                       <Typography level="body-xs">N/A</Typography>
                     )} */}
-                    <Box display="flex" flexDirection="column" alignItems="flex-start" gap={0.5}>
-                      <Box display="flex" alignItems="left" gap={1}>
-                        <Typography variant="body-xs" component="span">
-                          <LocalPhoneIcon fontSize="small" sx={{mr: 1}}/>
-                          {client.phone_number}
-                        </Typography>
+                      <Box
+                        display="flex"
+                        flexDirection="column"
+                        alignItems="flex-start"
+                        gap={0.5}
+                      >
+                        <Box display="flex" alignItems="left" gap={1}>
+                          <Typography variant="body-xs" component="span">
+                            <LocalPhoneIcon fontSize="small" sx={{ mr: 1 }} />
+                            {client.phone_number}
+                          </Typography>
+                        </Box>
+                        <Box display="flex" alignItems="left" gap={1}>
+                          <Typography variant="body-xs" component="span">
+                            <EmailIcon fontSize="small" sx={{ mr: 1 }} />
+                            {client.email}
+                          </Typography>
+                        </Box>
                       </Box>
-                      <Box display="flex" alignItems="left" gap={1}>
-                        <Typography variant="body-xs" component="span">
-                          <EmailIcon fontSize="small"  sx={{mr: 1}}/>
-                          {client.email}
-                        </Typography>
-                      </Box>
-                    </Box>
-                  </td>
-                  <td style={{ textAlign: "left" }}>
+                    </td>
+                    <td style={{ textAlign: "left" }}>
                       <Typography level="body-xs">{`${client.address}`}</Typography>
-                  </td>
+                    </td>
 
-                  {/* <td>
+                    {/* <td>
                   <Typography level="body-xs">{project.project_id}</Typography>
                 </td>
                 <td>
                   <Typography level="body-xs">{project.client_id ? `${project.client_id.first_name} ${project.client_id.last_name}` : 'N/A' }</Typography>
                 </td>*/}
-                  {/* <td>
+                    {/* <td>
                     <Chip
                       variant="soft"
                       size="sm"
@@ -394,41 +454,40 @@ export default function ClientTable() {
                       {project.status.name}
                     </Chip>
                   </td> */}
-                  <td>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        gap: 2,
-                        alignItems: "center",
-                      }}
-                    >
-                      {/* <Avatar size="sm">{project.client.first_name}</Avatar> */}
-                      <div>
-                        {/* <Typography level="body-xs">{project.client_id }</Typography> */}
+                    <td>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          gap: 2,
+                          alignItems: "center",
+                        }}
+                      >
+                        {/* <Avatar size="sm">{project.client.first_name}</Avatar> */}
+                        <div>
+                          {/* <Typography level="body-xs">{project.client_id }</Typography> */}
 
-                        <Typography level="body-xs">{status.name}</Typography>
-                      </div>
+                          <Typography level="body-xs">{status.name}</Typography>
+                        </div>
 
-                      {/* {project.client ? (
+                        {/* {project.client ? (
                         <Typography level="body-xs">{`${project.end_date}`}</Typography>
                       ) : (
                         <Typography level="body-xs">N/A</Typography>
                       )} */}
-                    </Box>
-                  </td>
-                  <td>
-                    <Box sx={{ display: "flex", gap: 2, alignItems: "left" }}>
-                      <Link level="body-xs" component="button">
-                        Email
-                      </Link>
-                      <RowMenu clientId={client.client_id} />
-                    </Box>
-                  </td>
-                  <td>
-                    
-                  </td>
-                </tr>
-              ))
+                      </Box>
+                    </td>
+                    <td>
+                      <Box sx={{ display: "flex", gap: 2, alignItems: "left" }}>
+                        <Link level="body-xs" component="button">
+                          Email
+                        </Link>
+                        <RowMenu clientId={client.client_id} />
+                      </Box>
+                    </td>
+                    <td></td>
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </Table>
