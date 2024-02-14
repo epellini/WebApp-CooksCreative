@@ -4,6 +4,7 @@ import Grid from "@mui/joy/Grid";
 import Stack from "@mui/joy/Stack";
 import Typography from '@mui/joy/Typography';
 import Button from "@mui/joy/Button";
+import { Link } from "react-router-dom";
 import {supabaseClient}  from "../../supabase-client";
 const ClientDetails = () => {
   // Extract the client ID from the URL parameters
@@ -48,6 +49,18 @@ const ClientDetails = () => {
     getClient();
   }, [id]);
 
+  // Delete Client
+  async function deleteClient(client_id) {
+    const { error } = await supabase.from("clients").delete().match({ client_id });
+    if (error) {
+      console.error("Error deleting client:", error);
+    } else {
+      console.log("Client deleted successfully");
+      // navigate back to the clients page
+      navigate("/clients");
+    }
+  }
+
   if (!client) {
     return <div>Loading client details...</div>;
   }
@@ -68,8 +81,8 @@ const ClientDetails = () => {
           {projects.map((project) => (
             <Typography key={project.project_id}>Project Name: {project.project_name}</Typography>
           ))}
-          {/* Implement Delete function  here if needed*/}
-          {/* <Button onClick={() => deleteClient(client.client_id)}>Delete</Button> */}
+          
+          <Button  onClick={() => deleteClient(client.client_id)} component={Link} to="/clients" >Delete</Button>
         </Stack>
       </Grid>
     </div>
