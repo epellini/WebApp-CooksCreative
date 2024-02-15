@@ -3,15 +3,20 @@ import { Session, User } from "@supabase/supabase-js";
 import { useContext, useState, useEffect, createContext } from "react";
 import { supabaseClient } from "../../supabase-client";
 
-// create a context for authentication
+import { User as SupabaseUser } from "@supabase/supabase-js";
+
+interface ExtendedUser extends SupabaseUser {
+  is_admin?: boolean; // Assuming is_admin is optional
+}
+
 const AuthContext = createContext<{
   session: Session | null | undefined;
-  user: User | null | undefined;
+  user: ExtendedUser | null | undefined; // Use ExtendedUser here
   signOut: () => void;
 }>({ session: null, user: null, signOut: () => {} });
 
 export const AuthProvider = ({ children }: any) => {
-  const [user, setUser] = useState<User>();
+  const [user, setUser] = useState<ExtendedUser | undefined>(undefined);
   const [session, setSession] = useState<Session | null>();
   const [loading, setLoading] = useState(true);
 
@@ -25,7 +30,20 @@ export const AuthProvider = ({ children }: any) => {
       setSession(session);
       setUser(session?.user);
       setLoading(false);
-    };
+
+      const { data: userDetails, error: userDetailsError } = await supabaseClient
+        .from('users')
+        .select('is_admin')
+        .eq('id', session?.user.id)
+        .single(); 
+
+        if (!userDetailsError && userDetails) {
+          setUser((prevUser) => ({ ...prevUser, ...userDetails }));
+        } else {
+          console.error('Error fetching user details:', userDetailsError);
+        } 
+      }
+      setLoading(false);
 
     const { data: listener } = supabaseClient.auth.onAuthStateChange(
       (_event, session) => {

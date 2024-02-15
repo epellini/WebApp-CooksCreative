@@ -13,6 +13,7 @@ import BetterProjectForm from './components/project/BetterProjectForm.jsx';
 // Auth Pages:
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
+import CreateUserPage from './pages/Auth/CreateUserPage.jsx';
 // Protected Route:
 import Protected from './components/Protected';
 import ClientDetails from './pages/Clients/ClientDetails.jsx';
@@ -34,6 +35,7 @@ function App() {
             {/* HOME ROUTE */}
             <Route index element={<Home/>} />
 
+
             {/* PROJECTS ROUTES */}
             <Route path="/projects">
               <Route index element={<Projects/>}/>
@@ -43,7 +45,7 @@ function App() {
             </Route>
             
             {/* CLIENTS ROUTES */}
-            <Route path="/clients"> 
+            <Route path="/clients" element={<Protected isAdminRoute={true} />}> 
               <Route index element={<Clients/>}/>
               <Route path=":id" element={<ClientDetails/>}/>
               <Route path="new" element={<ClientForm/>}/>
@@ -51,6 +53,7 @@ function App() {
             </Route>
           </Route> {/* END OF PROTECTED ROUTE */}
           
+            <Route path="/create-user" element={<CreateUserPage/>} />
           {/* NOT FOUND ROUTE */}
           <Route path="*" element={<NotFound/>}/> 
         </Routes>
