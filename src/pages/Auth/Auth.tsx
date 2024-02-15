@@ -1,80 +1,89 @@
-import React from "react";
+import React, { useContext, useState, useEffect, createContext, ReactNode } from "react";
 import { Session, User } from "@supabase/supabase-js";
-import { useContext, useState, useEffect, createContext } from "react";
 import { supabaseClient } from "../../supabase-client";
 
-import { User as SupabaseUser } from "@supabase/supabase-js";
-
-interface ExtendedUser extends SupabaseUser {
-  is_admin?: boolean; // Assuming is_admin is optional
-}
 
 const AuthContext = createContext<{
-  session: Session | null | undefined;
-  user: ExtendedUser | null | undefined; // Use ExtendedUser here
-  signOut: () => void;
-}>({ session: null, user: null, signOut: () => {} });
+  session: Session | null;
+  user: User | null;
+  signOut: () => Promise<void>;
+  isAdmin: boolean;
+}>({
+  session: null,
+  user: null,
+  signOut: async () => {},
+  isAdmin: false,
+});
 
-export const AuthProvider = ({ children }: any) => {
-  const [user, setUser] = useState<ExtendedUser | undefined>(undefined);
-  const [session, setSession] = useState<Session | null>();
-  const [loading, setLoading] = useState(true);
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const setData = async () => {
-      const {
-        data: { session },
-        error,
-      } = await supabaseClient.auth.getSession();
-      if (error) throw error;
-      setSession(session);
-      setUser(session?.user);
-      setLoading(false);
+      const { data: { session }, error } = await supabaseClient.auth.getSession();
+      if (error) {
+        console.error("Error fetching session:", error.message);
+        setLoading(false);
+        return;
+      }
 
-      const { data: userDetails, error: userDetailsError } = await supabaseClient
-        .from('users')
-        .select('is_admin')
-        .eq('id', session?.user.id)
-        .single(); 
+      setSession(session);
+      //setUser(session?.user || null); // move this after the respose
+
+      if (session?.user) {
+        const { data: userDetails, error: userDetailsError } = await supabaseClient
+          .from('users')
+          .select('*')
+          .eq('user_id', session.user.id)
+          .single();
+          console.log(session.user.id)
+          //console.log(session.user.is_admin)
 
         if (!userDetailsError && userDetails) {
-          setUser((prevUser) => ({ ...prevUser, ...userDetails }));
+          setUser(userDetails);
+          console.log(userDetails.is_admin);
+          setIsAdmin(userDetails.is_admin);
         } else {
-          console.error('Error fetching user details:', userDetailsError);
-        } 
+          console.error('Error fetching user details:', userDetailsError?.message);
+        }
       }
+
       setLoading(false);
+    };
+
+    setData();
 
     const { data: listener } = supabaseClient.auth.onAuthStateChange(
       (_event, session) => {
         setSession(session);
-        setUser(session?.user);
+        setUser(session?.user || null);
         setLoading(false);
       }
     );
 
-    setData();
-
     return () => {
-      listener?.subscription.unsubscribe();
+      listener.subscription.unsubscribe();
     };
   }, []);
 
-  const value = {
-    session,
-    user,
-    signOut: () => supabaseClient.auth.signOut(),
+  const signOut = async () => {
+    await supabaseClient.auth.signOut();
   };
 
-  // use a provider to pass down the value
+  const value = { session, user, signOut, isAdmin };
+
   return (
     <AuthContext.Provider value={value}>
-        {!loading && children}
+      {!loading && children}
     </AuthContext.Provider>
   );
 };
 
-// export the useAuth hook
 export const useAuth = () => {
-  return useContext(AuthContext);
+  const context = useContext(AuthContext);
+  if (!context) throw new Error('useAuth must be used within an AuthProvider');
+  return context;
 };
