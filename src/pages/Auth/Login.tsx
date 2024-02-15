@@ -3,12 +3,12 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabaseClient } from "../../supabase-client"; // Import the supabase client
 import { Session } from "@supabase/supabase-js"; // Import the Session type
-import DarkModeRoundedIcon from '@mui/icons-material/DarkModeRounded';
-import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
-import BadgeRoundedIcon from '@mui/icons-material/BadgeRounded';
-import LocalDiningRounded from '@mui/icons-material/LocalDiningRounded';
+
+import {useAuth} from '../Auth/Auth';
 
 // MUI Joy imports
+import BadgeRoundedIcon from '@mui/icons-material/BadgeRounded';
+import LocalDiningRounded from '@mui/icons-material/LocalDiningRounded';
 import { CssVarsProvider, useColorScheme } from '@mui/joy/styles';
 import GlobalStyles from '@mui/joy/GlobalStyles';
 import CssBaseline from '@mui/joy/CssBaseline';
@@ -24,7 +24,7 @@ import Typography from '@mui/joy/Typography';
 import Stack from '@mui/joy/Stack';
 
 // Aliasing MUI Joy's Link to avoid conflict with React Router's Link
-const MuiLink = Link;
+//const MuiLink = Link;
 
 interface FormElements extends HTMLFormControlsCollection {
   email: HTMLInputElement;
@@ -38,31 +38,29 @@ interface SignInFormElement extends HTMLFormElement {
 function Login() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [session, setSession] = useState<Session | null>();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  //const { isAdmin, user } = useAuth();
 
-  useEffect(() => {
-    supabaseClient.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    });
-
-    supabaseClient.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-  }, []);
+  const { session, signOut } = useAuth();  // Use session and signOut from AuthProvider
 
   const handleLogin = async (email: string, password: string) => {
     setLoading(true);
     try {
-      const { error } = await supabaseClient.auth.signInWithPassword({
+      const { data, error } = await supabaseClient.auth.signInWithPassword({
         email,
         password,
       });
       if (error) throw error;
+
+      // No need to manually set session here, as AuthProvider will update it globally
+      
       navigate("/");
+      //window.location.reload();
+      //window.location.href = "/";  // Nasty fix but it works for now, found no issues
+
     } catch (err) {
-      throw err;
+       console.error("Login error:", err.message);
     } finally {
       setEmail("");
       setPassword("");
@@ -82,7 +80,7 @@ function Login() {
        {session ? ( <>
        
          <div>
-         <h2>Welcome back, {session.user?.email}</h2>
+         <h2>Welcome back</h2>
          </div>
        
        </>
