@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect, createContext, ReactNode } from "react";
+import React, { useContext, useState, useEffect, createContext, ReactNode, useLayoutEffect } from "react";
 import { Session, User } from "@supabase/supabase-js";
 import { supabaseClient } from "../../supabase-client";
 
@@ -22,17 +22,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const setData = async () => {
+    const fetchData = async () => {
       const { data: { session }, error } = await supabaseClient.auth.getSession();
       if (error) {
         console.error("Error fetching session:", error.message);
         setLoading(false);
         return;
       }
-
+  
       setSession(session);
-      //setUser(session?.user || null); // move this after the respose
-
+  
       if (session?.user) {
         const { data: userDetails, error: userDetailsError } = await supabaseClient
           .from('users')
@@ -40,8 +39,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           .eq('user_id', session.user.id)
           .single();
           console.log(session.user.id)
-          //console.log(session.user.is_admin)
-
+  
         if (!userDetailsError && userDetails) {
           setUser(userDetails);
           console.log(userDetails.is_admin);
@@ -50,12 +48,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           console.error('Error fetching user details:', userDetailsError?.message);
         }
       }
-
+  
       setLoading(false);
     };
-
-    setData();
-
+  
+    fetchData();
+  
     const { data: listener } = supabaseClient.auth.onAuthStateChange(
       (_event, session) => {
         setSession(session);
@@ -63,7 +61,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setLoading(false);
       }
     );
-
+  
     return () => {
       listener.subscription.unsubscribe();
     };
@@ -72,6 +70,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signOut = async () => {
     await supabaseClient.auth.signOut();
   };
+
+  if (loading) {
+    // Render a loading indicator or skeleton UI while fetching data
+    return <div>Loading...</div>;
+  }
 
   const value = { session, user, signOut, isAdmin };
 
