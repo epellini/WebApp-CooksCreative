@@ -37,6 +37,7 @@ export const AuthProvider = ({ children }) => {
 
       //setSession(session);
 
+
       if (data.session?.user) {
         const { data: userDetails, error: userDetailsError } =
           await supabaseClient
@@ -61,18 +62,24 @@ export const AuthProvider = ({ children }) => {
     
     fetchData();
 
-    const { data: listener } = supabaseClient.auth.onAuthStateChange(
+    const { data: listener } = supabaseClient.auth.onAuthStateChange( 
       (_event, session) => {
-        setSession(session);
-        setUser(session?.user || null);
-        setIsAdmin(session?.user?.is_admin || false);
-        setLoading(false);
+          setSession(session);
+          setUser(session?.user || null);
+          setIsAdmin(session?.user?.is_admin || false);
+          setLoading(false);
 
-        if (session?.user) {
-          fetchData();
-        }
+          if (session?.user) {
+            fetchData();
+          }
       }
     );
+
+
+    // setUser(userDetails);
+    // console.log("User details: " + userDetails.first_name + " " + userDetails.user_id);
+    // setIsAdmin(userDetails.is_admin);
+    // console.log("Is the user an admin? " + userDetails.is_admin);
 
     return () => {
       listener.subscription.unsubscribe();

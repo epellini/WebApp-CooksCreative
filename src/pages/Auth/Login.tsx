@@ -53,8 +53,6 @@ function Login() {
       });
       if (error) throw error;
 
-      // No need to manually set session here, as AuthProvider will update it globally
-      
       navigate("/");
       //window.location.reload();
       //window.location.href = "/";  // Nasty fix but it works for now, found no issues
