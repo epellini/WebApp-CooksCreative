@@ -336,7 +336,6 @@ export default function ProjectTable() {
   ))
 ) : (
               filteredProjects.map((project) => {
-                console.log("Project:", project); // Log the project object to inspect its structure
                 return (
                   <tr key={project.project_id}>
                     <td
@@ -378,9 +377,6 @@ export default function ProjectTable() {
                       )}
                     </td>
                     <td style={{ textAlign: "left" }}>
-                      {/* Logging client data */}
-                      {console.log("Client data:", project.clients)}
-                      {console.log("Status data:", project.status)}
                       {/* Displaying client's first name and last name if available */}
                       {project.clients ? (
                         <Typography level="body-xs">{`${project.clients.first_name} ${project.clients.last_name}`}</Typography>
