@@ -34,6 +34,7 @@ import ColorSchemeToggle from './ColorSchemeToggle';
 import { closeSidebar } from '../utils';
 import { useNavigate } from 'react-router-dom';
 import { supabaseClient } from '../supabase-client';
+import { useAuth } from '../pages/Auth/Auth';
 
 function Toggler({
 
@@ -68,9 +69,16 @@ function Toggler({
   );
 }
 
-export default function Sidebar() {
+interface User {
+  name?: string;
+  email?: string;
+  avatar_url?: string; 
+}
 
+export default function Sidebar() {
   const navigate = useNavigate();
+  const { isAdmin, user } = useAuth();
+
 
   const handleLogout = async () => {
     // await signOut(auth);
@@ -174,6 +182,7 @@ export default function Sidebar() {
           </ListItemButton>
         </ListItem>
 
+        {isAdmin && (
         <ListItem>
           <ListItemButton component={Link} to="/clients">
             <DashboardRoundedIcon />
@@ -182,6 +191,7 @@ export default function Sidebar() {
             </ListItemContent>
           </ListItemButton>
         </ListItem>
+        )}
 
         <ListItem>
           <ListItemButton component={Link} to="/projects">
@@ -203,8 +213,8 @@ export default function Sidebar() {
         src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=286"
       />
       <Box sx={{ minWidth: 0, flex: 1 }}>
-        <Typography level="title-sm">Dustin C.</Typography>
-        <Typography level="body-xs">dustin@test.com</Typography>
+        <Typography level="title-sm">{user?.first_name || "Default Name"}</Typography>
+        <Typography level="body-xs">{user?.email || "default@example.com"}</Typography>
       </Box>
       <IconButton onClick={Logout} size="sm" variant="plain" color="neutral">
         <LogoutRoundedIcon />

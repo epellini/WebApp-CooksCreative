@@ -1,14 +1,17 @@
-import React from 'react'
+import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../pages/Auth/Auth';
 
-const Protected = () => {
-  const { user } = useAuth();
+const Protected = ({ isAdminRoute = false }) => {
+  const { user, isAdmin } = useAuth();
 
   if (!user) {
-    // If the user is not logged in, redirect to the login page
+    // User not logged in, redirect to login
     return <Navigate to="/login" />;
-  } 
+  } else if (isAdminRoute && !isAdmin) {
+    // Checking isAdmin flag for admin-only routes
+    return <Navigate to="/" />; // Redirect non-admin users trying to access admin-only routes
+  }
   return <Outlet />;
 };
 
