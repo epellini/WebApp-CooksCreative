@@ -18,6 +18,7 @@ import CreateUserPage from './pages/Auth/CreateUserPage.jsx';
 import Protected from './components/Protected';
 import ClientDetails from './pages/Clients/ClientDetails.jsx';
 import ClientForm from './pages/Clients/ClientForm.jsx';
+import ForgotPassword from './pages/Auth/ForgotPassword.jsx';
 
 
 function App() {
@@ -54,6 +55,7 @@ function App() {
           </Route> {/* END OF PROTECTED ROUTE */}
           
             <Route path="/create-user" element={<CreateUserPage/>} />
+            <Route path="/forgot-password" element={<ForgotPassword/>} />
           {/* NOT FOUND ROUTE */}
           <Route path="*" element={<NotFound/>}/> 
         </Routes>

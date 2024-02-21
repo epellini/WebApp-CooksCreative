@@ -137,7 +137,7 @@ function Login() {
             <IconButton variant="soft" color="primary" size="sm">
               <BadgeRoundedIcon />
             </IconButton>
-            <Typography level="title-lg">Company logo</Typography>
+            <Typography level="title-lg">Cooks Creative Contracting</Typography>
           </Box>
         </Box>
         <Box
@@ -166,21 +166,15 @@ function Login() {
           <Stack gap={4} sx={{ mb: 2 }}>
             <Stack gap={1}>
               <Typography level="h3">Sign in</Typography>
-              <Typography level="body-sm">
-                New to company?{' '}
-                <Link to="#replace-with-a-link">
-                  Sign up!
-                </Link>
-              </Typography>
             </Stack>
-            <Button
+            {/* <Button
               variant="soft"
               color="neutral"
               fullWidth
              // startDecorator={<GoogleIcon />}
             >
               Continue with Google
-            </Button>
+            </Button> */}
           </Stack>
           <Divider
             sx={(theme) => ({
@@ -193,7 +187,7 @@ function Login() {
               },
             })}
           >
-            or
+            
           </Divider>
           <Stack gap={4} sx={{ mt: 2 }}>
             <form
@@ -225,10 +219,16 @@ function Login() {
                     alignItems: 'center',
                   }}
                 >
-                  <Checkbox size="sm" label="Remember me" name="persistent" />
-                  <Link to="#replace-with-a-link">
+                  <Box   sx={{
+                    display: 'flex',
+                    textAlign: 'center',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                  }}>
+                  <Link to="/forgot-password">
                     Forgot your password?
                   </Link>
+                  </Box>
                 </Box>
                 <Button fullWidth type='submit'>
                   Sign in
@@ -239,7 +239,7 @@ function Login() {
         </Box>
         <Box component="footer" sx={{ py: 3 }}>
           <Typography level="body-xs" textAlign="center">
-            © Your company {new Date().getFullYear()}
+            © Cooks Creative Contracting {new Date().getFullYear()}
           </Typography>
         </Box>
       </Box>
@@ -261,10 +261,10 @@ function Login() {
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
         backgroundImage:
-          'url(https://www.iwastesomuchtime.com/wp-content/uploads-webpc/uploads/sites/68/2023/01/Construction-Memes-6-86522.png.webp)',
+          'url(https://upload.wikimedia.org/wikipedia/commons/e/e7/Everest_North_Face_toward_Base_Camp_Tibet_Luca_Galuzzi_2006.jpg)',
         [theme.getColorSchemeSelector('dark')]: {
           backgroundImage:
-            'url(https://www.iwastesomuchtime.com/wp-content/uploads-webpc/uploads/sites/68/2023/01/Construction-Memes-6-86522.png.webp)',
+            'url(https://upload.wikimedia.org/wikipedia/commons/e/e7/Everest_North_Face_toward_Base_Camp_Tibet_Luca_Galuzzi_2006.jpg)',
         },
         
       })} 
