@@ -67,11 +67,13 @@ function RowMenu({ projectId }) {
 
 export default function ProjectTable() {
   const [projects, setProjects] = useState([]);
+  const [clients, setClients] = useState([]);
   const [selected, setSelected] = useState([]);
   const [status, setStatus] = useState([]);
   const [open, setOpen] = React.useState(false);
   const [loading, setLoading] = useState(true);
   const [selectedProject, setSelectedProject] = useState(null);
+  const [selectedClient, setSelectedClient] = useState(null);
 
   useEffect(() => {
     async function getProjects() {
@@ -87,16 +89,20 @@ export default function ProjectTable() {
         console.error("Error fetching projects:", error);
       } else {
         setProjects(data);
+        setClients(data.map((project) => project.clients));
+        console.log(clients);
         console.log();
         setLoading(false); // Set loading to false when data is fetched
       }
     }
     getProjects();
   }, []);
-    // Filtered projects based on selected project name
-    const filteredProjects = selectedProject
+  // Filtered projects based on selected project name
+  const filteredProjects = selectedProject
     ? projects.filter((project) =>
-        project.project_name.toLowerCase().includes(selectedProject.toLowerCase())
+        `${project.clients.first_name} ${project.clients.last_name}`
+          .toLowerCase()
+          .includes(selectedProject.toLowerCase())
       )
     : projects;
 
@@ -130,19 +136,9 @@ export default function ProjectTable() {
           <Option value="debit">Bathrooms</Option>
         </Select>
       </FormControl>
-      <FormControl size="sm">
-        {/* WILL NEED TO POPULATE THIS WITH DB DATA - ALSO NEED TO KNOW WHAT TO ADD HERE */}
-        <FormLabel>Customer</FormLabel>
-        <Select size="sm" placeholder="All">
-          <Option value="all">All</Option>
-          <Option value="olivia">Olivia Rhye</Option>
-          <Option value="steve">Steve Hampton</Option>
-          <Option value="ciaran">Ciaran Murray</Option>
-          <Option value="marina">Marina Macdonald</Option>
-          <Option value="charles">Charles Fulton</Option>
-          <Option value="jay">Jay Hoper</Option>
-        </Select>
-      </FormControl>
+      {/* pushes the filters to the left */}
+      <FormControl sx={{ flex: 1 }} size="sm">
+        </FormControl>
     </React.Fragment>
   );
   return (
@@ -155,7 +151,7 @@ export default function ProjectTable() {
           gap: 1,
         }}
       >
-      <input type="text" style={{ display: "none" }} />
+        <input type="text" style={{ display: "none" }} />
         <IconButton
           size="sm"
           variant="outlined"
@@ -194,16 +190,34 @@ export default function ProjectTable() {
         }}
       >
         <FormControl sx={{ flex: 1 }} size="sm">
-          <FormLabel>Search for project</FormLabel>
+          <FormLabel>Search for client</FormLabel>
           <Autocomplete
             size="sm"
-            options={projects.map((project) => project.project_name)}
-            value={selectedProject}
-            onChange={(event, newValue) => setSelectedProject(newValue)}
+            placeholder="Search"
+            options={clients.filter(
+              (client, index, self) =>
+                index ===
+                self.findIndex(
+                  (c) =>
+                    c.first_name === client.first_name &&
+                    c.last_name === client.last_name
+                )
+            )}
+            getOptionLabel={(option) =>
+              `${option.first_name} ${option.last_name}`
+            }
+            value={selectedClient}
+            onChange={(event, newValue) => {
+              setSelectedClient(newValue);
+              setSelectedProject(
+                newValue ? `${newValue.first_name} ${newValue.last_name}` : null
+              ); // Update selectedProject
+              console.log("Selected client:", newValue);
+            }}
             renderInput={(params) => <Input {...params} />}
           />
         </FormControl>
-        {renderFilters()}
+        ;{renderFilters()}
       </Box>
       <Sheet
         className="OrderTableContainer"
@@ -305,159 +319,177 @@ export default function ProjectTable() {
 
           {/*  */}
           <tbody>
-          {loading ? (
-    Array.from(new Array(5)).map((_, index) => ( // Assuming 5 rows of skeletons
-    <tr key={index}>
-      <td style={{ textAlign: "center", width: 48 }}>
-        <Skeleton variant="rectangular" width={24} height={24} />
-      </td>
-      <td>
-        <Skeleton variant="text" width="100%" /> {/* Project */}
-      </td>
-      <td>
-        <Skeleton variant="text" width="100%" /> {/* Client Name */}
-      </td>
-      <td style={{ textAlign: "center" }}>
-        <Skeleton variant="rectangular" width="80%" height={20} /> {/* Status */}
-      </td>
-      <td>
-        <Skeleton variant="text" width="70%" /> {/* Start Date */}
-      </td>
-      <td>
-        <Skeleton variant="text" width="70%" /> {/* End Date */}
-      </td>
-      <td>
-        <Skeleton variant="text" width="100%" /> {/* Category */}
-      </td>
-      <td style={{ textAlign: "right" }}>
-        <Skeleton variant="circular" width={24} height={24} /> {/* Actions */}
-      </td>
-    </tr>
-  ))
-) : (
-              filteredProjects.map((project) => {
-                return (
-                  <tr key={project.project_id}>
-                    <td
-                      style={{
-                        textAlign: "center",
-                        width: 120,
-                      }}
-                    >
-                      <Checkbox
-                        size="sm"
-                        checked={selected.includes(
-                          project.project_id.toString()
-                        )}
-                        color={
-                          selected.includes(project.project_id.toString())
-                            ? "primary"
-                            : undefined
-                        }
-                        onChange={(event) => {
-                          setSelected((prevSelected) =>
-                            event.target.checked
-                              ? prevSelected.concat(
-                                  project.project_id.toString()
-                                )
-                              : prevSelected.filter(
-                                  (id) => id !== project.project_id.toString()
-                                )
-                          );
+            {loading
+              ? Array.from(new Array(5)).map(
+                  (
+                    _,
+                    index // Assuming 5 rows of skeletons
+                  ) => (
+                    <tr key={index}>
+                      <td style={{ textAlign: "center", width: 48 }}>
+                        <Skeleton
+                          variant="rectangular"
+                          width={24}
+                          height={24}
+                        />
+                      </td>
+                      <td>
+                        <Skeleton variant="text" width="100%" /> {/* Project */}
+                      </td>
+                      <td>
+                        <Skeleton variant="text" width="100%" />{" "}
+                        {/* Client Name */}
+                      </td>
+                      <td style={{ textAlign: "center" }}>
+                        <Skeleton
+                          variant="rectangular"
+                          width="80%"
+                          height={20}
+                        />{" "}
+                        {/* Status */}
+                      </td>
+                      <td>
+                        <Skeleton variant="text" width="70%" />{" "}
+                        {/* Start Date */}
+                      </td>
+                      <td>
+                        <Skeleton variant="text" width="70%" /> {/* End Date */}
+                      </td>
+                      <td>
+                        <Skeleton variant="text" width="100%" />{" "}
+                        {/* Category */}
+                      </td>
+                      <td style={{ textAlign: "right" }}>
+                        <Skeleton variant="circular" width={24} height={24} />{" "}
+                        {/* Actions */}
+                      </td>
+                    </tr>
+                  )
+                )
+              : filteredProjects.map((project) => {
+                  return (
+                    <tr key={project.project_id}>
+                      <td
+                        style={{
+                          textAlign: "center",
+                          width: 120,
                         }}
-                        slotProps={{ checkbox: { sx: { textAlign: "left" } } }}
-                        sx={{ verticalAlign: "text-bottom" }}
-                      />
-                    </td>
-                    <td style={{ textAlign: "left" }}>
-                      {project ? (
-                        <Typography level="body-xs">{`${project.project_name}`}</Typography>
-                      ) : (
-                        <Typography level="body-xs">N/A</Typography>
-                      )}
-                    </td>
-                    <td style={{ textAlign: "left" }}>
-                      {/* Displaying client's first name and last name if available */}
-                      {project.clients ? (
-                        <Typography level="body-xs">{`${project.clients.first_name} ${project.clients.last_name}`}</Typography>
-                      ) : (
-                        <Typography level="body-xs">N/A</Typography>
-                      )}
-                    </td>
-                    {/* <td>
+                      >
+                        <Checkbox
+                          size="sm"
+                          checked={selected.includes(
+                            project.project_id.toString()
+                          )}
+                          color={
+                            selected.includes(project.project_id.toString())
+                              ? "primary"
+                              : undefined
+                          }
+                          onChange={(event) => {
+                            setSelected((prevSelected) =>
+                              event.target.checked
+                                ? prevSelected.concat(
+                                    project.project_id.toString()
+                                  )
+                                : prevSelected.filter(
+                                    (id) => id !== project.project_id.toString()
+                                  )
+                            );
+                          }}
+                          slotProps={{
+                            checkbox: { sx: { textAlign: "left" } },
+                          }}
+                          sx={{ verticalAlign: "text-bottom" }}
+                        />
+                      </td>
+                      <td style={{ textAlign: "left" }}>
+                        {project ? (
+                          <Typography level="body-xs">{`${project.project_name}`}</Typography>
+                        ) : (
+                          <Typography level="body-xs">N/A</Typography>
+                        )}
+                      </td>
+                      <td style={{ textAlign: "left" }}>
+                        {/* Displaying client's first name and last name if available */}
+                        {project.clients ? (
+                          <Typography level="body-xs">{`${project.clients.first_name} ${project.clients.last_name}`}</Typography>
+                        ) : (
+                          <Typography level="body-xs">N/A</Typography>
+                        )}
+                      </td>
+                      {/* <td>
                     <Typography level="body-xs">{project.project_id}</Typography>
                   </td>
                   <td>
                     <Typography level="body-xs">{project.client_id ? `${project.client_id.first_name} ${project.client_id.last_name}` : 'N/A' }</Typography>
                   </td>*/}
-                    <td style={{ textAlign: "center" }}>
-                      <Chip
-                        variant="soft"
-                        size="sm"
-                        startDecorator={
-                          project.status.name == "Completed" ? (
-                            <CheckRoundedIcon />
-                          ) : project.status.name == "Cancelled" ? (
-                            <BlockIcon />
-                          ) : project.status.name == "Active" ? (
-                            <AutorenewRoundedIcon />
-                          ) : undefined // No icon for "N/A" or other statuses
-                        }
-                        color={
-                          project.status.name == "Completed"
-                            ? "success"
-                            : project.status.name == "Active"
-                            ? "neutral"
-                            : project.status.name == "Cancelled"
-                            ? "danger"
-                            : "default" // Use default color for "N/A" or other statuses
-                        }
-                      >
-                        {project.status.name}
-                      </Chip>
-                    </td>
+                      <td style={{ textAlign: "center" }}>
+                        <Chip
+                          variant="soft"
+                          size="sm"
+                          startDecorator={
+                            project.status.name == "Completed" ? (
+                              <CheckRoundedIcon />
+                            ) : project.status.name == "Cancelled" ? (
+                              <BlockIcon />
+                            ) : project.status.name == "Active" ? (
+                              <AutorenewRoundedIcon />
+                            ) : undefined // No icon for "N/A" or other statuses
+                          }
+                          color={
+                            project.status.name == "Completed"
+                              ? "success"
+                              : project.status.name == "Active"
+                              ? "neutral"
+                              : project.status.name == "Cancelled"
+                              ? "danger"
+                              : "default" // Use default color for "N/A" or other statuses
+                          }
+                        >
+                          {project.status.name}
+                        </Chip>
+                      </td>
 
-                    <td style={{ textAlign: "left" }}>
-                      {/* <Avatar size="sm">{project.client.first_name}</Avatar> */}
-                      {/* <div> */}
-                      {/* <Typography level="body-xs">{project.client_id }</Typography> */}
+                      <td style={{ textAlign: "left" }}>
+                        {/* <Avatar size="sm">{project.client.first_name}</Avatar> */}
+                        {/* <div> */}
+                        {/* <Typography level="body-xs">{project.client_id }</Typography> */}
 
-                      {/* <Typography level="body-xs">{status.name}</Typography> */}
-                      {/* </div> */}
-                      {project ? (
-                        <Typography level="body-xs">{`${project.start_date}`}</Typography>
-                      ) : (
-                        <Typography level="body-xs">N/A</Typography>
-                      )}
-                    </td>
-                    <td style={{ textAlign: "left" }}>
-                      {project ? (
-                        <Typography level="body-xs">{`${project.end_date}`}</Typography>
-                      ) : (
-                        <Typography level="body-xs">N/A</Typography>
-                      )}
-                    </td>
-                    <td style={{ textAlign: "left" }}>
-                      {project ? (
-                        <Typography level="body-xs">{`${project.category.name}`}</Typography>
-                      ) : (
-                        <Typography level="body-xs">N/A</Typography>
-                      )}
-                    </td>
-                    <td>
-                      <Box
-                        sx={{ display: "flex", gap: 2, alignItems: "center" }}
-                      >
-                        {/* <Link level="body-xs" component="button" >
+                        {/* <Typography level="body-xs">{status.name}</Typography> */}
+                        {/* </div> */}
+                        {project ? (
+                          <Typography level="body-xs">{`${project.start_date}`}</Typography>
+                        ) : (
+                          <Typography level="body-xs">N/A</Typography>
+                        )}
+                      </td>
+                      <td style={{ textAlign: "left" }}>
+                        {project ? (
+                          <Typography level="body-xs">{`${project.end_date}`}</Typography>
+                        ) : (
+                          <Typography level="body-xs">N/A</Typography>
+                        )}
+                      </td>
+                      <td style={{ textAlign: "left" }}>
+                        {project ? (
+                          <Typography level="body-xs">{`${project.category.name}`}</Typography>
+                        ) : (
+                          <Typography level="body-xs">N/A</Typography>
+                        )}
+                      </td>
+                      <td>
+                        <Box
+                          sx={{ display: "flex", gap: 2, alignItems: "center" }}
+                        >
+                          {/* <Link level="body-xs" component="button" >
                         Download
                       </Link> */}
-                        <RowMenu projectId={project.project_id} />
-                      </Box>
-                    </td>
-                  </tr>
-                );
-              })
-            )}
+                          <RowMenu projectId={project.project_id} />
+                        </Box>
+                      </td>
+                    </tr>
+                  );
+                })}
           </tbody>
         </Table>
       </Sheet>
