@@ -69,11 +69,14 @@ export default function ProjectTable() {
   const [projects, setProjects] = useState([]);
   const [clients, setClients] = useState([]);
   const [selected, setSelected] = useState([]);
-  const [status, setStatus] = useState([]);
+  const [statuses, setStatus] = useState([]);
+  const [categories, setCategory] = useState([]);
   const [open, setOpen] = React.useState(false);
   const [loading, setLoading] = useState(true);
   const [selectedProject, setSelectedProject] = useState(null);
   const [selectedClient, setSelectedClient] = useState(null);
+  const [selectedStatus, setSelectedStatus] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState(null);
 
   useEffect(() => {
     async function getProjects() {
@@ -90,57 +93,40 @@ export default function ProjectTable() {
       } else {
         setProjects(data);
         setClients(data.map((project) => project.clients));
+        setStatus(data.map((project) => project.status));
+        setCategory(data.map((project) => project.category));
         console.log(clients);
+        console.log(categories);
         console.log();
         setLoading(false); // Set loading to false when data is fetched
       }
     }
     getProjects();
   }, []);
-  // Filtered projects based on selected project name
-  const filteredProjects = selectedProject
-    ? projects.filter((project) =>
-        `${project.clients.first_name} ${project.clients.last_name}`
-          .toLowerCase()
-          .includes(selectedProject.toLowerCase())
-      )
-    : projects;
+  const filteredProjects = projects.filter((project) => {
+    const clientMatches =
+      !selectedClient ||
+      `${project.clients.first_name} ${project.clients.last_name}`
+        .toLowerCase() ===
+      `${selectedClient.first_name} ${selectedClient.last_name}`.toLowerCase();
+  
+    const statusMatches =
+      !selectedStatus ||
+      project.status.name.toLowerCase() === selectedStatus.name.toLowerCase();
+  
+    const categoryMatches =
+      !selectedCategory ||
+      project.category.name.toLowerCase() ===
+        selectedCategory.name.toLowerCase();
+  
+    return (
+      clientMatches &&
+      (!selectedStatus || statusMatches) &&
+      (!selectedCategory || categoryMatches)
+    );
+  });
 
-  // FILTERS
-  const renderFilters = () => (
-    <React.Fragment>
-      <FormControl size="sm">
-        {/* WILL NEED TO POPULATE THIS WITH DB DATA */}
-        <FormLabel>Status</FormLabel>
-        <Select
-          size="sm"
-          placeholder="Filter by status"
-          slotProps={{ button: { sx: { whiteSpace: "nowrap" } } }}
-        >
-          <Option value="completed">Completed</Option>
-          <Option value="in-progress">In Progress</Option>
-          <Option value="pending-approval">Pending Approval</Option>
-          <Option value="cancelled">Cancelled</Option>
-          <Option value="refunded">Refunded</Option>
-        </Select>
-      </FormControl>
-      <FormControl size="sm">
-        {/* WILL NEED TO POPULATE THIS WITH DB DATA */}
-        <FormLabel>Category</FormLabel>
-        <Select size="sm" placeholder="All">
-          <Option value="all">All</Option>
-          <Option value="refund">General Home</Option>
-          <Option value="purchase">Tiny Homes</Option>
-          <Option value="debit">Additions</Option>
-          <Option value="debit">Basements</Option>
-          <Option value="debit">Bathrooms</Option>
-        </Select>
-      </FormControl>
-      {/* pushes the filters to the left */}
-      <FormControl sx={{ flex: 1 }} size="sm">
-        </FormControl>
-    </React.Fragment>
-  );
+
   return (
     <React.Fragment>
       <Sheet
@@ -168,7 +154,6 @@ export default function ProjectTable() {
             </Typography>
             <Divider sx={{ my: 2 }} />
             <Sheet sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-              {renderFilters()}
               <Button color="primary" onClick={() => setOpen(false)}>
                 Submit
               </Button>
@@ -190,7 +175,7 @@ export default function ProjectTable() {
         }}
       >
         <FormControl sx={{ flex: 1 }} size="sm">
-          <FormLabel>Search for client</FormLabel>
+          <FormLabel>Search By Client Name</FormLabel>
           <Autocomplete
             size="sm"
             placeholder="Search"
@@ -217,7 +202,45 @@ export default function ProjectTable() {
             renderInput={(params) => <Input {...params} />}
           />
         </FormControl>
-        ;{renderFilters()}
+        <FormControl sx={{ flex: 1 }} size="sm">
+          <FormLabel>Search By Category Name</FormLabel>
+          <Autocomplete
+            size="sm"
+            placeholder="Search"
+            options={categories.filter(
+              (category, index, self) =>
+                index === self.findIndex((c) => c.name === category.name)
+            )}
+            getOptionLabel={(option) => option.name}
+            value={selectedCategory}
+            onChange={(event, newValue) => {
+              setSelectedCategory(newValue);
+              setSelectedProject(newValue ? `${newValue.name}` : null); // Update selectedProject
+              console.log("Selected category:", newValue);
+            }}
+            renderInput={(params) => <Input {...params} />}
+          />
+        </FormControl>
+        <FormControl sx={{ flex: 1 }} size="sm">
+          <FormLabel>Search By Status</FormLabel>
+          <Autocomplete
+            size="sm"
+            placeholder="Search"
+            options={statuses.filter(
+              (status, index, self) =>
+                index === self.findIndex((s) => s.name === status.name)
+            )}
+            getOptionLabel={(option) => option.name}
+            value={selectedStatus}
+            onChange={(event, newValue) => {
+              setSelectedStatus(newValue);
+              setSelectedProject(newValue ? `${newValue.name}` : null); // Update selectedProject
+              console.log("Selected status:", newValue);
+            }}
+            renderInput={(params) => <Input {...params} />}
+          />
+        </FormControl>
+        ;
       </Box>
       <Sheet
         className="OrderTableContainer"
