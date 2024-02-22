@@ -101,7 +101,7 @@ export default function Sidebar() {
       position: { xs: 'fixed', md: 'sticky' },
       transform: {
         xs: 'translateX(calc(100% * (var(--SideNavigation-slideIn, 0) - 1)))',
-        md: 'none',
+        md: 'none',  width: '250px',
       },
       transition: 'transform 0.4s, width 0.4s',
       zIndex: 10000,
