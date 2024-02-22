@@ -37,12 +37,14 @@ import Stack from "@mui/joy/Stack";
 import EmailIcon from "@mui/icons-material/Email";
 import LocalPhoneIcon from "@mui/icons-material/LocalPhone";
 import Autocomplete from "@mui/joy/Autocomplete";
-import { useNavigate } from "react-router-dom";
+import { Skeleton } from "@mui/joy";
 
+import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabaseClient } from "../../supabase-client"; // Import the supabase client
-import { Skeleton } from "@mui/joy";
+import { usePagination} from "../../hooks/usePagination";
 import { convertToCSV, downloadCSV } from "../../utils/CsvUtils";
+
 function RowMenu({ clientId }) {
   const navigate = useNavigate();
 
@@ -108,33 +110,44 @@ export default function ClientTable() {
     ? clients.filter((client) => client.client_id === selectedClient.client_id)
     : clients;
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
 
-  // Calculate total pages
-  const totalPages = Math.ceil(filteredClients.length / itemsPerPage);
+  // const [currentPage, setCurrentPage] = useState(1);
+  // const [itemsPerPage, setItemsPerPage] = useState(10);
 
-  // Determine the clients for the current page
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentClients = filteredClients.slice(
-    indexOfFirstItem,
-    indexOfLastItem
-  );
+  // // Calculate total pages
+  // const totalPages = Math.ceil(filteredClients.length / itemsPerPage);
 
-  // Handle page change
-  const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
+  // // Determine the clients for the current page
+  // const indexOfLastItem = currentPage * itemsPerPage;
+  // const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  // const currentClients = filteredClients.slice(
+  //   indexOfFirstItem,
+  //   indexOfLastItem
+  // );
 
-  // Previous and Next page handlers
-  const handlePrevious = () =>
-    setCurrentPage((currentPage) => Math.max(1, currentPage - 1));
-  const handleNext = () =>
-    setCurrentPage((currentPage) => Math.min(totalPages, currentPage + 1));
+  // // Handle page change
+  // const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
 
-  const pageNumbers = [];
-  for (let i = 0; i < totalPages; i++) {
-    pageNumbers.push(i);
-  }
+  // // Previous and Next page handlers
+  // const handlePrevious = () =>
+  //   setCurrentPage((currentPage) => Math.max(1, currentPage - 1));
+  // const handleNext = () =>
+  //   setCurrentPage((currentPage) => Math.min(totalPages, currentPage + 1));
+
+  // const pageNumbers = [];
+  // for (let i = 0; i < totalPages; i++) {
+  //   pageNumbers.push(i);
+  // }
+
+  const {
+    currentItems: currentClients,
+    currentPage,
+    totalPages,
+    handlePageChange,
+    handlePrevious,
+    handleNext
+  } = usePagination(filteredClients, 10);
+
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
