@@ -42,7 +42,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabaseClient } from "../../supabase-client"; // Import the supabase client
 import { Skeleton } from "@mui/joy";
-
+import { convertToCSV, downloadCSV } from "../../utils/CsvUtils";
 function RowMenu({ clientId }) {
   const navigate = useNavigate();
 
@@ -104,6 +104,42 @@ export default function ClientTable() {
     getClients();
   }, []);
 
+  const handleSelectAllClick = (event) => {
+    if (event.target.checked) {
+      // Select all clients
+      const newSelected = clients.map((client) => client.client_id.toString());
+      setSelected(newSelected);
+    } else {
+      // Clear selection if the main checkbox is unchecked
+      setSelected([]);
+    }
+  };
+
+  // This function copies the email of the client in clipboard and also redirects to email
+  function handleEmailClick(emailAddress) {
+    navigator.clipboard.writeText(emailAddress).then(() => {
+      console.log('Email address copied to clipboard');
+    }).catch(err => {
+      console.error('Failed to copy email address: ', err);
+    });
+  
+    // Open default email client with the email address in the "To" field
+    window.location.href = `mailto:${emailAddress}`;
+  }
+
+  const handleExportSelected = () => {
+    // Filter the clients to only those selected
+    const selectedClientsData = clients.filter(client => 
+      selected.includes(client.client_id.toString())
+    );
+  
+    // Convert the selected clients' data to CSV
+    const csvData = convertToCSV(selectedClientsData);
+  
+    // Trigger the CSV file download
+    downloadCSV(csvData, 'SelectedClients.csv');
+  };
+
   // useEffect(() => {
   //   //Fliter(find) client based on a search query
   //   if (typeof searchQuery === 'string') {
@@ -130,50 +166,50 @@ export default function ClientTable() {
     : clients;
 
   // FILTERS
-  const renderFilters = () => (
-    <React.Fragment>
-      <FormControl size="sm">
-        {/* WILL NEED TO POPULATE THIS WITH DB DATA */}
-        <FormLabel>Status</FormLabel>
-        <Select
-          size="sm"
-          placeholder="Filter by status"
-          slotProps={{ button: { sx: { whiteSpace: "nowrap" } } }}
-        >
-          <Option value="completed">Completed</Option>
-          <Option value="in-progress">In Progress</Option>
-          <Option value="pending-approval">Pending Approval</Option>
-          <Option value="cancelled">Cancelled</Option>
-          <Option value="refunded">Refunded</Option>
-        </Select>
-      </FormControl>
-      <FormControl size="sm">
-        {/* WILL NEED TO POPULATE THIS WITH DB DATA */}
-        <FormLabel>Category</FormLabel>
-        <Select size="sm" placeholder="All">
-          <Option value="all">All</Option>
-          <Option value="refund">General Home</Option>
-          <Option value="purchase">Tiny Homes</Option>
-          <Option value="debit">Additions</Option>
-          <Option value="debit">Basements</Option>
-          <Option value="debit">Bathrooms</Option>
-        </Select>
-      </FormControl>
-      <FormControl size="sm">
-        {/* WILL NEED TO POPULATE THIS WITH DB DATA - ALSO NEED TO KNOW WHAT TO ADD HERE */}
-        <FormLabel>Customer</FormLabel>
-        <Select size="sm" placeholder="All">
-          <Option value="all">All</Option>
-          <Option value="olivia">Olivia Rhye</Option>
-          <Option value="steve">Steve Hampton</Option>
-          <Option value="ciaran">Ciaran Murray</Option>
-          <Option value="marina">Marina Macdonald</Option>
-          <Option value="charles">Charles Fulton</Option>
-          <Option value="jay">Jay Hoper</Option>
-        </Select>
-      </FormControl>
-    </React.Fragment>
-  );
+  // const renderFilters = () => (
+  //   <React.Fragment>
+  //     <FormControl size="sm">
+  //       {/* WILL NEED TO POPULATE THIS WITH DB DATA */}
+  //       <FormLabel>Status</FormLabel>
+  //       <Select
+  //         size="sm"
+  //         placeholder="Filter by status"
+  //         slotProps={{ button: { sx: { whiteSpace: "nowrap" } } }}
+  //       >
+  //         <Option value="completed">Completed</Option>
+  //         <Option value="in-progress">In Progress</Option>
+  //         <Option value="pending-approval">Pending Approval</Option>
+  //         <Option value="cancelled">Cancelled</Option>
+  //         <Option value="refunded">Refunded</Option>
+  //       </Select>
+  //     </FormControl>
+  //     <FormControl size="sm">
+  //       {/* WILL NEED TO POPULATE THIS WITH DB DATA */}
+  //       <FormLabel>Category</FormLabel>
+  //       <Select size="sm" placeholder="All">
+  //         <Option value="all">All</Option>
+  //         <Option value="refund">General Home</Option>
+  //         <Option value="purchase">Tiny Homes</Option>
+  //         <Option value="debit">Additions</Option>
+  //         <Option value="debit">Basements</Option>
+  //         <Option value="debit">Bathrooms</Option>
+  //       </Select>
+  //     </FormControl>
+  //     <FormControl size="sm">
+  //       {/* WILL NEED TO POPULATE THIS WITH DB DATA - ALSO NEED TO KNOW WHAT TO ADD HERE */}
+  //       <FormLabel>Customer</FormLabel>
+  //       <Select size="sm" placeholder="All">
+  //         <Option value="all">All</Option>
+  //         <Option value="olivia">Olivia Rhye</Option>
+  //         <Option value="steve">Steve Hampton</Option>
+  //         <Option value="ciaran">Ciaran Murray</Option>
+  //         <Option value="marina">Marina Macdonald</Option>
+  //         <Option value="charles">Charles Fulton</Option>
+  //         <Option value="jay">Jay Hoper</Option>
+  //       </Select>
+  //     </FormControl>
+  //   </React.Fragment>
+  // );
   return (
     <React.Fragment>
       <Sheet
@@ -206,7 +242,7 @@ export default function ClientTable() {
             </Typography>
             <Divider sx={{ my: 2 }} />
             <Sheet sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-              {renderFilters()}
+              {/* {renderFilters()} */}
               <Button color="primary" onClick={() => setOpen(false)}>
                 Submit
               </Button>
@@ -245,7 +281,7 @@ export default function ClientTable() {
             renderInput={(params) => <Input {...params} />}
           />
         </FormControl>
-        {renderFilters()}
+        {/* {renderFilters()} */}
       </Box>
       <Sheet
         className="OrderTableContainer"
@@ -273,7 +309,7 @@ export default function ClientTable() {
             "--TableCell-paddingX": "8px",
           }}
         >
-          {/* ADD CHANGES HERE MY BOY  */}
+          
           <thead>
             <tr>
               <th
@@ -284,12 +320,8 @@ export default function ClientTable() {
                   indeterminate={
                     selected.length > 0 && selected.length !== clients.length
                   }
-                  checked={selected.length === clients.length}
-                  onChange={(event) => {
-                    // setSelected(
-                    //   event.target.checked ? projects.map((project) => projects.project_id) : [],
-                    // );
-                  }}
+                  checked={clients.length > 0 && selected.length === clients.length}
+                  onChange={(handleSelectAllClick)}
                   color={
                     selected.length > 0 || selected.length === clients.length
                       ? "primary"
@@ -334,7 +366,7 @@ export default function ClientTable() {
                 Tags
               </th>
               <th style={{ width: 40, padding: "12px 6px", textAlign: "left" }}>
-                Created at
+                Utilities
               </th>
               <th
                 style={{ width: 40, padding: "12px 6px", textAlign: "left" }}
@@ -354,7 +386,7 @@ export default function ClientTable() {
               </tr>
             ) : (
               filteredClients.map((client) => {
-                console.log("Clients:", client);
+                //console.log("Clients:", client);
                 return (
                   <tr key={client.client_id}>
                     <td
@@ -421,39 +453,6 @@ export default function ClientTable() {
                     <td style={{ textAlign: "left" }}>
                       <Typography level="body-xs">{`${client.address}`}</Typography>
                     </td>
-
-                    {/* <td>
-                  <Typography level="body-xs">{project.project_id}</Typography>
-                </td>
-                <td>
-                  <Typography level="body-xs">{project.client_id ? `${project.client_id.first_name} ${project.client_id.last_name}` : 'N/A' }</Typography>
-                </td>*/}
-                    {/* <td>
-                    <Chip
-                      variant="soft"
-                      size="sm"
-                      startDecorator={
-                        project.status.name == "Completed" ? (
-                          <CheckRoundedIcon />
-                        ) : project.status.name == "Cancelled" ? (
-                          <BlockIcon />
-                        ) : project.status.name == "Active" ? (
-                          <AutorenewRoundedIcon />
-                        ) : undefined // No icon for "N/A" or other statuses
-                      }
-                      color={
-                        project.status.name == "Completed"
-                          ? "success"
-                          : project.status.name == "Active"
-                          ? "neutral"
-                          : project.status.name == "Cancelled"
-                          ? "danger"
-                          : "default" // Use default color for "N/A" or other statuses
-                      }
-                    >
-                      {project.status.name}
-                    </Chip>
-                  </td> */}
                     <td>
                       <Box
                         sx={{
@@ -478,7 +477,10 @@ export default function ClientTable() {
                     </td>
                     <td>
                       <Box sx={{ display: "flex", gap: 2, alignItems: "left" }}>
-                        <Link level="body-xs" component="button">
+                        <Link 
+                          level="body-xs" component="button"
+                          onClick={() => handleEmailClick(client.email)}
+                        >
                           Email
                         </Link>
                         <RowMenu clientId={client.client_id} />
@@ -535,6 +537,13 @@ export default function ClientTable() {
           Next
         </Button>
       </Box>
+
+      {/* Import to CSV button. Shows up when at least one client is selected  */}
+      {selected.length > 0 && (
+        <Button onClick={handleExportSelected} style={{margin: '10px 0'}}>
+          Export selected to CSV
+        </Button>
+      )}
     </React.Fragment>
   );
 }
