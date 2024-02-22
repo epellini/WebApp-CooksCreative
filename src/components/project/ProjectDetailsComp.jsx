@@ -1,4 +1,7 @@
-import * as React from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { supabaseClient } from "../../supabase-client";
+import { useParams } from "react-router-dom"; 
 import Box from "@mui/joy/Box";
 import Chip from "@mui/joy/Chip";
 import Card from "@mui/joy/Card";
@@ -20,17 +23,126 @@ import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import EditNoteIcon from '@mui/icons-material/EditNote';
 
 
-export default function EmailContent() {
-  const project = {
-    project_name: "Kitchen Remodeling Project",
-    client_id: "123",
-    project_description:
-      "A kitchen renovation project encompasses a complete overhaul of the existing kitchen space, focusing on enhancing both functionality and aesthetics. This transformation often includes the installation of new countertops, cabinets, flooring, and state-of-the-art appliances, tailored to the homeowner's preferences and needs. The goal is to create a more efficient, modern, and inviting cooking and dining area that adds value to the home and improves the quality of living.",
-    start_date: "2023-01-01",
-    end_date: "2023-12-31",
-    status: "Active",
-    type: "Development",
-  };
+export default function ProjectDetailsComp() {
+  // const project = {
+  //   project_name: "Kitchen Remodeling Project",
+  //   client_id: "123",
+  //   project_description:
+  //     "A kitchen renovation project encompasses a complete overhaul of the existing kitchen space, focusing on enhancing both functionality and aesthetics. This transformation often includes the installation of new countertops, cabinets, flooring, and state-of-the-art appliances, tailored to the homeowner's preferences and needs. The goal is to create a more efficient, modern, and inviting cooking and dining area that adds value to the home and improves the quality of living.",
+  //   start_date: "2023-01-01",
+  //   end_date: "2023-12-31",
+  //   status: "Active",
+  //   type: "Development",
+  // };
+
+  const [project, setProject] = useState({
+    project_name: "",
+    client_id: "",
+    project_description: "",
+    start_date: "",
+    end_date: "",
+    status_id: "",
+    category_id: "",
+  });
+  const [client, setClient] = useState({
+    client: {
+      id: "",
+      first_name: "",
+      last_name: "",
+      email: "",
+      phone_number: "",
+      notes: "",
+      tag: "",
+    },
+  });
+  const [status, setStatus] = useState({
+    status: {
+      category_id: "",
+      name: "",
+    },
+  });
+
+  const [category, setCategory] = useState({
+    category: {
+      id: "",
+      name: "",
+    },
+  });
+
+  const navigate = useNavigate();
+  const supabase = supabaseClient;
+  const { id } = useParams();
+
+
+  useEffect(() => {
+    const getProject = async () => {
+        if(id){
+          const { data: projectData, error: projectError } = await supabase
+            .from("projects")
+            .select("*")
+            .eq("project_id", id)
+            .single();
+          if (projectError) {
+            console.log("Error fetching project details:", projectError.message);
+          } else {
+            setProject(projectData);
+          }
+
+          const { data: clientData, error: clientError } = await supabase
+            .from("clients")
+            .select("*")
+            .eq("client_id", projectData.client_id)
+            .single();
+            console.log(clientData);
+          if (clientError) {
+            console.log("Error fetching client details:", clientError.message);
+          } else {
+            setClient(clientData);
+          }
+
+          const { data: statusData, error: statusError } = await supabase
+            .from("status")
+            .select("*")
+            .eq("status_id", projectData.status_id)
+            .single();
+          if (statusError) {
+            console.log("Error fetching status details:", statusError.message);
+          }
+          else {
+            setStatus(statusData);
+          }
+
+          const { data: categoryData, error: categoryError } = await supabase
+            .from("category")
+            .select("*")
+            .eq("category_id", projectData.category_id)
+            .single();
+          if (categoryError) {
+            console.log("Error fetching category details:", categoryError.message);
+          }
+          else {
+            setCategory(categoryData);
+          }
+
+
+
+          
+
+        }
+    }
+    getProject();
+  }, []); // Fetch projects when the component mounts
+
+  async function deleteProject(project_id) {
+    const { error } = await supabase.from("projects").delete().match({ project_id });
+    if (error) {
+      console.error("Error deleting project:", error);
+    } else {
+      console.log("Project deleted successfully");
+      // navigate back to the projects page
+      navigate("/projects");
+    }
+  }
 
   const [open, setOpen] = React.useState([false, false, false]);
 
@@ -85,7 +197,7 @@ export default function EmailContent() {
             variant="plain"
             color="neutral"
             startDecorator={<EditNoteIcon />}
-            onClick={() => handleSnackbarOpen(1)}
+            onClick={() => navigate(`/projects/edit/${project.project_id}`)}
           >
             Edit Project
           </Button>
@@ -113,7 +225,7 @@ export default function EmailContent() {
             variant="plain"
             color="danger"
             startDecorator={<DeleteRoundedIcon />}
-            onClick={() => handleSnackbarOpen(2)}
+            onClick={() => deleteProject(project.project_id)}
           >
             Delete
           </Button>
@@ -147,8 +259,10 @@ export default function EmailContent() {
           alignItems: "start",
         }}
       >
+
+
         <Typography level="title-md" textColor="text.primary">
-          Project Client: Mr. Smith -
+          Project Client: {client.first_name} {client.last_name}
           <Typography
             variant="body2"
             component="span"
@@ -174,7 +288,7 @@ export default function EmailContent() {
               component="span"
               sx={{ mr: 1, display: "inline-block" }}
             >
-              Project Start Date:
+              Project Start Date: 
             </Typography>
             <Tooltip size="sm" variant="outlined">
               <Chip size="sm" variant="soft" color="primary">
@@ -205,7 +319,7 @@ export default function EmailContent() {
           component="span"
           sx={{ mr: 1, display: "inline-block" }}
         >
-          Project Status: {project.status}
+          Project Status: {status.name}
         </Typography>
         <Typography
           mt={1}
@@ -214,7 +328,7 @@ export default function EmailContent() {
           component="span"
           sx={{ mr: 1, display: "inline-block" }}
         >
-          Project Category: {project.type}
+          Project Category: {category.name}
         </Typography>
       </Box>
 

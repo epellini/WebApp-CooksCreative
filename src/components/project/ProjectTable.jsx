@@ -39,6 +39,7 @@ import { useEffect, useState } from "react";
 import { supabaseClient } from "../../supabase-client"; // Import the supabase client
 import { Skeleton } from "@mui/joy";
 
+
 function RowMenu({ projectId }) {
   const navigate = useNavigate();
 
@@ -77,8 +78,11 @@ export default function ProjectTable() {
   const [selectedClient, setSelectedClient] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const navigate = useNavigate();
+
 
   useEffect(() => {
+
     async function getProjects() {
       setLoading(true); // Start loading
       const { data, error } = await supabaseClient.from("projects").select(`
@@ -128,6 +132,7 @@ export default function ProjectTable() {
 
 
   return (
+
     <React.Fragment>
       <Sheet
         className="SearchAndFilters-mobile"
@@ -427,7 +432,11 @@ export default function ProjectTable() {
                       </td>
                       <td style={{ textAlign: "left" }}>
                         {project ? (
-                          <Typography level="body-xs">{`${project.project_name}`}</Typography>
+                          <Typography 
+                          level="body-xs"
+                          onClick={() => navigate(`/projects/${project.project_id}`)}
+                          style={{cursor: "pointer"}}
+                          >{`${project.project_name}`}</Typography>
                         ) : (
                           <Typography level="body-xs">N/A</Typography>
                         )}
@@ -435,7 +444,12 @@ export default function ProjectTable() {
                       <td style={{ textAlign: "left" }}>
                         {/* Displaying client's first name and last name if available */}
                         {project.clients ? (
-                          <Typography level="body-xs">{`${project.clients.first_name} ${project.clients.last_name}`}</Typography>
+                          
+                          <Typography 
+                          level="body-xs"
+                          onClick={() => navigate(`/projects/${project.project_id}`)}
+                          style={{cursor: "pointer"}}
+                          >{`${project.clients.first_name} ${project.clients.last_name}`}</Typography>
                         ) : (
                           <Typography level="body-xs">N/A</Typography>
                         )}
@@ -448,6 +462,8 @@ export default function ProjectTable() {
                   </td>*/}
                       <td style={{ textAlign: "center" }}>
                         <Chip
+                          onClick={() => navigate(`/projects/${project.project_id}`)}
+                          style={{cursor: "pointer"}}
                           variant="soft"
                           size="sm"
                           startDecorator={
@@ -481,21 +497,30 @@ export default function ProjectTable() {
                         {/* <Typography level="body-xs">{status.name}</Typography> */}
                         {/* </div> */}
                         {project ? (
-                          <Typography level="body-xs">{`${project.start_date}`}</Typography>
+                          <Typography 
+                          onClick={() => navigate(`/projects/${project.project_id}`)}
+                          style={{cursor: "pointer"}}
+                          level="body-xs">{`${project.start_date}`}</Typography>
                         ) : (
                           <Typography level="body-xs">N/A</Typography>
                         )}
                       </td>
                       <td style={{ textAlign: "left" }}>
                         {project ? (
-                          <Typography level="body-xs">{`${project.end_date}`}</Typography>
+                          <Typography 
+                          onClick={() => navigate(`/projects/${project.project_id}`)}
+                          style={{cursor: "pointer"}}
+                          level="body-xs">{`${project.end_date}`}</Typography>
                         ) : (
                           <Typography level="body-xs">N/A</Typography>
                         )}
                       </td>
                       <td style={{ textAlign: "left" }}>
                         {project ? (
-                          <Typography level="body-xs">{`${project.category.name}`}</Typography>
+                          <Typography 
+                          onClick={() => navigate(`/projects/${project.project_id}`)}
+                          style={{cursor: "pointer"}}
+                          level="body-xs">{`${project.category.name}`}</Typography>
                         ) : (
                           <Typography level="body-xs">N/A</Typography>
                         )}

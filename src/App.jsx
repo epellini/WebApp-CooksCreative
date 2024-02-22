@@ -6,7 +6,7 @@ import Home from "./pages/Home.jsx";
 import Clients from "./pages/Clients/Clients.jsx";
 import NotFound from "./pages/NotFound.jsx";
 import Projects from "./pages/Projects/Projects.jsx";
-import ProjectDetails from "./pages/Projects/ProjectDetails"; // Import the Project component
+import ProjectDetailsComp from "./components/project/ProjectDetailsComp.jsx"; // Import the project details component
 // import ProjectForm from "./pages/Projects/ProjectForm.jsx"; // Import the project form component
 import BetterProjectForm from './components/project/BetterProjectForm.jsx';
 
@@ -40,7 +40,7 @@ function App() {
             {/* PROJECTS ROUTES */}
             <Route path="/projects">
               <Route index element={<Projects/>}/>
-              <Route path=":id" element={<ProjectDetails/>} />
+              <Route path=":id" element={<ProjectDetailsComp/>} />
               <Route path="new" element={<BetterProjectForm/>} />
               <Route path="edit/:projectid" element={<BetterProjectForm/>} />
             </Route>
