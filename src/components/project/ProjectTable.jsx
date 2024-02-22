@@ -38,7 +38,7 @@ import Autocomplete from "@mui/joy/Autocomplete";
 import { useEffect, useState } from "react";
 import { supabaseClient } from "../../supabase-client"; // Import the supabase client
 import { Skeleton } from "@mui/joy";
-
+import { usePagination } from "../../hooks/usePagination";
 
 function RowMenu({ projectId }) {
   const navigate = useNavigate();
@@ -80,9 +80,7 @@ export default function ProjectTable() {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const navigate = useNavigate();
 
-
   useEffect(() => {
-
     async function getProjects() {
       setLoading(true); // Start loading
       const { data, error } = await supabaseClient.from("projects").select(`
@@ -107,22 +105,22 @@ export default function ProjectTable() {
     }
     getProjects();
   }, []);
+
   const filteredProjects = projects.filter((project) => {
     const clientMatches =
       !selectedClient ||
-      `${project.clients.first_name} ${project.clients.last_name}`
-        .toLowerCase() ===
-      `${selectedClient.first_name} ${selectedClient.last_name}`.toLowerCase();
-  
+      `${project.clients.first_name} ${project.clients.last_name}`.toLowerCase() ===
+        `${selectedClient.first_name} ${selectedClient.last_name}`.toLowerCase();
+
     const statusMatches =
       !selectedStatus ||
       project.status.name.toLowerCase() === selectedStatus.name.toLowerCase();
-  
+
     const categoryMatches =
       !selectedCategory ||
       project.category.name.toLowerCase() ===
         selectedCategory.name.toLowerCase();
-  
+
     return (
       clientMatches &&
       (!selectedStatus || statusMatches) &&
@@ -130,9 +128,16 @@ export default function ProjectTable() {
     );
   });
 
+  const {
+    currentItems: currentProjects,
+    currentPage,
+    totalPages,
+    handlePageChange,
+    handlePrevious,
+    handleNext,
+  } = usePagination(filteredProjects, 10);
 
   return (
-
     <React.Fragment>
       <Sheet
         className="SearchAndFilters-mobile"
@@ -394,7 +399,7 @@ export default function ProjectTable() {
                     </tr>
                   )
                 )
-              : filteredProjects.map((project) => {
+              : currentProjects.map((project) => {
                   return (
                     <tr key={project.project_id}>
                       <td
@@ -432,10 +437,12 @@ export default function ProjectTable() {
                       </td>
                       <td style={{ textAlign: "left" }}>
                         {project ? (
-                          <Typography 
-                          level="body-xs"
-                          onClick={() => navigate(`/projects/${project.project_id}`)}
-                          style={{cursor: "pointer"}}
+                          <Typography
+                            level="body-xs"
+                            onClick={() =>
+                              navigate(`/projects/${project.project_id}`)
+                            }
+                            style={{ cursor: "pointer" }}
                           >{`${project.project_name}`}</Typography>
                         ) : (
                           <Typography level="body-xs">N/A</Typography>
@@ -444,11 +451,12 @@ export default function ProjectTable() {
                       <td style={{ textAlign: "left" }}>
                         {/* Displaying client's first name and last name if available */}
                         {project.clients ? (
-                          
-                          <Typography 
-                          level="body-xs"
-                          onClick={() => navigate(`/projects/${project.project_id}`)}
-                          style={{cursor: "pointer"}}
+                          <Typography
+                            level="body-xs"
+                            onClick={() =>
+                              navigate(`/projects/${project.project_id}`)
+                            }
+                            style={{ cursor: "pointer" }}
                           >{`${project.clients.first_name} ${project.clients.last_name}`}</Typography>
                         ) : (
                           <Typography level="body-xs">N/A</Typography>
@@ -462,8 +470,10 @@ export default function ProjectTable() {
                   </td>*/}
                       <td style={{ textAlign: "center" }}>
                         <Chip
-                          onClick={() => navigate(`/projects/${project.project_id}`)}
-                          style={{cursor: "pointer"}}
+                          onClick={() =>
+                            navigate(`/projects/${project.project_id}`)
+                          }
+                          style={{ cursor: "pointer" }}
                           variant="soft"
                           size="sm"
                           startDecorator={
@@ -497,30 +507,39 @@ export default function ProjectTable() {
                         {/* <Typography level="body-xs">{status.name}</Typography> */}
                         {/* </div> */}
                         {project ? (
-                          <Typography 
-                          onClick={() => navigate(`/projects/${project.project_id}`)}
-                          style={{cursor: "pointer"}}
-                          level="body-xs">{`${project.start_date}`}</Typography>
+                          <Typography
+                            onClick={() =>
+                              navigate(`/projects/${project.project_id}`)
+                            }
+                            style={{ cursor: "pointer" }}
+                            level="body-xs"
+                          >{`${project.start_date}`}</Typography>
                         ) : (
                           <Typography level="body-xs">N/A</Typography>
                         )}
                       </td>
                       <td style={{ textAlign: "left" }}>
                         {project ? (
-                          <Typography 
-                          onClick={() => navigate(`/projects/${project.project_id}`)}
-                          style={{cursor: "pointer"}}
-                          level="body-xs">{`${project.end_date}`}</Typography>
+                          <Typography
+                            onClick={() =>
+                              navigate(`/projects/${project.project_id}`)
+                            }
+                            style={{ cursor: "pointer" }}
+                            level="body-xs"
+                          >{`${project.end_date}`}</Typography>
                         ) : (
                           <Typography level="body-xs">N/A</Typography>
                         )}
                       </td>
                       <td style={{ textAlign: "left" }}>
                         {project ? (
-                          <Typography 
-                          onClick={() => navigate(`/projects/${project.project_id}`)}
-                          style={{cursor: "pointer"}}
-                          level="body-xs">{`${project.category.name}`}</Typography>
+                          <Typography
+                            onClick={() =>
+                              navigate(`/projects/${project.project_id}`)
+                            }
+                            style={{ cursor: "pointer" }}
+                            level="body-xs"
+                          >{`${project.category.name}`}</Typography>
                         ) : (
                           <Typography level="body-xs">N/A</Typography>
                         )}
@@ -558,32 +577,65 @@ export default function ProjectTable() {
           variant="outlined"
           color="neutral"
           startDecorator={<KeyboardArrowLeftIcon />}
+          onClick={handlePrevious}
+          disabled={currentPage === 1}
         >
           Previous
         </Button>
 
-        <Box sx={{ flex: 1 }} />
-        {["1", "2", "3", "…", "8", "9", "10"].map((page) => (
-          <IconButton
-            key={page}
-            size="sm"
-            variant={Number(page) ? "outlined" : "plain"}
-            color="neutral"
-          >
-            {page}
-          </IconButton>
-        ))}
-        <Box sx={{ flex: 1 }} />
+        <Box sx={{ flex: 1, display: "flex", justifyContent: "center" }}>
+          {[...Array(totalPages).keys()].map((number) => (
+            <IconButton
+              key={number + 1}
+              size="sm"
+              color="neutral"
+              variant="outlined"
+              onClick={() => handlePageChange(number + 1)}
+              sx={{
+                backgroundColor:
+                  currentPage === number + 1 ? "primary.main" : "transparent",
+                color:
+                  currentPage === number + 1
+                    ? "primary.contrastText"
+                    : "inherit",
+                "&:hover": {
+                  backgroundColor:
+                    currentPage === number + 1
+                      ? "primary.dark"
+                      : "action.hover",
+                },
+                mx: 0.5, // Add some margin for spacing
+                border:
+                  currentPage === number + 1
+                    ? "2px solid primary.dark"
+                    : "1px solid rgba(0, 0, 0, 0.23)", // Adjust for your theme
+                boxShadow:
+                  currentPage === number + 1 ? "palette.primary.main" : "none", // Optional: adds a glow effect for the current page
+              }}
+            >
+              {number + 1}
+            </IconButton>
+          ))}
+        </Box>
 
         <Button
           size="sm"
           variant="outlined"
           color="neutral"
           endDecorator={<KeyboardArrowRightIcon />}
+          onClick={handleNext}
+          disabled={currentPage === totalPages}
         >
           Next
         </Button>
       </Box>
+
+      {/* Import to CSV button. Shows up when at least one client is selected  */}
+      {selected.length > 0 && (
+        <Button onClick={handleExportSelected} style={{ margin: "10px 0" }}>
+          Export selected to CSV
+        </Button>
+      )}
     </React.Fragment>
   );
 }
