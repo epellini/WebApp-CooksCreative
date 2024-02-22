@@ -104,6 +104,38 @@ export default function ClientTable() {
     getClients();
   }, []);
 
+  const filteredClients = selectedClient
+    ? clients.filter((client) => client.client_id === selectedClient.client_id)
+    : clients;
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
+  // Calculate total pages
+  const totalPages = Math.ceil(filteredClients.length / itemsPerPage);
+
+  // Determine the clients for the current page
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentClients = filteredClients.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
+
+  // Handle page change
+  const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
+
+  // Previous and Next page handlers
+  const handlePrevious = () =>
+    setCurrentPage((currentPage) => Math.max(1, currentPage - 1));
+  const handleNext = () =>
+    setCurrentPage((currentPage) => Math.min(totalPages, currentPage + 1));
+
+  const pageNumbers = [];
+  for (let i = 0; i < totalPages; i++) {
+    pageNumbers.push(i);
+  }
+
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
       // Select all clients
@@ -117,27 +149,30 @@ export default function ClientTable() {
 
   // This function copies the email of the client in clipboard and also redirects to email
   function handleEmailClick(emailAddress) {
-    navigator.clipboard.writeText(emailAddress).then(() => {
-      console.log('Email address copied to clipboard');
-    }).catch(err => {
-      console.error('Failed to copy email address: ', err);
-    });
-  
+    navigator.clipboard
+      .writeText(emailAddress)
+      .then(() => {
+        console.log("Email address copied to clipboard");
+      })
+      .catch((err) => {
+        console.error("Failed to copy email address: ", err);
+      });
+
     // Open default email client with the email address in the "To" field
     window.location.href = `mailto:${emailAddress}`;
   }
 
   const handleExportSelected = () => {
     // Filter the clients to only those selected
-    const selectedClientsData = clients.filter(client => 
+    const selectedClientsData = clients.filter((client) =>
       selected.includes(client.client_id.toString())
     );
-  
+
     // Convert the selected clients' data to CSV
     const csvData = convertToCSV(selectedClientsData);
-  
+
     // Trigger the CSV file download
-    downloadCSV(csvData, 'SelectedClients.csv');
+    downloadCSV(csvData, "SelectedClients.csv");
   };
 
   // useEffect(() => {
@@ -160,10 +195,6 @@ export default function ClientTable() {
   //       `${client.first_name} ${client.last_name}`.toLowerCase().includes(selectedClient)
   //     )
   //   : clients;
-
-  const filteredClients = selectedClient
-    ? clients.filter((client) => client.client_id === selectedClient.client_id)
-    : clients;
 
   // FILTERS
   // const renderFilters = () => (
@@ -309,7 +340,6 @@ export default function ClientTable() {
             "--TableCell-paddingX": "8px",
           }}
         >
-          
           <thead>
             <tr>
               <th
@@ -320,8 +350,10 @@ export default function ClientTable() {
                   indeterminate={
                     selected.length > 0 && selected.length !== clients.length
                   }
-                  checked={clients.length > 0 && selected.length === clients.length}
-                  onChange={(handleSelectAllClick)}
+                  checked={
+                    clients.length > 0 && selected.length === clients.length
+                  }
+                  onChange={handleSelectAllClick}
                   color={
                     selected.length > 0 || selected.length === clients.length
                       ? "primary"
@@ -385,7 +417,8 @@ export default function ClientTable() {
                 </td>
               </tr>
             ) : (
-              filteredClients.map((client) => {
+              currentClients.map((client) => {
+                // filteredClients.map((client) => {
                 //console.log("Clients:", client);
                 return (
                   <tr key={client.client_id}>
@@ -477,8 +510,9 @@ export default function ClientTable() {
                     </td>
                     <td>
                       <Box sx={{ display: "flex", gap: 2, alignItems: "left" }}>
-                        <Link 
-                          level="body-xs" component="button"
+                        <Link
+                          level="body-xs"
+                          component="button"
                           onClick={() => handleEmailClick(client.email)}
                         >
                           Email
@@ -506,7 +540,7 @@ export default function ClientTable() {
           },
         }}
       >
-        <Button
+        {/* <Button
           size="sm"
           variant="outlined"
           color="neutral"
@@ -535,12 +569,85 @@ export default function ClientTable() {
           endDecorator={<KeyboardArrowRightIcon />}
         >
           Next
+        </Button> */}
+        <Button
+          size="sm"
+          variant="outlined"
+          color="neutral"
+          startDecorator={<KeyboardArrowLeftIcon />}
+          onClick={handlePrevious}
+          disabled={currentPage === 1}
+        >
+          Previous
+        </Button>
+
+        {/* <Box sx={{ flex: 1, display: "flex", justifyContent: "center" }}>
+          {pageNumbers.map((page) => (
+            <IconButton
+              key={page}
+              size="sm"
+              variant={currentPage === page ? "contained" : "outlined"}
+              color="neutral"
+              onClick={() => handlePageChange(page)}
+            >
+              {page}
+            </IconButton>
+          ))}
+        </Box> */}
+
+        {/* This is working version, the UI is not what we want  */}
+        {/* {[...Array(totalPages).keys()].map(number => (
+          <Button
+            key={number + 1}
+            onClick={() => handlePageChange(number + 1)}
+            disabled={currentPage === number + 1}
+          >
+            {number + 1}
+          </Button>
+        ))} */}
+
+        <Box sx={{ flex: 1, display: "flex", justifyContent: "center" }}>
+          {[...Array(totalPages).keys()].map((number) => (
+            <IconButton
+              key={number + 1}
+              size="sm"
+              color="neutral"
+              variant="outlined"
+              onClick={() => handlePageChange(number + 1)}
+              sx={{
+                backgroundColor:
+                  currentPage === number + 1 ? "primary.main" : "transparent",
+                color:
+                  currentPage === number + 1 ? "primary.contrastText" : "inherit",
+                "&:hover": {
+                  backgroundColor:
+                    currentPage === number + 1 ? "primary.dark" : "action.hover",
+                },
+                mx: 0.5, // Add some margin for spacing
+                border: currentPage === number + 1 ? '2px solid primary.dark' : '1px solid rgba(0, 0, 0, 0.23)', // Adjust for your theme
+                boxShadow: currentPage === number + 1 ? 'palette.primary.main' : 'none', // Optional: adds a glow effect for the current page
+              }}
+            >
+              {number + 1}
+            </IconButton>
+          ))}
+        </Box>
+
+        <Button
+          size="sm"
+          variant="outlined"
+          color="neutral"
+          endDecorator={<KeyboardArrowRightIcon />}
+          onClick={handleNext}
+          disabled={currentPage === totalPages}
+        >
+          Next
         </Button>
       </Box>
 
       {/* Import to CSV button. Shows up when at least one client is selected  */}
       {selected.length > 0 && (
-        <Button onClick={handleExportSelected} style={{margin: '10px 0'}}>
+        <Button onClick={handleExportSelected} style={{ margin: "10px 0" }}>
           Export selected to CSV
         </Button>
       )}
