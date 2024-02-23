@@ -29,6 +29,7 @@ import {
   DialogActions,
   MenuItem,
   Sheet,
+  Chip,
 } from "@mui/joy";
 
 import Tab, { tabClasses } from "@mui/joy/Tab";
@@ -46,7 +47,7 @@ export default function TasksLayoutMain() {
 
   return (
     <React.Fragment>
-     <Sheet
+      <Sheet
         className="OrderTableContainer"
         variant="outlined"
         sx={{
@@ -63,103 +64,113 @@ export default function TasksLayoutMain() {
           overflow: "auto",
           minHeight: 0,
         }}
-      >
+      ></Sheet>
 
-      </Sheet>
-
-    <Box sx={{ flex: 1, width: "100%" }}>
-      
-      <Stack
-        spacing={4}
-        sx={{
-          display: "flex",
-          maxWidth: "800px",
-          mx: "auto",
-          px: { xs: 2, md: 6 },
-          py: { xs: 2, md: 3 },
-        }}
-      >
-        <Card>
-          <Box sx={{ mb: 1 }}>
-            <Typography level="title-md">Personal info</Typography>
-            <Typography level="body-sm">All tasks</Typography>
-          </Box>
-          <Divider />
-          <Stack
-            direction="row"
-            spacing={3}
-            sx={{ display: { xs: "none", md: "flex" }, my: 1 }}
-          >
-            <Stack spacing={2} sx={{ flexGrow: 1 }}>
-              HI
-              <Stack spacing={1}></Stack>
-            </Stack>
-          </Stack>
-
-          <React.Fragment>
-            <Button
-              variant="outlined"
-              color="neutral"
-              startDecorator={<Add />}
-              onClick={() => setOpen(true)}
+      <Box sx={{ flex: 1, width: "100%" }}>
+        <Stack
+          spacing={4}
+          sx={{
+            display: "flex",
+            maxWidth: "800px",
+            mx: "auto",
+            px: { xs: 2, md: 6 },
+            py: { xs: 2, md: 3 },
+          }}
+        >
+          <Card>
+            <Box sx={{ mb: 1 }}>
+              <Typography level="title-md">All Tasks</Typography>
+              <Typography level="body-sm">Showing all tasks bla bla</Typography>
+            </Box>
+            <Divider />
+            <Stack
+              direction="row"
+              spacing={3}
+              sx={{ display: { xs: "none", md: "flex" }, my: 1 }}
             >
-              New Task
-            </Button>
-            <Modal open={open} onClose={() => setOpen(false)}>
-              <ModalDialog>
-                <DialogTitle>New Task</DialogTitle>
-                <DialogContent sx={{ textAlign: "left" }}>
-                  Fill in the form to create task
-                </DialogContent>
-                <form
-                  onSubmit={(event) => {
-                    event.preventDefault();
-                    setOpen(false);
-                  }}
-                >
-                  <Stack spacing={1}>
-                    <Stack direction="row" spacing={2} >
-                      <FormControl sx={{ flexGrow: 1, width:'50%' }}>
-                        <FormLabel>Name:</FormLabel>
+              <Stack spacing={2} sx={{ flexGrow: 1 }}>
+                HI
+                <Stack spacing={1}></Stack>
+              </Stack>
+            </Stack>
+
+            <React.Fragment>
+              <Button
+                variant="outlined"
+                color="neutral"
+                startDecorator={<Add />}
+                onClick={() => setOpen(true)}
+              >
+                New Task
+              </Button>
+              <Modal open={open} onClose={() => setOpen(false)}>
+                <ModalDialog>
+                  <DialogTitle>New Task</DialogTitle>
+                  <DialogContent sx={{ textAlign: "left" }}>
+                    Fill in the form to create task
+                  </DialogContent>
+                  <form
+                    onSubmit={(event) => {
+                      event.preventDefault();
+                      setOpen(false);
+                    }}
+                  >
+                    <Stack direction="column" spacing={2}>
+                      <FormControl sx={{ flexGrow: 1 }}>
+                        <FormLabel>Task:</FormLabel>
                         <Input autoFocus required />
                       </FormControl>
 
-                      <FormControl sx={{ flexGrow: 1,width:'50%' }}>
+                      <FormControl sx={{ flexGrow: 1 }}>
                         <FormLabel>Assign to:</FormLabel>
-                        <Select placeholder="Assign to" required>
-                          <MenuItem>Dimitri</MenuItem>
+                        <Select
+                          multiple
+                          defaultValue={["dog", "cat"]}
+                          renderValue={(selected) => (
+                            <Box sx={{ display: "flex", gap: "0.25rem" }}>
+                              {selected.map((selectedOption) => (
+                                <Chip variant="soft" color="primary">
+                                  {selectedOption.label}
+                                </Chip>
+                              ))}
+                            </Box>
+                          )}
+                          sx={{
+                            minWidth: "15rem",
+                          }}
+                          slotProps={{
+                            listbox: {
+                              sx: {
+                                width: "100%",
+                              },
+                            },
+                          }}
+                        >
+                          <Option value="dog">Dog</Option>
+                          <Option value="cat">Cat</Option>
+                          <Option value="fish">Fish</Option>
+                          <Option value="bird">Bird</Option>
                         </Select>
                       </FormControl>
+
+                      <FormControl sx={{ flex: 1 }} size="sm">
+                        <FormLabel>Project:</FormLabel>
+                        <Autocomplete
+                          placeholder="Combo box"
+                          options={options}
+                          sx={{ width: 300 }}
+                        />
+                      </FormControl>
+
+                      <Button type="submit">Create</Button>
                     </Stack>
+                  </form>
+                </ModalDialog>
+              </Modal>
+            </React.Fragment>
 
-                    <FormControl sx={{ flex: 1 }} size="sm">
-                      <FormLabel>Project:</FormLabel>
-                      <Autocomplete
-                        placeholder="Combo box"
-                        options={options}
-                        sx={{ width: 300 }}
-                      />
-                    </FormControl>
-
-                    <FormControl>
-                      <FormLabel>Notes:</FormLabel>
-                      <Textarea
-                        size="sm"
-                        minRows={3}
-                        sx={{ flexGrow: 1 }}
-                        required
-                      />
-                    </FormControl>
-
-                    <Button type="submit">Create</Button>
-                  </Stack>
-                </form>
-              </ModalDialog>
-            </Modal>
-          </React.Fragment>
-
-          {/* Mobile View */}
-          <Stack
+            {/* Mobile View */}
+            {/* <Stack
             direction="column"
             spacing={2}
             sx={{ display: { xs: "flex", md: "none" }, my: 1 }}
@@ -216,20 +227,22 @@ export default function TasksLayoutMain() {
               <FormLabel>Role</FormLabel>
               <Input size="sm" defaultValue="UI Developer" />
             </FormControl>
-          </Stack>
-          <CardOverflow sx={{ borderTop: "1px solid", borderColor: "divider" }}>
-            <CardActions sx={{ alignSelf: "flex-end", pt: 2 }}>
-              <Button size="sm" variant="outlined" color="neutral">
-                Cancel
-              </Button>
-              <Button size="sm" variant="solid">
-                Save
-              </Button>
-            </CardActions>
-          </CardOverflow>
-        </Card>
-      </Stack>
-    </Box>
+          </Stack> */}
+            <CardOverflow
+              sx={{ borderTop: "1px solid", borderColor: "divider" }}
+            >
+              <CardActions sx={{ alignSelf: "flex-end", pt: 2 }}>
+                <Button size="sm" variant="outlined" color="neutral">
+                  Cancel
+                </Button>
+                <Button size="sm" variant="solid">
+                  Save
+                </Button>
+              </CardActions>
+            </CardOverflow>
+          </Card>
+        </Stack>
+      </Box>
     </React.Fragment>
   );
 }

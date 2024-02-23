@@ -53,7 +53,7 @@ const TasksPage = () => {
                 <HomeRoundedIcon />
               </Link>
               <Typography color="primary" fontWeight={500} fontSize={12}>
-                Projects
+                Tasks
               </Typography>
             </Breadcrumbs>
           </Box>
