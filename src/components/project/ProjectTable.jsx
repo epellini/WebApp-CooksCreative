@@ -16,6 +16,7 @@ import Option from "@mui/joy/Option";
 import Table from "@mui/joy/Table";
 import Sheet from "@mui/joy/Sheet";
 import Checkbox from "@mui/joy/Checkbox";
+import Badge from "@mui/joy/Badge";
 import IconButton, { iconButtonClasses } from "@mui/joy/IconButton";
 import Typography from "@mui/joy/Typography";
 import Menu from "@mui/joy/Menu";
@@ -34,6 +35,7 @@ import MoreHorizRoundedIcon from "@mui/icons-material/MoreHorizRounded";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import { useNavigate } from "react-router-dom";
 import Autocomplete from "@mui/joy/Autocomplete";
+import { MoreVertOutlined } from "@mui/icons-material";
 
 import { useEffect, useState } from "react";
 import { supabaseClient } from "../../supabase-client"; // Import the supabase client
@@ -137,6 +139,17 @@ export default function ProjectTable() {
     handleNext,
   } = usePagination(filteredProjects, 10);
 
+  const getStatusColor = (statusName) => {
+    switch (statusName.toLowerCase()) {
+      case "completed":
+        return "success";
+      case "active":
+        return "warning";
+      case "cancelled":
+        return "danger";
+    }
+  };
+
   return (
     <React.Fragment>
       <Sheet
@@ -176,7 +189,13 @@ export default function ProjectTable() {
         sx={{
           borderRadius: "sm",
           py: 2,
-          display: { xs: "none", sm: "flex" },
+          display: {
+            xs: "none",
+            sm: "none",
+            md: "flex",
+            lg: "flex",
+            xl: "flex",
+          },
           flexWrap: "wrap",
           gap: 1.5,
           "& > *": {
@@ -256,7 +275,13 @@ export default function ProjectTable() {
         className="OrderTableContainer"
         variant="outlined"
         sx={{
-          display: { xs: "none", sm: "initial" },
+          display: {
+            xs: "none",
+            sm: "none",
+            md: "initial",
+            lg: "initial",
+            xl: "initial",
+          },
           width: "100%", // if you want to make the table full width <----- HERE
           borderRadius: "sm",
           flexShrink: 1,
@@ -278,7 +303,7 @@ export default function ProjectTable() {
             "--TableCell-paddingX": "8px",
           }}
         >
-          {/* ADD CHANGES HERE MY BOY  */}
+          {/* TABLE HEAD BEGINS HERE */}
           <thead>
             <tr>
               <th
@@ -462,12 +487,7 @@ export default function ProjectTable() {
                           <Typography level="body-xs">N/A</Typography>
                         )}
                       </td>
-                      {/* <td>
-                    <Typography level="body-xs">{project.project_id}</Typography>
-                  </td>
-                  <td>
-                    <Typography level="body-xs">{project.client_id ? `${project.client_id.first_name} ${project.client_id.last_name}` : 'N/A' }</Typography>
-                  </td>*/}
+
                       <td style={{ textAlign: "center" }}>
                         <Chip
                           onClick={() =>
@@ -500,12 +520,6 @@ export default function ProjectTable() {
                       </td>
 
                       <td style={{ textAlign: "left" }}>
-                        {/* <Avatar size="sm">{project.client.first_name}</Avatar> */}
-                        {/* <div> */}
-                        {/* <Typography level="body-xs">{project.client_id }</Typography> */}
-
-                        {/* <Typography level="body-xs">{status.name}</Typography> */}
-                        {/* </div> */}
                         {project ? (
                           <Typography
                             onClick={() =>
@@ -560,6 +574,132 @@ export default function ProjectTable() {
           </tbody>
         </Table>
       </Sheet>
+
+      {/* Mobile View Table goes here? */}
+      <Sheet
+        textAlign="left"
+        className="OrderTableContainer-mobile"
+        variant="outlined"
+        sx={{
+          display: {
+            xs: "flex",
+            sm: "flex",
+            md: "none",
+            lg: "none",
+            xl: "none",
+          },
+          width: "100%",
+          borderRadius: "sm",
+          flexShrink: 1,
+          overflow: "auto",
+          minHeight: 0,
+        }}
+      >
+        <Table
+          aria-labelledby="tableTitle-mobile"
+          size="small"
+          sx={{
+            "--TableCell-paddingY": "6px",
+            "--TableCell-paddingX": "8px",
+          }}
+        >
+          <thead>
+            <tr>
+              <th style={{ width: 48, textAlign: "center" }}></th>
+              <th>Project</th>
+              <th>Client</th>
+              <th style={{textAlign: "center"}} >Status</th>
+              <th style={{ width: 48, textAlign: "center" }}></th>
+            </tr>
+          </thead>
+          <tbody>
+            {loading
+              ? Array.from(new Array(5)).map((_, index) => (
+                  <tr key={index}>
+                    <td colSpan={5} style={{ textAlign: "left" }}>
+                      <Skeleton variant="text" width="100%" height={30} />
+                    </td>
+                  </tr>
+                ))
+              : currentProjects.map((project) => (
+                  <tr key={project.project_id}>
+                    <td style={{ textAlign: "left" }}>
+                      <Checkbox
+                        size="sm"
+                        checked={selected.includes(
+                          project.project_id.toString()
+                        )}
+                        onChange={(event) => {
+                          if (event.target.checked) {
+                            setSelected([
+                              ...selected,
+                              project.project_id.toString(),
+                            ]);
+                          } else {
+                            setSelected(
+                              selected.filter(
+                                (id) => id !== project.project_id.toString()
+                              )
+                            );
+                          }
+                        }}
+                      />
+                    </td>
+                    <td
+                      onClick={() =>
+                        navigate(`/projects/${project.project_id}`)
+                      }
+                      style={{ cursor: "pointer" }}
+                    >
+                      <Typography
+                        sx={{
+                          textAlign: "left",
+                          fontSize: {
+                            xs: "0.8rem",
+                            sm: "0.85rem",
+                          },
+                        }}
+                      >
+                        {project.project_name}
+                      </Typography>
+                    </td>
+                    <td>
+                    <Typography
+                        sx={{
+                          textAlign: "left",
+                          fontSize: {
+                            xs: "0.8rem",
+                            sm: "0.85rem",
+                          },
+                        }}
+                      >
+                      {project.clients.first_name} {project.clients.last_name}
+                      </Typography>
+                    </td>
+                    <td style={{ justifyContent: 'center', alignItems: 'center' }}>
+                      <Badge
+                        alignItems="center"
+                        variant="outlined"
+                        label={project.status.name}
+                        color={getStatusColor(project.status.name)}
+                      />
+                    </td>
+                    <td>
+                      <Box
+                        sx={{ display: "flex", gap: 2, alignItems: "center" }}
+                      >
+                        {/* <Link level="body-xs" component="button" >
+                        Download
+                      </Link> */}
+                        <RowMenu projectId={project.project_id} />
+                      </Box>
+                    </td>
+                  </tr>
+                ))}
+          </tbody>
+        </Table>
+      </Sheet>
+
       <Box
         className="Pagination-laptopUp"
         sx={{
