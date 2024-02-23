@@ -19,6 +19,7 @@ import Protected from './components/Protected';
 import ClientDetails from './pages/Clients/ClientDetails.jsx';
 import ClientForm from './pages/Clients/ClientForm.jsx';
 import ForgotPassword from './pages/Auth/ForgotPassword.jsx';
+import TasksPage from './pages/Tasks/TasksPage.jsx';
 
 
 function App() {
@@ -36,7 +37,6 @@ function App() {
             {/* HOME ROUTE */}
             <Route index element={<Home/>} />
 
-
             {/* PROJECTS ROUTES */}
             <Route path="/projects">
               <Route index element={<Projects/>}/>
@@ -52,6 +52,17 @@ function App() {
               <Route path="new" element={<ClientForm/>}/>
               <Route path="edit/:clientId" element={<ClientForm />} />
             </Route>
+
+             {/* TASKS ROUTES */}
+
+             <Route path="/tasks">
+             <Route index element={<TasksPage/>}/>
+
+             </Route>
+
+
+
+
           </Route> {/* END OF PROTECTED ROUTE */}
           
             <Route path="/create-user" element={<CreateUserPage/>} />
