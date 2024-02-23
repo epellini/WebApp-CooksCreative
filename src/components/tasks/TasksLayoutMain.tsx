@@ -1,5 +1,6 @@
 import * as React from "react";
 import {
+  Autocomplete,
   Box,
   Button,
   AspectRatio,
@@ -27,7 +28,7 @@ import {
   DialogContent,
   DialogActions,
   MenuItem,
-
+  Sheet,
 } from "@mui/joy";
 
 import Tab, { tabClasses } from "@mui/joy/Tab";
@@ -41,78 +42,33 @@ import Add from "@mui/icons-material/Add";
 export default function TasksLayoutMain() {
   const [open, setOpen] = React.useState(false);
 
+  const options = ["The Godfather", "Pulp Fiction"];
+
   return (
-    <Box sx={{ flex: 1, width: "100%" }}>
-      <Box
+    <React.Fragment>
+     <Sheet
+        className="OrderTableContainer"
+        variant="outlined"
         sx={{
-          position: "sticky",
-          top: { sm: -100, md: -110 },
-          bgcolor: "background.body",
-          zIndex: 9995,
+          display: {
+            xs: "none",
+            sm: "none",
+            md: "initial",
+            lg: "initial",
+            xl: "initial",
+          },
+          width: "100%", // if you want to make the table full width <----- HERE
+          borderRadius: "sm",
+          flexShrink: 1,
+          overflow: "auto",
+          minHeight: 0,
         }}
       >
-        <Box sx={{ px: { xs: 2, md: 6 } }}>
-          <Breadcrumbs
-            size="sm"
-            aria-label="breadcrumbs"
-            separator={<ChevronRightRoundedIcon />}
-            sx={{ pl: 0 }}
-          >
-            <Link
-              underline="none"
-              color="neutral"
-              href="#some-link"
-              aria-label="Home"
-            >
-              <HomeRoundedIcon />
-            </Link>
-            <Typography color="primary" fontWeight={500} fontSize={12}>
-              Tasks
-            </Typography>
-          </Breadcrumbs>
-          <Typography level="h2" component="h1" sx={{ mt: 1, mb: 2 }}>
-            Tasks
-          </Typography>
-        </Box>
-        <Tabs
-          defaultValue={0}
-          sx={{
-            bgcolor: "transparent",
-          }}
-        >
-          <TabList
-            tabFlex={1}
-            size="sm"
-            sx={{
-              pl: { xs: 0, md: 4 },
-              justifyContent: "left",
-              [`&& .${tabClasses.root}`]: {
-                fontWeight: "600",
-                flex: "initial",
-                color: "text.tertiary",
-                [`&.${tabClasses.selected}`]: {
-                  bgcolor: "transparent",
-                  color: "text.primary",
-                  "&::after": {
-                    height: "2px",
-                    bgcolor: "primary.500",
-                  },
-                },
-              },
-            }}
-          >
-            <Tab sx={{ borderRadius: "6px 6px 0 0" }} indicatorInset value={0}>
-              All Tasks
-            </Tab>
-            <Tab sx={{ borderRadius: "6px 6px 0 0" }} indicatorInset value={2}>
-              Ongoing Tasks
-            </Tab>
-            <Tab sx={{ borderRadius: "6px 6px 0 0" }} indicatorInset value={3}>
-              Completed Tasks
-            </Tab>
-          </TabList>
-        </Tabs>
-      </Box>
+
+      </Sheet>
+
+    <Box sx={{ flex: 1, width: "100%" }}>
+      
       <Stack
         spacing={4}
         sx={{
@@ -161,11 +117,30 @@ export default function TasksLayoutMain() {
                     setOpen(false);
                   }}
                 >
-                  <Stack spacing={2}>
-                    <FormControl>
-                      <FormLabel>Name:</FormLabel>
-                      <Input autoFocus required />
+                  <Stack spacing={1}>
+                    <Stack direction="row" spacing={2} >
+                      <FormControl sx={{ flexGrow: 1, width:'50%' }}>
+                        <FormLabel>Name:</FormLabel>
+                        <Input autoFocus required />
+                      </FormControl>
+
+                      <FormControl sx={{ flexGrow: 1,width:'50%' }}>
+                        <FormLabel>Assign to:</FormLabel>
+                        <Select placeholder="Assign to" required>
+                          <MenuItem>Dimitri</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Stack>
+
+                    <FormControl sx={{ flex: 1 }} size="sm">
+                      <FormLabel>Project:</FormLabel>
+                      <Autocomplete
+                        placeholder="Combo box"
+                        options={options}
+                        sx={{ width: 300 }}
+                      />
                     </FormControl>
+
                     <FormControl>
                       <FormLabel>Notes:</FormLabel>
                       <Textarea
@@ -174,34 +149,6 @@ export default function TasksLayoutMain() {
                         sx={{ flexGrow: 1 }}
                         required
                       />
-                    </FormControl>
-                    <FormControl sx={{ flexGrow: 1 }}>
-                      <FormLabel>Assign to:</FormLabel>
-                      <Select
-                        placeholder="Assign to"
-                        // // id="status_id"
-                        // // name="status_id" // Add the name attribute
-                        // // value={project.status_id}
-                        // // onChange={(e, value) =>
-                        // //   handleChange(e, value, "status_id")
-                        // } // Pass the name along with the value
-                        required
-                      >
-                        <MenuItem>Dimitri</MenuItem>
-                        {/* {status.map((statusOption) => (
-                          <Option
-                            key="1"
-                            value="1"
-                             key={statusOption.status_id}
-                             value={statusOption.status_id}
-                             selected={
-                               statusOption.status_id === project.status_id
-                             }
-                          >
-                           {statusOption.name} 
-                          </Option> */}
-                        {/* ))} */}
-                      </Select>
                     </FormControl>
 
                     <Button type="submit">Create</Button>
@@ -283,5 +230,6 @@ export default function TasksLayoutMain() {
         </Card>
       </Stack>
     </Box>
+    </React.Fragment>
   );
 }
