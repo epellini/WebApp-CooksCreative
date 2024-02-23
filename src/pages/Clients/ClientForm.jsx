@@ -122,12 +122,7 @@ const ClientForm = () => {
           }}
         >
           <Box sx={{ px: { xs: 2, md: 6 } }}>
-            <Breadcrumbs
-              size="sm"
-              aria-label="breadcrumbs"
-              //separator={<ChevronRightRoundedIcon fontSize="sm" />}
-              sx={{ pl: 0 }}
-            >
+            <Breadcrumbs size="sm" aria-label="breadcrumbs" sx={{ pl: 0 }}>
               <Link underline="none" color="neutral" href="/" aria-label="Home">
                 <HomeRoundedIcon />
               </Link>
@@ -195,14 +190,15 @@ const ClientForm = () => {
                       id="last_name"
                       name="last_name"
                       value={client.last_name}
-                      onChange={handleChange} // Pass the event object directly
+                      onChange={handleChange}
                       required
                     />
                   </FormControl>
                 </Stack>
 
-                <Stack spacing={1.5}>
-                  <Box>
+                <Stack spacing={1}>
+                  {" "}
+                  <FormControl>
                     <FormLabel htmlFor="address">Address</FormLabel>
                     <Input
                       id="address"
@@ -211,8 +207,8 @@ const ClientForm = () => {
                       onChange={handleChange}
                       required
                     />
-                  </Box>
-                  <Box>
+                  </FormControl>
+                  <FormControl>
                     <FormLabel htmlFor="email">Email</FormLabel>
                     <Input
                       id="email"
@@ -221,8 +217,8 @@ const ClientForm = () => {
                       onChange={handleChange}
                       required
                     />
-                  </Box>
-                  <Box>
+                  </FormControl>
+                  <FormControl>
                     <FormLabel htmlFor="phone_number">Phone Number</FormLabel>
                     <Input
                       id="phone_number"
@@ -231,8 +227,8 @@ const ClientForm = () => {
                       onChange={handleChange}
                       required
                     />
-                  </Box>
-                  <Box>
+                  </FormControl>
+                  <FormControl>
                     <FormLabel htmlFor="notes">Notes</FormLabel>
                     <Textarea
                       size="sm"
@@ -244,8 +240,8 @@ const ClientForm = () => {
                       onChange={handleChange}
                       required
                     />
-                  </Box>
-                  <Box>
+                  </FormControl>
+                  <FormControl>
                     <FormLabel htmlFor="tag">Tag</FormLabel>
                     <Input
                       id="tag"
@@ -254,10 +250,104 @@ const ClientForm = () => {
                       onChange={handleChange}
                       required
                     />
-                  </Box>
+                  </FormControl>
                 </Stack>
               </Stack>
             </Stack>
+
+            <Stack
+              direction="column"
+              spacing={2}
+              sx={{ display: { xs: "flex", md: "none" }, my: 1 }}
+            >
+              {/* MOBILE VIEW */}
+              <Stack direction="row" spacing={2}>
+                <Stack spacing={1} sx={{ flexGrow: 1 }}>
+                  <FormControl sx={{ flexGrow: 1 }}>
+                    <FormLabel>First Name</FormLabel>
+                    <Input
+                      size="sm"
+                      type="text"
+                      id="first_name"
+                      name="first_name"
+                      value={client.first_name}
+                      onChange={handleChange} // Pass the event object directly
+                      required
+                    />
+                  </FormControl>
+                  <FormControl sx={{ flexGrow: 1 }}>
+                    <FormLabel>Last Name</FormLabel>
+                    <Input
+                      size="sm"
+                      type="text"
+                      id="last_name"
+                      name="last_name"
+                      value={client.last_name}
+                      onChange={handleChange}
+                      required
+                    />
+                  </FormControl>
+
+                  <Stack spacing={1}>
+                    {" "}
+                    <FormControl>
+                      <FormLabel htmlFor="address">Address</FormLabel>
+                      <Input
+                        id="address"
+                        name="address"
+                        value={client.address}
+                        onChange={handleChange}
+                        required
+                      />
+                    </FormControl>
+                    <FormControl>
+                      <FormLabel htmlFor="email">Email</FormLabel>
+                      <Input
+                        id="email"
+                        name="email"
+                        value={client.email}
+                        onChange={handleChange}
+                        required
+                      />
+                    </FormControl>
+                    <FormControl>
+                      <FormLabel htmlFor="phone_number">Phone Number</FormLabel>
+                      <Input
+                        id="phone_number"
+                        name="phone_number"
+                        value={client.phone_number}
+                        onChange={handleChange}
+                        required
+                      />
+                    </FormControl>
+                    <FormControl>
+                      <FormLabel htmlFor="tag">Tag</FormLabel>
+                      <Input
+                        id="tag"
+                        name="tag"
+                        value={client.tag}
+                        onChange={handleChange}
+                        required
+                      />
+                    </FormControl>
+                    <FormControl>
+                      <FormLabel htmlFor="notes">Notes</FormLabel>
+                      <Textarea
+                        size="sm"
+                        minRows={4}
+                        sx={{ flexGrow: 1 }}
+                        id="notes"
+                        name="notes"
+                        value={client.notes}
+                        onChange={handleChange}
+                        required
+                      />
+                    </FormControl>
+                  </Stack>
+                </Stack>
+              </Stack>
+            </Stack>
+
             <CardOverflow
               sx={{ borderTop: "1px solid", borderColor: "divider" }}
             >
@@ -283,83 +373,3 @@ const ClientForm = () => {
 };
 
 export default ClientForm;
-
-{
-  /* <form onSubmit={handleSubmit}>
-      <Stack spacing={2} sx={{maxWidth: 600, margin: 'auto'}}> </Stack>
-      <Box> 
-          <FormLabel htmlFor="first_name">First Name</FormLabel>
-          <Input
-            id="first_name"
-            name="first_name"
-            value={client.first_name}
-            onChange={handleChange}
-            required
-          />
-        </Box>
-        <Box>
-          <FormLabel htmlFor="last_name">Last Name</FormLabel>
-          <Input
-            id="last_name"
-            name="last_name"
-            value={client.last_name}
-            onChange={handleChange}
-            required
-          />
-        </Box>
-        <Box>
-          <FormLabel htmlFor="address">Address</FormLabel>
-          <Input
-            id="address"
-            name="address"
-            value={client.address}
-            onChange={handleChange}
-            required
-          />
-        </Box>
-        <Box>
-          <FormLabel htmlFor="email">Email</FormLabel>
-          <Input
-            id="email"
-            name="email"
-            value={client.email}
-            onChange={handleChange}
-            required
-          />
-        </Box>
-        <Box>
-          <FormLabel htmlFor="phone_number">Phone Number</FormLabel>
-          <Input
-            id="phone_number"
-            name="phone_number"
-            value={client.phone_number}
-            onChange={handleChange}
-            required
-          />
-        </Box>
-        <Box>
-          <FormLabel htmlFor="notes">Notes</FormLabel>
-          <Input
-            id="notes"
-            name="notes"
-            value={client.notes}
-            onChange={handleChange}
-            required
-          />
-        </Box>
-        <Box>
-          <FormLabel htmlFor="tag">Tag</FormLabel>
-          <Input
-            id="tag"
-            name="tag"
-            value={client.tag}
-            onChange={handleChange}
-            required
-          />
-        </Box>
-        <Button type="submit" variant="solid" color="primary" size="lg">
-        {" "}
-        {clientId ? "Update Client" : "Add Client"}
-      </Button>
-    </form> */
-}

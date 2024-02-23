@@ -142,7 +142,7 @@ export default function ProjectTable() {
       <Sheet
         className="SearchAndFilters-mobile"
         sx={{
-          display: { xs: "flex", sm: "none" },
+          display: { xs: "none", sm: "none" },
           my: 1,
           gap: 1,
         }}
