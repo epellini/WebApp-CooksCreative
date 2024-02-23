@@ -77,7 +77,7 @@ export default function ClientTable() {
   const [status, setStatus] = useState([]);
   const [open, setOpen] = React.useState(false);
   const [loading, setLoading] = useState(true);
-
+  const navigate = useNavigate();
   // const [searchQuery, setSearchQuery] = useState("");
   // const [filteredClients, setFilteredClients] = useState([]);
 
@@ -464,7 +464,11 @@ export default function ClientTable() {
                     </td>
                     {/* Displaying client's first and last names information if available */}
                     <td style={{ textAlign: "left" }}>
-                      <Typography level="body-xs">{`${client.first_name} ${client.last_name}`}</Typography>
+                      <Typography 
+                      level="body-xs" 
+                      onClick={() => navigate(`/clients/${client.client_id}`)}
+                      style={{ cursor: "pointer" }}
+                      >{`${client.first_name} ${client.last_name}`}</Typography>
                     </td>
                     {/* Displaying client's contact information if available */}
                     <td>
