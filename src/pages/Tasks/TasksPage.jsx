@@ -69,7 +69,7 @@ const TasksPage = () => {
             }}
           >
             <Typography level="h2" component="h1">
-              Projects
+              Tasks
             </Typography>
             <Button
               // onClick={() => navigate('/projects/new')}
