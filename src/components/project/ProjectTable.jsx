@@ -280,7 +280,6 @@ export default function ProjectTable() {
             renderInput={(params) => <Input {...params} />}
           />
         </FormControl>
-        ;
       </Box>
       <Sheet
         className="OrderTableContainer"
