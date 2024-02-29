@@ -35,6 +35,8 @@ import FileUpload from "../FileUpload";
 import { useNavigate, useParams } from "react-router-dom";
 import { supabaseClient } from "../../supabase-client";
 
+import { uploadImageToSupabase } from "../../utils/ImageUploadUtils";
+
 const BetterProjectForm = () => {
   const [project, setProject] = useState({
     project_name: "",
@@ -49,6 +51,11 @@ const BetterProjectForm = () => {
   const [status, setStatus] = useState([{}]);
   const [category, setCategory] = useState([{}]);
   const [loading, setLoading] = useState(true);
+
+
+  const [selectedFiles, setSelectedFiles] = useState([]);
+
+
   const { projectid } = useParams();
   const navigate = useNavigate();
   const supabase = supabaseClient;
@@ -133,30 +140,149 @@ const BetterProjectForm = () => {
     }
   };
 
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   if (project.project_name.trim() !== "") {
+  //     try {
+  //       let result = null;
+  //       if (projectid) {
+  //         result = await supabase
+  //           .from("projects")
+  //           .update(project)
+  //           .eq("project_id", projectid);
+  //       } else {
+  //         const { data, error } = await supabase
+  //           .from("projects")
+  //           .insert([project]);
+  //         result = { data, error };
+  //       }
+  //       if (result.error) {
+  //         console.error("Error adding project:", result.error);
+  //       } else {
+  //         navigate("/projects");
+  //         console.log("Project added successfully");
+  //       }
+  //     }catch (error) {
+  //       console.error("Error adding project:", error);
+  //     }
+  //   }
+  // };
+
+
+
+  const onFilesAdded = async (fileList) => {
+    // Convert FileList to an array
+    const filesArray = Array.from(fileList);
+  
+    // Now you can use forEach
+    filesArray.forEach(async (file) => {
+      try {
+        const publicURL = await uploadImageToSupabase(file);
+        if (publicURL) {
+          const project_id = projectid; // Ensure this is correctly obtained
+          const { error } = await supabase.from('images').insert([
+            {
+              project_id,
+              image_url: publicURL,
+              // Include other fields as necessary
+            },
+          ]);
+          if (error) {
+            throw new Error(error.message);
+          }
+          console.log("Metadata stored for:", file.name);
+        }
+      } catch (error) {
+        console.error("Error in file upload or metadata storage:", error.message);
+      }
+    });
+  };
+
+  // const onFilesAdded = async (fileList) => {
+  //   // Convert FileList to an array
+  //   const filesArray = Array.from(fileList);
+  
+  //   // Now you can use forEach
+  //   filesArray.forEach(async (file) => {
+  //     try {
+  //       const publicURL = await uploadImageToSupabase(file);
+  //       if (publicURL) {
+  //         const project_id = projectid; // Ensure this is correctly obtained
+  //         const { error } = await supabase.from('images').insert([
+  //           {
+  //             project_id,
+  //             image_url: publicURL,
+  //             // Include other fields as necessary
+  //           },
+  //         ]);
+  //         if (error) {
+  //           throw new Error(error.message);
+  //         }
+  //         console.log("Metadata stored for:", file.name);
+  //       }
+  //     } catch (error) {
+  //       console.error("Error in file upload or metadata storage:", error.message);
+  //     }
+  //   });
+  // };
+
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (project.project_name.trim() !== "") {
       try {
-        let result = null;
-        if (projectid) {
-          result = await supabase
+        // Use a local variable to keep track of the current project ID
+        let currentProjectId = projectid;
+
+        let projectResult = null;
+        if (currentProjectId) {
+          // Update existing project
+          projectResult = await supabase
             .from("projects")
             .update(project)
-            .eq("project_id", projectid);
+            .eq("project_id", currentProjectId);
         } else {
+          // Create new project
           const { data, error } = await supabase
             .from("projects")
             .insert([project]);
-          result = { data, error };
+          projectResult = { data, error };
+
+          // Update the local variable with the new project ID
+          if (data && data.length > 0) {
+            currentProjectId = data[0].project_id;
+          }
         }
-        if (result.error) {
-          console.error("Error adding project:", result.error);
-        } else {
-          navigate("/projects");
-          console.log("Project added successfully");
+
+        if (projectResult.error) {
+          console.error("Error adding project:", projectResult.error);
+          return;
         }
+
+        // Continue with image upload and metadata linking using currentProjectId
+        for (let file of selectedFiles) {
+          const publicURL = await uploadImageToSupabase(file);
+          // After uploading, insert the image metadata into the 'images' table
+          const imageMetadata = {
+            project_id: currentProjectId, // Use the updated project ID
+            url: publicURL,
+            // Add other metadata as needed
+          };
+          const { error: imageError } = await supabase
+            .from("images")
+            .insert([imageMetadata]);
+
+          if (imageError) {
+            console.error("Error saving image metadata:", imageError);
+          }
+        }
+
+        navigate("/projects");
+        console.log("Project and images added/updated successfully");
       } catch (error) {
-        console.error("Error adding project:", error);
+        console.error("Error adding project or images:", error);
       }
     }
   };
@@ -564,19 +690,16 @@ const BetterProjectForm = () => {
             </Box>
             <Divider />
             <Stack spacing={2} sx={{ my: 1 }}>
-              <DropZone />
-              <FileUpload
-                icon={<InsertDriveFileRoundedIcon />}
-                fileName="kitchen-before.png"
-                fileSize="200 kB"
-                progress={100}
-              />
-              <FileUpload
-                icon={<VideocamRoundedIcon />}
-                fileName="kitchen-after.png"
-                fileSize="1 MB"
-                progress={40}
-              />
+              <DropZone onFilesAdded={(files) => onFilesAdded(files)} />
+              {selectedFiles.map((file, index) => (
+                <FileUpload
+                  key={index}
+                  icon={<InsertDriveFileRoundedIcon />}
+                  fileName={file.name}
+                  fileSize={`${(file.size / 1024).toFixed(2)} kB`}
+                  progress={10} // Initial progress is 0; update this as the file uploads
+                />
+              ))}
             </Stack>
           </Card>
         </Stack>

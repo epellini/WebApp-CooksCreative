@@ -7,8 +7,41 @@ import AspectRatio from '@mui/joy/AspectRatio';
 
 import FileUploadRoundedIcon from '@mui/icons-material/FileUploadRounded';
 
-export default function DropZone(props: CardProps & { icon?: React.ReactElement }) {
-  const { icon, sx, ...other } = props;
+export default function DropZone(props: CardProps & { onFilesAdded: (files: FileList) => void, icon?: React.ReactElement }) {
+  const { icon, onFilesAdded, sx, ...other } = props;
+
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  const handleFileInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      onFilesAdded(files);
+      
+    }
+  };
+
+  // const handleFileInput = (event) => {
+  //   // Pass the FileList directly
+  //   onFilesAdded(event.target.files);
+  // };
+
+  const handleClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const files = event.dataTransfer.files;
+    if (files && files.length > 0) {
+      onFilesAdded(files);
+    }
+  };
+
+  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+  };
+
   return (
     <Card
       variant="soft"
@@ -26,7 +59,17 @@ export default function DropZone(props: CardProps & { icon?: React.ReactElement 
         },
         ...(Array.isArray(sx) ? sx : [sx]),
       ]}
+      onClick={handleClick}
+      onDrop={handleDrop}
+      onDragOver={handleDragOver}
     >
+      <input
+        ref={fileInputRef}
+        type="file"
+        multiple
+        style={{ display: 'none' }}
+        onChange={handleFileInput}
+      />
       <AspectRatio
         ratio="1"
         variant="solid"
@@ -40,7 +83,7 @@ export default function DropZone(props: CardProps & { icon?: React.ReactElement 
         <div>{icon ?? <FileUploadRoundedIcon />}</div>
       </AspectRatio>
       <Typography level="body-sm" textAlign="center">
-        <Link component="button" overlay>
+        <Link component="button" overlay onClick={handleClick}>
           Click to upload
         </Link>{' '}
         or drag and drop
