@@ -25,17 +25,20 @@ export default function DropZone(props: CardProps & { onFilesAdded: (files: File
   //   onFilesAdded(event.target.files);
   // };
 
-  const handleClick = () => {
+  const handleClick = (event) => {
+    
+    event.stopPropagation();
+    
     fileInputRef.current?.click();
   };
 
   const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    event.stopPropagation();
-    const files = event.dataTransfer.files;
-    if (files && files.length > 0) {
-      onFilesAdded(files);
-    }
+  event.preventDefault();
+  event.stopPropagation(); // Add this line
+  const files = event.dataTransfer.files;
+  if (files && files.length > 0) {
+    onFilesAdded(files);
+  }
   };
 
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
@@ -91,4 +94,5 @@ export default function DropZone(props: CardProps & { onFilesAdded: (files: File
       </Typography>
     </Card>
   );
+
 }

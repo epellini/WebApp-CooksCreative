@@ -173,29 +173,29 @@ const BetterProjectForm = () => {
   const onFilesAdded = async (fileList) => {
     // Convert FileList to an array
     const filesArray = Array.from(fileList);
-  
-    // Now you can use forEach
-    filesArray.forEach(async (file) => {
-      try {
-        const publicURL = await uploadImageToSupabase(file);
-        if (publicURL) {
-          const project_id = projectid; // Ensure this is correctly obtained
-          const { error } = await supabase.from('images').insert([
-            {
-              project_id,
-              image_url: publicURL,
-              // Include other fields as necessary
-            },
-          ]);
-          if (error) {
-            throw new Error(error.message);
-          }
-          console.log("Metadata stored for:", file.name);
-        }
-      } catch (error) {
-        console.error("Error in file upload or metadata storage:", error.message);
-      }
-    });
+    setSelectedFiles((prevFiles) => [...prevFiles, ...filesArray]);
+    // // Now you can use forEach
+    // filesArray.forEach(async (file) => {
+    //   try {
+    //     const publicURL = await uploadImageToSupabase(file);
+    //     if (publicURL) {
+    //       const project_id = projectid; // Ensure this is correctly obtained
+    //       const { error } = await supabase.from('images').insert([
+    //         {
+    //           project_id,
+    //           image_url: publicURL,
+    //           // Include other fields as necessary
+    //         },
+    //       ]);
+    //       if (error) {
+    //         throw new Error(error.message);
+    //       }
+    //       console.log("Metadata stored for:", file.name);
+    //     }
+    //   } catch (error) {
+    //     console.error("Error in file upload or metadata storage:", error.message);
+    //   }
+    // });
   };
 
   // const onFilesAdded = async (fileList) => {
@@ -227,63 +227,170 @@ const BetterProjectForm = () => {
   // };
 
 
+  //This is not working version, but this is what I had :
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
 
+  //   if (project.project_name.trim() !== "") {
+  //     try {
+  //       // Use a local variable to keep track of the current project ID
+  //       let currentProjectId = projectid;
+
+  //       let projectResult = null;
+  //       if (currentProjectId) {
+  //         // Update existing project
+  //         projectResult = await supabase
+  //           .from("projects")
+  //           .update(project)
+  //           .eq("project_id", currentProjectId);
+  //       } else {
+  //         // Create new project
+  //         const { data, error } = await supabase
+  //           .from("projects")
+  //           .insert([project]);
+  //         projectResult = { data, error };
+
+  //         // Update the local variable with the new project ID
+  //         if (data && data.length > 0) {
+  //           currentProjectId = data[0].project_id;
+  //         }
+  //       }
+
+  //       if (projectResult.error) {
+  //         console.error("Error adding project:", projectResult.error);
+  //         return;
+  //       }
+
+  //       // Continue with image upload and metadata linking using currentProjectId
+  //       for (let file of selectedFiles) {
+  //         const publicURL = await uploadImageToSupabase(file);
+  //         // After uploading, insert the image metadata into the 'images' table
+  //         const imageMetadata = {
+  //           project_id: currentProjectId, // Use the updated project ID
+  //           url: publicURL,
+  //           // Add other metadata as needed
+  //         };
+  //         const { error: imageError } = await supabase
+  //           .from("images")
+  //           .insert([imageMetadata]);
+
+  //         if (imageError) {
+  //           console.error("Error saving image metadata:", imageError);
+  //         }
+  //       }
+
+  //       navigate("/projects");
+  //       console.log("Project and images added/updated successfully");
+  //     } catch (error) {
+  //       console.error("Error adding project or images:", error);
+  //     }
+  //   }
+  // };
+
+  // This is what was working but not entirely correct:
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  
+  //   if (project.project_name.trim() !== "") {
+  //     try {
+  //       let currentProjectId = projectid;
+  
+  //       let projectResult = null;
+  //       if (currentProjectId) {
+  //         // Update existing project
+  //         projectResult = await supabase
+  //           .from("projects")
+  //           .update(project)
+  //           .eq("project_id", currentProjectId);
+  //       } else {
+  //         // Create new project
+  //         const { data, error } = await supabase
+  //           .from("projects")
+  //           .insert([project]);
+  //         projectResult = { data, error };
+  
+  //         // Update the local variable with the new project ID
+  //         if (data && data.length > 0) {
+  //           currentProjectId = data[0].project_id;
+  //         }
+  //       }
+  
+  //       if (projectResult.error) {
+  //         console.error("Error adding project:", projectResult.error);
+  //         return;
+  //       }
+  
+  //       // Assuming all goes well with the project operation, proceed to handle file uploads
+  //       const uploadPromises = selectedFiles.map(async (file) => {
+  //         const publicURL = await uploadImageToSupabase(file);
+  //         return { publicURL, file };
+  //       });
+  
+  //       // Wait for all uploads to finish
+  //       const uploadedFiles = await Promise.all(uploadPromises);
+  
+  //       // Handle metadata storage for each uploaded file
+  //       const metadataPromises = uploadedFiles.map(({ publicURL, file }) => {
+  //         if (publicURL) {
+  //           return supabase.from('images').insert([
+  //             {
+  //               project_id: currentProjectId,
+  //               image_url: publicURL,
+  //               // Include other fields as necessary
+  //             },
+  //           ]);
+  //         }
+  //       });
+  
+  //       // Wait for all metadata insertions to finish
+  //       await Promise.all(metadataPromises);
+  
+  //       navigate("/projects");
+  //       console.log("Project and images added/updated successfully");
+  //     } catch (error) {
+  //       console.error("Error adding project or images:", error);
+  //     }
+  //   }
+  // };
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (project.project_name.trim() !== "") {
-      try {
-        // Use a local variable to keep track of the current project ID
-        let currentProjectId = projectid;
-
-        let projectResult = null;
-        if (currentProjectId) {
-          // Update existing project
-          projectResult = await supabase
-            .from("projects")
-            .update(project)
-            .eq("project_id", currentProjectId);
-        } else {
-          // Create new project
-          const { data, error } = await supabase
-            .from("projects")
-            .insert([project]);
-          projectResult = { data, error };
-
-          // Update the local variable with the new project ID
-          if (data && data.length > 0) {
-            currentProjectId = data[0].project_id;
-          }
+  
+    try {
+      let currentProjectId = projectid;
+      let projectResult = null;
+  
+      if (!currentProjectId) {
+        // Create new project if no project ID is present
+        const { data, error } = await supabase
+          .from("projects")
+          .insert([project]);
+        if (error) throw error;
+        if (data && data.length > 0) {
+          currentProjectId = data[0].project_id; // Update with the new project ID
         }
-
-        if (projectResult.error) {
-          console.error("Error adding project:", projectResult.error);
-          return;
-        }
-
-        // Continue with image upload and metadata linking using currentProjectId
-        for (let file of selectedFiles) {
-          const publicURL = await uploadImageToSupabase(file);
-          // After uploading, insert the image metadata into the 'images' table
-          const imageMetadata = {
-            project_id: currentProjectId, // Use the updated project ID
-            url: publicURL,
-            // Add other metadata as needed
-          };
-          const { error: imageError } = await supabase
-            .from("images")
-            .insert([imageMetadata]);
-
-          if (imageError) {
-            console.error("Error saving image metadata:", imageError);
-          }
-        }
-
-        navigate("/projects");
-        console.log("Project and images added/updated successfully");
-      } catch (error) {
-        console.error("Error adding project or images:", error);
+      } else {
+        // Update existing project
+        const { error } = await supabase
+          .from("projects")
+          .update(project)
+          .eq("project_id", currentProjectId);
+        if (error) throw error;
       }
+  
+      // Handle image uploads after the project is created/updated
+      for (const file of selectedFiles) {
+        const publicURL = await uploadImageToSupabase(file);
+        if (publicURL) {
+          await supabase.from('images').insert([
+            { project_id: currentProjectId, image_url: publicURL },
+          ]);
+        }
+      }
+  
+      navigate("/projects");
+      console.log("Project and images added/updated successfully");
+    } catch (error) {
+      console.error("Error during project creation or image upload:", error);
     }
   };
 
