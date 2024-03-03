@@ -20,6 +20,7 @@ import ClientDetails from './pages/Clients/ClientDetails.jsx';
 import ClientForm from './pages/Clients/ClientForm.jsx';
 import ForgotPassword from './pages/Auth/ForgotPassword.jsx';
 import TasksPage from './pages/Tasks/TasksPage.jsx';
+import TaskForm from './components/tasks/TaskForm.jsx';
 
 
 function App() {
@@ -56,7 +57,9 @@ function App() {
              {/* TASKS ROUTES */}
 
              <Route path="/tasks">
-             <Route index element={<TasksPage/>}/>
+              <Route index element={<TasksPage/>}/>
+              <Route path="new" element={<TaskForm/>}/>
+             
 
              </Route>
 
