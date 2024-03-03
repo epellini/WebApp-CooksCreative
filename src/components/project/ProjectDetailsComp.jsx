@@ -21,6 +21,7 @@ import FolderIcon from "@mui/icons-material/Folder";
 import ReplyRoundedIcon from "@mui/icons-material/ReplyRounded";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import EditNoteIcon from '@mui/icons-material/EditNote';
+import ProjectTaskDetails from "./projectTaskDetails";
 
 
 export default function ProjectDetailsComp() {
@@ -37,16 +38,16 @@ export default function ProjectDetailsComp() {
 
   const [project, setProject] = useState({
     project_name: "",
-    client_id: "",
+    client_id: null,
     project_description: "",
     start_date: "",
     end_date: "",
-    status_id: "",
-    category_id: "",
+    status_id: null,
+    category_id: null,
   });
   const [client, setClient] = useState({
     client: {
-      id: "",
+      id: null,
       first_name: "",
       last_name: "",
       email: "",
@@ -57,14 +58,14 @@ export default function ProjectDetailsComp() {
   });
   const [status, setStatus] = useState({
     status: {
-      category_id: "",
+      category_id: null,
       name: "",
     },
   });
 
   const [category, setCategory] = useState({
     category: {
-      id: "",
+      id: null,
       name: "",
     },
   });
@@ -112,6 +113,18 @@ export default function ProjectDetailsComp() {
             setStatus(statusData);
           }
 
+          const { data: taskData, error: taskError } = await supabase
+            .from("tasks")
+            .select("*")
+            .order("task_id", { ascending: false })
+          if (taskError) {
+            console.log("Error fetching task details:", taskError.message);
+          }
+          else {
+            console.log(taskData);
+          }
+
+
           const { data: categoryData, error: categoryError } = await supabase
             .from("category")
             .select("*")
@@ -123,11 +136,6 @@ export default function ProjectDetailsComp() {
           else {
             setCategory(categoryData);
           }
-
-
-
-          
-
         }
     }
     getProject();
@@ -375,6 +383,8 @@ export default function ProjectDetailsComp() {
           </AspectRatio>
         </Card>
       </Box>
+      <ProjectTaskDetails projectid={project.project_id}/>
+
     </Sheet>
   );
 }
