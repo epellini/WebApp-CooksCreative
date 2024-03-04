@@ -4,6 +4,7 @@ import Card, { CardProps } from '@mui/joy/Card';
 import Link from '@mui/joy/Link';
 import Typography from '@mui/joy/Typography';
 import AspectRatio from '@mui/joy/AspectRatio';
+import Button from '@mui/joy/Button';
 
 import FileUploadRoundedIcon from '@mui/icons-material/FileUploadRounded';
 
@@ -86,9 +87,14 @@ export default function DropZone(props: CardProps & { onFilesAdded: (files: File
         <div>{icon ?? <FileUploadRoundedIcon />}</div>
       </AspectRatio>
       <Typography level="body-sm" textAlign="center">
-        <Link component="button" overlay onClick={handleClick}>
+
+        {/* <Link component="button" overlay onClick={handleClick}>
           Click to upload
-        </Link>{' '}
+        </Link> */}
+        <Button type="button" onClick={handleClick}>
+          Click to upload
+        </Button>
+        {' '}
         or drag and drop
         <br /> SVG, PNG, JPG or GIF (max. 800x400px)
       </Typography>

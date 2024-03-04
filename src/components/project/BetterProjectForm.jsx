@@ -352,6 +352,8 @@ const BetterProjectForm = () => {
   //     }
   //   }
   // };
+
+//March 3 commented out 
   const handleSubmit = async (e) => {
     e.preventDefault();
   
@@ -364,7 +366,10 @@ const BetterProjectForm = () => {
         const { data, error } = await supabase
           .from("projects")
           .insert([project]);
-        if (error) throw error;
+        if (error){
+          console.log("Error creating project: ", error)
+          return;
+        } 
         if (data && data.length > 0) {
           currentProjectId = data[0].project_id; // Update with the new project ID
         }
@@ -379,7 +384,7 @@ const BetterProjectForm = () => {
   
       // Handle image uploads after the project is created/updated
       for (const file of selectedFiles) {
-        const publicURL = await uploadImageToSupabase(file);
+        const publicURL = await uploadImageToSupabase(file, currentProjectId);
         if (publicURL) {
           await supabase.from('images').insert([
             { project_id: currentProjectId, image_url: publicURL },
@@ -393,6 +398,8 @@ const BetterProjectForm = () => {
       console.error("Error during project creation or image upload:", error);
     }
   };
+  
+
 
   return (
     <form onSubmit={handleSubmit}>
