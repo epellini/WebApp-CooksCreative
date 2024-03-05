@@ -32,6 +32,9 @@ import {
   MenuItem,
   Sheet,
   Chip,
+  TabPanel,
+  Tab,
+  tabClasses,
 } from "@mui/joy";
 import Checkbox, { checkboxClasses } from "@mui/joy/Checkbox";
 import { useEffect, useState } from "react";
@@ -49,6 +52,7 @@ export default function TasksLayoutMain() {
   const [projects, setProjects] = useState([]);
   const [clients, setClients] = useState([]);
   const options = ["The Godfather", "Pulp Fiction"];
+  const [index, setIndex] = React.useState(0);
 
   const [members, setMembers] = React.useState([false, true, false]);
   const toggleMember = (index) => (event) => {
@@ -100,111 +104,173 @@ export default function TasksLayoutMain() {
           minHeight: 0,
         }}
       >
-        <Box sx={{ flex: 1, width: "100%" }}>
-         
-            <Box sx={{ mb: 1 }}>
-              <Typography level="title-md">All Tasks</Typography>
-              <Typography level="body-sm"></Typography>
-            </Box>
-            <Divider />
+        <Tabs
+          aria-label="Pipeline"
+          value={index}
+          onChange={(event, value) => setIndex(value)}
+        >
+          <TabList
+            sx={{
+              pt: 1,
+              justifyContent: "center",
+              [`&& .${tabClasses.root}`]: {
+                flex: "initial",
+                bgcolor: "transparent",
+                "&:hover": {
+                  bgcolor: "transparent",
+                },
+                [`&.${tabClasses.selected}`]: {
+                  color: "primary.plainColor",
+                  "&::after": {
+                    height: 2,
+                    borderTopLeftRadius: 3,
+                    borderTopRightRadius: 3,
+                    bgcolor: "primary.500",
+                  },
+                },
+              },
+            }}
+          >
+            <Tab indicatorInset>
+              Active Tasks{" "}
+              <Chip
+                size="sm"
+                variant="soft"
+                color={index === 0 ? "primary" : "neutral"}
+              >
+                14
+              </Chip>
+            </Tab>
+            <Tab indicatorInset>
+              Tasks by Project{" "}
+              <Chip
+                size="sm"
+                variant="soft"
+                color={index === 1 ? "primary" : "neutral"}
+              >
+                20
+              </Chip>
+            </Tab>
+            <Tab indicatorInset>
+              Completed Tasks{" "}
+              <Chip
+                size="sm"
+                variant="soft"
+                color={index === 2 ? "primary" : "neutral"}
+              >
+                8
+              </Chip>
+            </Tab>
+          </TabList>
+          <Box
+            sx={(theme) => ({
+              "--bg": theme.vars.palette.background.surface,
+              background: "var(--bg)",
+              boxShadow: "0 0 0 100vmax var(--bg)",
+              clipPath: "inset(0 -100vmax)",
+            })}
+          >
+            <TabPanel value={0}>
+              <Box sx={{ flex: 1, width: "100%" }}>
+                {/* <Divider /> */}
 
-            <Stack
-              direction="column"
-              spacing={1}
-              sx={{ display: { xs: "flex", md: "flex" }, my: 1 }}
-            >
-              {Object.values(tasks).map((task) => (
                 <Stack
-                  justifyContent={"center"}
-                  alignItems={"center"}
-                  key={task.task_id}
-                  direction="row"
+                  direction="column"
                   spacing={1}
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    width: "90%",
-                    borderRadius: "sm",
-                    border: "1px solid",
-                    borderColor: "divider",
-                    bgcolor: "background.body",
-                    boxShadow: "sm",
-                  }}
+                  sx={{ display: { xs: "flex", md: "flex" }, my: 1 }}
                 >
-                  <List
-                    sx={{
-                      "--ListItem-gap": "0.05rem",
-                      [`& .${checkboxClasses.root}`]: {
-                        mr: "auto",
-                        flexGrow: 1,
+                  {Object.values(tasks).map((task) => (
+                    <Stack
+                      justifyContent={"center"}
+                      alignItems={"center"}
+                      key={task.task_id}
+                      direction="row"
+                      spacing={1}
+                      sx={{
+                        display: "flex",
                         alignItems: "center",
-                        flexDirection: "row",
-                      },
-                    }}
-                  >
-                    <ListItem>
-                      <FormControl>
+                        justifyContent: "space-between",
+                        width: "90%",
+                        borderRadius: "sm",
+                        border: "1px solid",
+                        borderColor: "divider",
+                        bgcolor: "background.body",
+                        boxShadow: "sm",
+                      }}
+                    >
+                      <List
+                        sx={{
+                          "--ListItem-gap": "0.05rem",
+                          [`& .${checkboxClasses.root}`]: {
+                            mr: "auto",
+                            flexGrow: 1,
+                            alignItems: "center",
+                            flexDirection: "row",
+                          },
+                        }}
+                      >
                         <ListItem>
-                          <Checkbox
-                            label={
-                              <div style={{ textAlign: "left" }}>
-                                {task.task_name}
-                              </div>
-                            }
-                            overlay
-                            checked={members[0]}
-                            onChange={toggleMember(0)}
-                          />
-                          <Typography sx={{ ml: "auto"}}>
-                            {task.projects ? (
-                              <>Project: {task.projects.project_name}</>
-                            ) : (
-                              <>Project: No Project</>
-                            )}
-                          </Typography>
+                          <FormControl>
+                            <ListItem>
+                              <Checkbox
+                                label={
+                                  <div style={{ textAlign: "left" }}>
+                                    {task.task_name}
+                                  </div>
+                                }
+                                overlay
+                                checked={members[0]}
+                                onChange={toggleMember(0)}
+                              />
+                              <Typography sx={{ ml: "auto" }}>
+                                {task.projects ? (
+                                  <>Project: {task.projects.project_name}</>
+                                ) : (
+                                  <>Project: No Project</>
+                                )}
+                              </Typography>
+                            </ListItem>
+                          </FormControl>
                         </ListItem>
-                      </FormControl>
-                    </ListItem>
-                  </List>
+                      </List>
 
-                  {/* We might not need this here for now, but leaving it for reference */}
+                      {/* We might not need this here for now, but leaving it for reference */}
 
-                  {/* <Typography level="body-md">
+                      {/* <Typography level="body-md">
                         Task ID: {task.task_id}
                       </Typography> 
 
                      <Typography level="body-sm">
                         Status: {task.is_completed ? "Yes" : "No"}
                       </Typography>  */}
+                    </Stack>
+                  ))}
                 </Stack>
-              ))}
-            </Stack>
 
-            <React.Fragment>
-              <Button
-                variant="outlined"
-                color="neutral"
-                startDecorator={<Add />}
-                onClick={() => setOpen(true)}
-              >
-                New Task
-              </Button>
-              <Modal
-                className="formWindow"
-                open={open}
-                onClose={() => setOpen(false)}
-              >
-                <ModalDialog>
-                  <TaskForm
+                <React.Fragment>
+                  <Button
+                    variant="outlined"
+                    color="neutral"
+                    startDecorator={<Add />}
+                    onClick={() => setOpen(true)}
+                  >
+                    New Task
+                  </Button>
+                  <Modal
+                    className="formWindow"
                     open={open}
-                    setOpen={setOpen}
-                    onHandleSubmit={onHandleSubmit}
-                  />
-                </ModalDialog>
-              </Modal>
-            </React.Fragment>
-            {/* <CardOverflow
+                    onClose={() => setOpen(false)}
+                  >
+                    <ModalDialog>
+                      <TaskForm
+                        open={open}
+                        setOpen={setOpen}
+                        onHandleSubmit={onHandleSubmit}
+                      />
+                    </ModalDialog>
+                  </Modal>
+                </React.Fragment>
+                {/* <CardOverflow
               sx={{ borderTop: "1px solid", borderColor: "divider" }}
             >
               <CardActions sx={{ alignSelf: "flex-end", pt: 2 }}>
@@ -216,8 +282,12 @@ export default function TasksLayoutMain() {
                 </Button>
               </CardActions>
             </CardOverflow> */}
-          
-        </Box>
+              </Box>
+            </TabPanel>
+            <TabPanel value={1}>Library</TabPanel>
+            <TabPanel value={2}>Products</TabPanel>
+          </Box>
+        </Tabs>
       </Sheet>
     </React.Fragment>
   );
