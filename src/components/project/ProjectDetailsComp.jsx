@@ -25,17 +25,6 @@ import ProjectTaskDetails from "./projectTaskDetails";
 
 
 export default function ProjectDetailsComp() {
-  // const project = {
-  //   project_name: "Kitchen Remodeling Project",
-  //   client_id: "123",
-  //   project_description:
-  //     "A kitchen renovation project encompasses a complete overhaul of the existing kitchen space, focusing on enhancing both functionality and aesthetics. This transformation often includes the installation of new countertops, cabinets, flooring, and state-of-the-art appliances, tailored to the homeowner's preferences and needs. The goal is to create a more efficient, modern, and inviting cooking and dining area that adds value to the home and improves the quality of living.",
-  //   start_date: "2023-01-01",
-  //   end_date: "2023-12-31",
-  //   status: "Active",
-  //   type: "Development",
-  // };
-
   const [project, setProject] = useState({
     project_name: "",
     client_id: null,
@@ -124,7 +113,6 @@ export default function ProjectDetailsComp() {
             console.log(taskData);
           }
 
-
           const { data: categoryData, error: categoryError } = await supabase
             .from("category")
             .select("*")
@@ -168,14 +156,14 @@ export default function ProjectDetailsComp() {
 
   return (
     <Sheet
-      variant="outlined"
-      sx={{
-        minHeight: 500,
-        width: "100%",
-        borderRadius: "sm",
-        p: 2,
-        mb: 3,
-      }}
+    variant="outlined"
+    sx={{
+      minHeight: 500,
+      width: "100%",
+      borderRadius: "sm",
+      p: 2,
+      mb: 3,
+    }}
     >
       <Box
         sx={{
@@ -384,7 +372,6 @@ export default function ProjectDetailsComp() {
         </Card>
       </Box>
       <ProjectTaskDetails projectid={project.project_id}/>
-
     </Sheet>
   );
 }

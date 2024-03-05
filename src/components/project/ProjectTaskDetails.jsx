@@ -1,34 +1,27 @@
-import { CssVarsProvider } from "@mui/joy/styles";
-import CssBaseline from "@mui/joy/CssBaseline";
-import Box from "@mui/joy/Box";
-import Divider from "@mui/joy/Divider";
-import Stack from "@mui/joy/Stack";
-import Card from "@mui/joy/Card";
-
-import Breadcrumbs from "@mui/joy/Breadcrumbs";
-import Link from "@mui/joy/Link";
-import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
-import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
-import Typography from "@mui/joy/Typography";
-import Button from "@mui/joy/Button";
-import DownloadRoundedIcon from "@mui/icons-material/DownloadRounded";
-import { Css } from "@mui/icons-material";
 import React, { useState, useEffect } from "react";
-
+import {
+  Box,
+  Sheet,
+  Typography,
+  Tabs,
+  TabList,
+  TabPanel,
+  Tab,
+  Chip,
+  Table,
+} from "@mui/joy";
+import { Skeleton } from "@mui/joy";
 import { supabaseClient } from "../../supabase-client";
-
-const supabase = supabaseClient;
-
 
 const ProjectTaskDetails = ({ projectid }) => {
   const [tasks, setTasks] = useState([]);
-  const id = projectid;
+  const [index, setIndex] = useState(0);
+
   async function getTasks() {
-    console.log(id);
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from("tasks")
       .select("*")
-      .eq("project_id", id)
+      .eq("project_id", projectid)
       .order("task_id", { ascending: true });
 
     if (error) {
@@ -38,91 +31,103 @@ const ProjectTaskDetails = ({ projectid }) => {
     }
   }
 
-    useEffect(() => {
-        getTasks();
-        }
-    , [projectid]);
+  useEffect(() => {
+    getTasks();
+  }, [projectid]);
+
+  const completedTasks = tasks.filter(task => task.is_completed === true);
+  const activeTasks = tasks.filter(task => task.is_completed === false);
 
   return (
-    <CssVarsProvider disableTransitionOnChange>
-      <CssBaseline />
-      <Box sx={{ display: "flex", minHeight: "100dvh" }}>
-        <Box
-          component="main"
-          className="MainContent"
-          sx={{
-            px: { xs: 2, md: 6 },
-            pt: {
-              xs: "calc(12px + var(--Header-height))",
-              sm: "calc(12px + var(--Header-height))",
-              md: 3,
-            },
-            pb: { xs: 2, sm: 2, md: 3 },
-            flex: 1,
-            display: "flex",
-            flexDirection: "column",
-            minWidth: 0,
-            height: "100dvh",
-            gap: 1,
-          }}
-        >
-          <Divider />
-          <Box
-            sx={{
-              display: "flex",
-              mb: 1,
-              gap: 1,
-              flexDirection: { xs: "column", sm: "row" },
-              alignItems: { xs: "start", sm: "center" },
-              flexWrap: "wrap",
-              justifyContent: "space-between",
-            }}
-          >
-            <Typography level="h2" component="h1">
-              Tasks
-            </Typography>
-          </Box>
-          <Stack
-              direction="row"
-              spacing={3}
-              sx={{ display: { xs: "none", md: "flex" }, my: 1 }}
+    <React.Fragment>
+      <Sheet variant="outlined" sx={{
+        display: {
+          maxWidth: "1600px",
+          mx: "auto",
+          borderRadius: "sm",
+          marginTop: "15px",
+          px: { xs: 2, md: 6 },
+          py: { xs: 2, md: 3 },
+        },
+        width: "100%",
+        borderRadius: "sm",
+        flexShrink: 1,
+        overflow: "auto",
+        minHeight: 0,
+      }}>
+        <Tabs aria-label="Task Categories" value={index} onChange={(event, value) => setIndex(value)}>
+          <TabList>
+            <Tab>Active Tasks <Chip size="sm" variant="soft" color={index === 0 ? "primary" : "neutral"}>{activeTasks.length}</Chip></Tab>
+            <Tab>Completed Tasks <Chip size="sm" variant="soft" color={index === 1 ? "primary" : "neutral"}>{completedTasks.length}</Chip></Tab>
+          </TabList>
+
+          <TabPanel value={0}>
+            <Table
+              stickyHeader
+              hoverRow
+              sx={{
+                "--TableCell-headBackground":
+                  "var(--joy-palette-background-level1)",
+                "--Table-headerUnderlineThickness": "1px",
+                "--TableRow-hoverBackground":
+                  "var(--joy-palette-background-level1)",
+                "--TableCell-paddingY": "4px",
+                "--TableCell-paddingX": "8px",
+              }}
             >
-              {Object.values(tasks).map((task) => (
-                <Stack
-                  key={task.task_id}
-                  direction="row"
-                  spacing={2}
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    width: "100%",
-                    p: 2,
-                    borderRadius: "sm",
-                    bgcolor: "background.body",
-                    boxShadow: "sm",
-                  }}
-                >
-                  <Stack spacing={1} sx={{ flexGrow: 1 }}>
-                    <Typography level="body-sm">
-                      Task Name: {task.task_name}
-                    </Typography>
-                    <Typography level="body-md">
-                      Task ID: {task.task_id}
-                    </Typography>
-                    <Typography level="body-sm">
-                      Task Status: {task.is_completed ? "Yes" : "No"}
-                    </Typography>
-                  </Stack>
-                  <Stack spacing={2} sx={{ flexGrow: 1 }}>
-                    <Stack spacing={1}></Stack>
-                  </Stack>
-                </Stack>
-              ))}
-            </Stack>
-        </Box>
-      </Box>
-    </CssVarsProvider>
+              {/* TABLE HEAD BEGINS HERE */}
+              <thead>
+                <tr>
+                  <th style={{ width: 120, padding: "12px 6px" }}>Task Name</th>
+                  <th style={{ width: 60, padding: "12px 6px" }}>Created</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {activeTasks.map(task => (
+                  <tr key={task.task_id}>
+                    <td style={{ textAlign: 'left' }}>     <Typography
+                      level="body-xs"
+                      onClick={() =>
+                        console.log("Task Clicked")
+                      }
+                      style={{ cursor: "pointer" }}
+                    >{`${task.task_name}`}</Typography></td>
+                    <td style={{ textAlign: 'left' }}>
+                      {task.date_created ?
+                        new Intl.DateTimeFormat('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(task.date_created))
+                        : "N/A"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+
+            </Table>
+          </TabPanel>
+
+          <TabPanel value={1}>
+            <table>
+              <thead>
+                <tr>
+                  <th>Task Name</th>
+                  <th>Start Date</th>
+                  <th>End Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {completedTasks.map(task => (
+                  <tr key={task.task_id}>
+                    <td>{task.task_name}</td>
+                    <td>{task.start_date || "N/A"}</td>
+                    <td>{task.end_date || "N/A"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </TabPanel>
+        </Tabs>
+      </Sheet>
+    </React.Fragment>
   );
 };
 
