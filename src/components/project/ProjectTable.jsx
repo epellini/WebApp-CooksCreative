@@ -327,6 +327,7 @@ export default function ProjectTable() {
                 Status
               </th>
               <th
+            
                 style={{ width: 100, padding: "12px 6px", textAlign: "left" }}
               >
                 Start Date

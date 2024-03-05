@@ -21,32 +21,22 @@ import FolderIcon from "@mui/icons-material/Folder";
 import ReplyRoundedIcon from "@mui/icons-material/ReplyRounded";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import EditNoteIcon from '@mui/icons-material/EditNote';
+import ProjectTaskDetails from "./projectTaskDetails";
 
 
 export default function ProjectDetailsComp() {
-  // const project = {
-  //   project_name: "Kitchen Remodeling Project",
-  //   client_id: "123",
-  //   project_description:
-  //     "A kitchen renovation project encompasses a complete overhaul of the existing kitchen space, focusing on enhancing both functionality and aesthetics. This transformation often includes the installation of new countertops, cabinets, flooring, and state-of-the-art appliances, tailored to the homeowner's preferences and needs. The goal is to create a more efficient, modern, and inviting cooking and dining area that adds value to the home and improves the quality of living.",
-  //   start_date: "2023-01-01",
-  //   end_date: "2023-12-31",
-  //   status: "Active",
-  //   type: "Development",
-  // };
-
   const [project, setProject] = useState({
     project_name: "",
-    client_id: "",
+    client_id: null,
     project_description: "",
     start_date: "",
     end_date: "",
-    status_id: "",
-    category_id: "",
+    status_id: null,
+    category_id: null,
   });
   const [client, setClient] = useState({
     client: {
-      id: "",
+      id: null,
       first_name: "",
       last_name: "",
       email: "",
@@ -57,14 +47,14 @@ export default function ProjectDetailsComp() {
   });
   const [status, setStatus] = useState({
     status: {
-      category_id: "",
+      category_id: null,
       name: "",
     },
   });
 
   const [category, setCategory] = useState({
     category: {
-      id: "",
+      id: null,
       name: "",
     },
   });
@@ -112,6 +102,17 @@ export default function ProjectDetailsComp() {
             setStatus(statusData);
           }
 
+          const { data: taskData, error: taskError } = await supabase
+            .from("tasks")
+            .select("*")
+            .order("task_id", { ascending: false })
+          if (taskError) {
+            console.log("Error fetching task details:", taskError.message);
+          }
+          else {
+            console.log(taskData);
+          }
+
           const { data: categoryData, error: categoryError } = await supabase
             .from("category")
             .select("*")
@@ -123,11 +124,6 @@ export default function ProjectDetailsComp() {
           else {
             setCategory(categoryData);
           }
-
-
-
-          
-
         }
     }
     getProject();
@@ -160,14 +156,14 @@ export default function ProjectDetailsComp() {
 
   return (
     <Sheet
-      variant="outlined"
-      sx={{
-        minHeight: 500,
-        width: "100%",
-        borderRadius: "sm",
-        p: 2,
-        mb: 3,
-      }}
+    variant="outlined"
+    sx={{
+      minHeight: 500,
+      width: "100%",
+      borderRadius: "sm",
+      p: 2,
+      mb: 3,
+    }}
     >
       <Box
         sx={{
@@ -375,6 +371,7 @@ export default function ProjectDetailsComp() {
           </AspectRatio>
         </Card>
       </Box>
+      <ProjectTaskDetails projectid={project.project_id}/>
     </Sheet>
   );
 }

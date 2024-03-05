@@ -145,21 +145,11 @@ const ProjectsList = () => {
             <Link
               underline="none"
               color="neutral"
-              href="#some-link"
+              href="/"
               aria-label="Home"
             >
               <HomeRoundedIcon />
             </Link>
-            <Link
-              underline="hover"
-              color="neutral"
-              to={"/"}
-              fontSize={12}
-              fontWeight={500}
-            >
-              Dashboard
-            </Link>
-
             <Typography color="primary" fontWeight={500} fontSize={12}>
               Projects
             </Typography>
@@ -188,6 +178,8 @@ const ProjectsList = () => {
           New Project
         </Button>
       </Box>
+
+
       <ProjectTable projects={projects}/>
       <ProjectList projects={projects}/>
     </Box>

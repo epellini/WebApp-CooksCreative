@@ -201,6 +201,15 @@ export default function Sidebar() {
             </ListItemContent>
           </ListItemButton>
         </ListItem>
+
+        <ListItem>
+          <ListItemButton component={Link} to="/tasks">
+            <AssignmentRoundedIcon />
+            <ListItemContent>
+              <Typography level="title-sm">Tasks</Typography>
+            </ListItemContent>
+          </ListItemButton>
+        </ListItem>
       </List>
 
       
