@@ -83,6 +83,12 @@ export default function TasksLayoutMain() {
     }
   })
 
+  const activeTasks = tasks.filter((task) => {
+    if(task.is_completed == false){
+      return task;
+    }
+  })
+
   const onHandleSubmit = () => {
     setOpen(false);
     //reload the tasks
@@ -143,7 +149,7 @@ export default function TasksLayoutMain() {
                 variant="soft"
                 color={index === 0 ? "primary" : "neutral"}
               >
-                {tasks.length}
+                {activeTasks.length}
               </Chip>
             </Tab>
             <Tab indicatorInset>
@@ -174,7 +180,7 @@ export default function TasksLayoutMain() {
                   spacing={1}
                   sx={{ display: { xs: "flex", md: "flex" }, my: 1 }}
                 >
-                  {Object.values(tasks).map((task) => (
+                  {Object.values(activeTasks).map((task) => (
                     <Stack
                       justifyContent={"center"}
                       alignItems={"center"}
