@@ -29,7 +29,6 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  MenuItem,
   Sheet,
   Chip,
   TabPanel,
@@ -37,6 +36,10 @@ import {
   tabClasses,
 } from "@mui/joy";
 import Checkbox, { checkboxClasses } from "@mui/joy/Checkbox";
+import Dropdown from '@mui/joy/Dropdown';
+import MenuButton from '@mui/joy/MenuButton';
+import MenuItem from '@mui/joy/MenuItem';
+import Menu from '@mui/joy/Menu';
 import { useEffect, useState } from "react";
 import { supabaseClient } from "../../supabase-client"; // Import the supabase client
 // ICONS:
@@ -53,6 +56,16 @@ export default function TasksLayoutMain() {
   const [clients, setClients] = useState([]);
   const options = ["The Godfather", "Pulp Fiction"];
   const [index, setIndex] = React.useState(0);
+  const [selectedIndex, setSelectedIndex] = React.useState(1);
+  let [days, setDays] = useState(30);
+
+  const createHandleClose = (index, value) => () => {
+    if (typeof index === 'number') {
+      setSelectedIndex(index);
+      setDays(value);
+      
+    }
+  }
 
   const [members, setMembers] = React.useState([false, true, false]);
   const toggleMember = (index) => (event) => {
@@ -77,17 +90,29 @@ export default function TasksLayoutMain() {
     getTasks();
   }, []);
 
+
+
   const completedTasks = tasks.filter((task) => {
-    if(task.is_completed == true){
+    const dayLength = days * 24 * 60 * 60 * 1000; // 30 days in milliseconds
+    const thirtyDaysAgoTimeStamp = Date.now() - dayLength;
+  
+    console.log('Task Date Created:', new Date(task.date_created).getTime());
+    console.log('Thirty Days Ago:', thirtyDaysAgoTimeStamp);
+  
+    // Check if the task is completed and its creation date is within the last 30 days
+    if (task.is_completed && new Date(task.date_created).getTime() >= thirtyDaysAgoTimeStamp) {
+      return true; // Keep the task in the filtered array
+    }
+    return false; // Exclude the task from the filtered array
+  });
+
+  const activeTasks = tasks.filter((task) => {
+    if (task.is_completed == false) {
       return task;
     }
   })
 
-  const activeTasks = tasks.filter((task) => {
-    if(task.is_completed == false){
-      return task;
-    }
-  })
+
 
   const onHandleSubmit = () => {
     setOpen(false);
@@ -120,6 +145,7 @@ export default function TasksLayoutMain() {
           value={index}
           onChange={(event, value) => setIndex(value)}
         >
+
           <TabList
             sx={{
               pt: 1,
@@ -142,6 +168,22 @@ export default function TasksLayoutMain() {
               },
             }}
           >
+              <Dropdown>
+                <MenuButton>
+                  Select Number of Days
+                </MenuButton>
+                <Menu>
+                  <MenuItem
+                    {...(selectedIndex === 0 && { selected: true, variant: 'soft' })}
+                    onClick={createHandleClose(0, 30)}
+                  >30
+                  </MenuItem>
+                  <MenuItem selected={selectedIndex === 1} onClick={createHandleClose(1, 60)}>
+                    60
+                  </MenuItem>
+
+                </Menu>
+              </Dropdown>
             <Tab indicatorInset>
               Active Tasks{" "}
               <Chip
@@ -288,7 +330,8 @@ export default function TasksLayoutMain() {
               </Box>
             </TabPanel>
             <TabPanel value={1}>
-              {Object.values(completedTasks).map((task) => (
+              {Object.values(completedTasks).map((task, days) => (
+
                 <Stack
                   justifyContent={"center"}
                   alignItems={"center"}
@@ -307,6 +350,7 @@ export default function TasksLayoutMain() {
                     boxShadow: "sm",
                   }}
                 >
+
                   <List
                     sx={{
                       "--ListItem-gap": "0.05rem",
