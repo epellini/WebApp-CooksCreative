@@ -1,12 +1,22 @@
-import React from 'react'
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
+import { Link as RouterLink} from 'react-router-dom';
+
+
+import Link from "@mui/joy/Link";
+import Button from '@mui/joy/Button';
+import TextField from '@mui/material/TextField';
+import Grid from '@mui/material/Grid';
+import Container  from '@mui/material/Container';
+import Typography from '@mui/joy/Typography';
 
 const Register = () => {
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
 
     const navigate = useNavigate();
 

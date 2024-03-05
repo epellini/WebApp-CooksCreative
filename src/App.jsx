@@ -47,7 +47,8 @@ function App() {
             </Route>
             
             {/* CLIENTS ROUTES */}
-            <Route path="/clients" element={<Protected isAdminRoute={true} />}> 
+       {/* CLIENTS ROUTES */}
+       <Route path="/clients" element={<Clients isAdminRoute={true} />}> 
               <Route index element={<Clients/>}/>
               <Route path=":id" element={<ClientDetails/>}/>
               <Route path="new" element={<ClientForm/>}/>
@@ -55,9 +56,8 @@ function App() {
             </Route>
 
             {/* ADMIN ROUTES */}
-            <Route path='/admin-panel' element={<Protected isAdminRoute={true} />}>
-              <Route index element={<AdminPanel/>}/>
-            </Route>
+            <Route path='/admin' element={<AdminPanel/>} ></Route>
+           
           </Route> {/* END OF PROTECTED ROUTE */}
           
             <Route path="/create-user" element={<CreateUserPage/>} />

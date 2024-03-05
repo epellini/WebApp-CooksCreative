@@ -174,7 +174,7 @@ export default function Sidebar() {
         >
           {isAdmin && (
             <ListItem>
-              <ListItemButton component={Link} to="/admin-panel">
+              <ListItemButton component={Link} to="/admin">
                 <DashboardIcon />
                 <ListItemContent>
                   <Typography level="title-sm">Admin Panel</Typography>
