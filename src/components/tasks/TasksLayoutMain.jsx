@@ -60,7 +60,6 @@ export default function TasksLayoutMain() {
     newMembers[index] = event.target.checked;
     setMembers(newMembers);
   };
-
   async function getTasks() {
     const { data, error } = await supabaseClient.from("tasks").select(`
   *,
@@ -77,6 +76,12 @@ export default function TasksLayoutMain() {
   useEffect(() => {
     getTasks();
   }, []);
+
+  const completedTasks = tasks.filter((task) => {
+    if(task.is_completed == true){
+      return task;
+    }
+  })
 
   const onHandleSubmit = () => {
     setOpen(false);
@@ -142,23 +147,13 @@ export default function TasksLayoutMain() {
               </Chip>
             </Tab>
             <Tab indicatorInset>
-              Tasks by Project{" "}
+              Completed Tasks{" "}
               <Chip
                 size="sm"
                 variant="soft"
                 color={index === 1 ? "primary" : "neutral"}
               >
                 20
-              </Chip>
-            </Tab>
-            <Tab indicatorInset>
-              Completed Tasks{" "}
-              <Chip
-                size="sm"
-                variant="soft"
-                color={index === 2 ? "primary" : "neutral"}
-              >
-                8
               </Chip>
             </Tab>
           </TabList>
@@ -212,6 +207,8 @@ export default function TasksLayoutMain() {
                         <ListItem>
                           <FormControl>
                             <ListItem>
+
+
                               <Checkbox
                                 label={
                                   <div style={{ textAlign: "left" }}>
@@ -284,7 +281,68 @@ export default function TasksLayoutMain() {
             </CardOverflow> */}
               </Box>
             </TabPanel>
-            <TabPanel value={1}>Library</TabPanel>
+            <TabPanel value={1}>
+              {Object.values(completedTasks).map((task) => (
+                <Stack
+                  justifyContent={"center"}
+                  alignItems={"center"}
+                  key={task.task_id}
+                  direction="row"
+                  spacing={1}
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    width: "90%",
+                    borderRadius: "sm",
+                    border: "1px solid",
+                    borderColor: "divider",
+                    bgcolor: "background.body",
+                    boxShadow: "sm",
+                  }}
+                >
+                  <List
+                    sx={{
+                      "--ListItem-gap": "0.05rem",
+                      [`& .${checkboxClasses.root}`]: {
+                        mr: "auto",
+                        flexGrow: 1,
+                        alignItems: "center",
+                        flexDirection: "row",
+                      },
+                    }}
+                  >
+                    <ListItem>
+                      <FormControl>
+                        <ListItem>
+                          <Typography sx={{ ml: "auto" }}>
+                            {task.projects ? (
+                              <>Project: {task.projects.project_name}</>
+                            ) : (
+                              <>Project: No Project</>
+                            )}
+                          </Typography>
+                          <Typography sx={{ ml: "auto" }}>
+                            <>Task Name: {task.task_name}</>
+                          </Typography>
+                        </ListItem>
+                      </FormControl>
+                    </ListItem>
+                  </List>
+
+                  {/* We might not need this here for now, but leaving it for reference */}
+
+                  {/* <Typography level="body-md">
+                        Task ID: {task.task_id}
+                      </Typography> 
+
+                     <Typography level="body-sm">
+                        Status: {task.is_completed ? "Yes" : "No"}
+                      </Typography>  */}
+                </Stack>
+              ))}
+
+            </TabPanel>
             <TabPanel value={2}>Products</TabPanel>
           </Box>
         </Tabs>
