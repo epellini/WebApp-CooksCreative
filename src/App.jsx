@@ -19,6 +19,7 @@ import Protected from './components/Protected';
 import ClientDetails from './pages/Clients/ClientDetails.jsx';
 import ClientForm from './pages/Clients/ClientForm.jsx';
 import ForgotPassword from './pages/Auth/ForgotPassword.jsx';
+import AdminPanel from './pages/AdminPanel/AdminPanel.jsx';
 
 
 function App() {
@@ -28,7 +29,7 @@ function App() {
         <Routes>
           {/* AUTH ROUTES */}
           <Route path="/login" element={<Login/>} /> 
-          <Route path="/register" element={<Register/>} /> 
+          
           {/* END OF AUTH ROUTES */}
 
           {/* PROTECTED ROUTE */}
@@ -51,6 +52,11 @@ function App() {
               <Route path=":id" element={<ClientDetails/>}/>
               <Route path="new" element={<ClientForm/>}/>
               <Route path="edit/:clientId" element={<ClientForm />} />
+            </Route>
+
+            {/* ADMIN ROUTES */}
+            <Route path='/admin-panel' element={<Protected isAdminRoute={true} />}>
+              <Route index element={<AdminPanel/>}/>
             </Route>
           </Route> {/* END OF PROTECTED ROUTE */}
           
