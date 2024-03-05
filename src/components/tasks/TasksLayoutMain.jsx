@@ -143,7 +143,7 @@ export default function TasksLayoutMain() {
                 variant="soft"
                 color={index === 0 ? "primary" : "neutral"}
               >
-                14
+                {tasks.length}
               </Chip>
             </Tab>
             <Tab indicatorInset>
@@ -153,7 +153,7 @@ export default function TasksLayoutMain() {
                 variant="soft"
                 color={index === 1 ? "primary" : "neutral"}
               >
-                20
+                {completedTasks.length}
               </Chip>
             </Tab>
           </TabList>
