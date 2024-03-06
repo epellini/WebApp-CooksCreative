@@ -21,7 +21,7 @@ import FolderIcon from "@mui/icons-material/Folder";
 import ReplyRoundedIcon from "@mui/icons-material/ReplyRounded";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import EditNoteIcon from '@mui/icons-material/EditNote';
-import ProjectTaskDetails from "./projectTaskDetails";
+import ProjectTaskDetails from "./ProjectTaskDetails";
 
 import Images from "../../pages/Images";
 
@@ -329,6 +329,8 @@ export default function ProjectDetailsComp() {
           Project Category: {category.name}
         </Typography>
       </Box>
+
+      <ProjectTaskDetails projectid={id} />
 
       <Divider />
       <Typography textAlign="left" level="body-sm" mt={2} mb={2}>
