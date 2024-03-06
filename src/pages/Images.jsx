@@ -12,41 +12,69 @@ import { Card } from "@mui/material";
 import CardContent from "@mui/joy/CardContent";
 import Box from "@mui/joy/Box";
 
-
-
 const Images = () => {
   const [images, setImages] = useState([]);
   const [projects, setProject] = useState([]); // need to do the function?
   const [fileName, setFileName] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+  const [projectImageUrl, setProjectImageUrl] = useState("");
 
-  let project = { // delete after testing
-    project_id: "123",
+  const insertData = async (imageUrl) => {
+    const { data, error } = await supabaseClient
+      .from("images")
+      .insert([{ image_urls: imageUrl, project_id: project.project_id}]);
+    if (error) {
+      console.error("Error inserting image", error);
+    }
+  }
+
+  async function getImageFromProject  () {
+    const { data, error } = await supabaseClient
+      .from("images")
+      .select("image_urls")
+      .eq("project_id", project.project_id);
+    if (error) {
+      console.error("Error fetching images", error);
+    } else {
+      console.log("Got images", data);
+      console.log("Image Url: ", data[0].image_urls);
+      setProjectImageUrl(data[0].image_urls);
+    }
+  }
+
+  const CDNURL =
+    "https://khqunikzqiyqnqgpcaml.supabase.co/storage/v1/object/public/images/project-images/";
+
+  let project = {
+    // delete after testing
+    project_id: "162",
   };
 
   useEffect(() => {
-    // const pathToImage = "project-images/123/2ee3b8bb-8fb2-4f56-a9b9-86f417a79cd0";
-  
-    // async function fetchImageUrl() {
-    //   try {
-    //     const { data, error } = await supabaseClient
-    //       .storage
-    //       .from("images")
-    //       .getPublicUrl(pathToImage);
-        
-    //     if (error) {
-    //       console.error(error);
-    //     } else {
-    //       console.log("Got public url", data);
-    //       setImageUrl(data.publicUrl);
-    //     }
-    //   } catch (error) {
-    //     console.error(error);
-    //   }
-    // }
-  
-    // fetchImageUrl();
+    getImageFromProject();
+    console.log("Project Image Url: ", projectImageUrl);
+
+    const pathToImage = projectImageUrl;
+    async function fetchImageUrl() {
+      try {
+        const { data, error } = await supabaseClient
+          .storage
+          .from("images")
+          .getPublicUrl(pathToImage);
+        if (error) {
+          console.error(error);
+        } else {
+          console.log("Got public url", data);
+          setImageUrl(data.publicUrl);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    fetchImageUrl();
   }, []); // Empty dependency array to run this effect
+
+
 
   async function uploadImage(e) {
     let file = e.target.files[0];
@@ -57,14 +85,15 @@ const Images = () => {
       .upload("project-images/" + project.project_id + "/" + uuidv4(), file);
 
     if (data) {
-      console.log(data);
-      setImages([...images, data]);
-      console.log(images);
+      console.log("Data from upload:", data); // Add this line to log data
+      console.log("path: "+ data.path);
+      setImageUrl(data.path);
+      insertData(data.path);
+
     } else {
-      console.log(error);
+      console.log("Error:", error);
     }
   }
-
 
   return (
     <div>
@@ -96,7 +125,6 @@ const Images = () => {
             return (
               <Box key={CDNURL + project.project_id + "/" + image.name}>
                 <Card>
-
                   <img src={CDNURL + project.project_id + "/" + image.name} />
                   <CardContent>
                     <Button>Delete</Button>
