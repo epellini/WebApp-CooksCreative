@@ -12,44 +12,41 @@ import { Card } from "@mui/material";
 import CardContent from "@mui/joy/CardContent";
 import Box from "@mui/joy/Box";
 
-const CDNURL =
-  "https://khqunikzqiyqnqgpcaml.supabase.co/storage/v1/object/public/images/project-images/";
-// CDNURL + project.project_id + "/" + image.name
+
 
 const Images = () => {
   const [images, setImages] = useState([]);
   const [projects, setProject] = useState([]); // need to do the function?
+  const [fileName, setFileName] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
 
   let project = { // delete after testing
     project_id: "123",
   };
 
-  async function getImages() {
-    const { data, error } = await supabaseClient.storage
-      .from("images")
-      .list(project?.project_id + "/", {
-        limit: 100,
-        offset: 0,
-        sortBy: { column: "name", order: "asc" },
-      });
-
-    if (data) {
-      console.log(data);
-    } else {
-      console.log(error);
-    }
-
-    if (data !== null) {
-      setImages(data);
-    } else {
-      alert("No images found");
-      console.log(error);
-    }
-  }
-
   useEffect(() => {
-    getImages();
-  }, []);
+    // const pathToImage = "project-images/123/2ee3b8bb-8fb2-4f56-a9b9-86f417a79cd0";
+  
+    // async function fetchImageUrl() {
+    //   try {
+    //     const { data, error } = await supabaseClient
+    //       .storage
+    //       .from("images")
+    //       .getPublicUrl(pathToImage);
+        
+    //     if (error) {
+    //       console.error(error);
+    //     } else {
+    //       console.log("Got public url", data);
+    //       setImageUrl(data.publicUrl);
+    //     }
+    //   } catch (error) {
+    //     console.error(error);
+    //   }
+    // }
+  
+    // fetchImageUrl();
+  }, []); // Empty dependency array to run this effect
 
   async function uploadImage(e) {
     let file = e.target.files[0];
@@ -60,15 +57,19 @@ const Images = () => {
       .upload("project-images/" + project.project_id + "/" + uuidv4(), file);
 
     if (data) {
-      getImages();
+      console.log(data);
+      setImages([...images, data]);
+      console.log(images);
     } else {
       console.log(error);
     }
   }
 
+
   return (
     <div>
       Images Page
+      <img src={imageUrl} />
       {/* <DropZone />
       <FileUpload /> */}
       <FormGroup>
@@ -95,6 +96,7 @@ const Images = () => {
             return (
               <Box key={CDNURL + project.project_id + "/" + image.name}>
                 <Card>
+
                   <img src={CDNURL + project.project_id + "/" + image.name} />
                   <CardContent>
                     <Button>Delete</Button>
