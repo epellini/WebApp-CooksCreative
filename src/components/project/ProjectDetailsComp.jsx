@@ -22,6 +22,8 @@ import ReplyRoundedIcon from "@mui/icons-material/ReplyRounded";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import EditNoteIcon from '@mui/icons-material/EditNote';
 
+import Images from "../../pages/Images";
+
 
 export default function ProjectDetailsComp() {
   // const project = {
@@ -344,37 +346,7 @@ export default function ProjectDetailsComp() {
       <Typography textAlign="left" level="title-sm" mt={2} mb={2}>
         Photos
       </Typography>
-      <Box
-        sx={(theme) => ({
-          display: "flex",
-          flexWrap: "wrap",
-          gap: 2,
-          "& > div": {
-            boxShadow: "none",
-            "--Card-padding": "0px",
-            "--Card-radius": theme.vars.radius.sm,
-          },
-        })}
-      >
-        <Card variant="outlined">
-          <AspectRatio ratio="1" sx={{ minWidth: 80 }}>
-            <img
-              src="https://images.unsplash.com/photo-1527549993586-dff825b37782?auto=format&h=80"
-              srcSet="https://images.unsplash.com/photo-1527549993586-dff825b37782?auto=format&h=160 2x"
-              alt="Yosemite National Park"
-            />
-          </AspectRatio>
-        </Card>
-        <Card variant="outlined">
-          <AspectRatio ratio="1" sx={{ minWidth: 80 }}>
-            <img
-              src="https://images.unsplash.com/photo-1532614338840-ab30cf10ed36?auto=format&h=80"
-              srcSet="https://images.unsplash.com/photo-1532614338840-ab30cf10ed36?auto=format&h=160 2x"
-              alt="Yosemite National Park"
-            />
-          </AspectRatio>
-        </Card>
-      </Box>
+      <Images projectid={id} />
     </Sheet>
   );
 }

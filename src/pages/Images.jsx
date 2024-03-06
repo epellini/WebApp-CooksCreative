@@ -11,24 +11,48 @@ import { Stack } from "@mui/material";
 import { Card } from "@mui/material";
 import CardContent from "@mui/joy/CardContent";
 import Box from "@mui/joy/Box";
+import AspectRatio from "@mui/joy/AspectRatio";
 
-const Images = () => {
+const Images = (projectid) => {
   const [images, setImages] = useState([]);
-  const [projects, setProject] = useState([]); // need to do the function?
+  const [project, setProject] = useState({ project_id: projectid.projectid });
   const [fileName, setFileName] = useState("");
   const [imageUrl, setImageUrl] = useState("");
-  const [projectImageUrl, setProjectImageUrl] = useState("");
-
+  const [imageUrls, setImageUrls] = useState([]);
+  
   const insertData = async (imageUrl) => {
     const { data, error } = await supabaseClient
       .from("images")
-      .insert([{ image_urls: imageUrl, project_id: project.project_id}]);
+      .insert([{ image_urls: imageUrl, project_id: project.project_id }]);
+
     if (error) {
       console.error("Error inserting image", error);
     }
+  };
+
+  const getImages = async (pathToImage) => {
+    const { data: publicUrlData, error: publicUrlError } =
+      await supabaseClient.storage.from("images").getPublicUrl(pathToImage);
+    if (publicUrlError) {
+      console.error(publicUrlError);
+      return;
+    }
+    console.log("Got public url", publicUrlData);
+    setImages(publicUrlData);
+  };
+
+  async function getProjects() {
+    const { data, error } = await supabaseClient.from("projects").select("*");
+    if (error) {
+      console.error("Error fetching projects", error);
+    } else {
+      console.log("Got projects", data);
+      setProject(data);
+    }
   }
 
-  async function getImageFromProject  () {
+  //might need this for loading the project from the project number on project details page.
+  async function getImageFromProject() {
     const { data, error } = await supabaseClient
       .from("images")
       .select("image_urls")
@@ -45,36 +69,60 @@ const Images = () => {
   const CDNURL =
     "https://khqunikzqiyqnqgpcaml.supabase.co/storage/v1/object/public/images/project-images/";
 
-  let project = {
-    // delete after testing
-    project_id: "162",
-  };
+  // let project = {
+  //   // delete after testing
+  //   project_id: "162",
+  // };
 
   useEffect(() => {
-    getImageFromProject();
-    console.log("Project Image Url: ", projectImageUrl);
-
-    const pathToImage = projectImageUrl;
-    async function fetchImageUrl() {
+    async function fetchData() {
       try {
-        const { data, error } = await supabaseClient
-          .storage
+        // Fetch image URLs
+        const { data: imageData, error: imageError } = await supabaseClient
           .from("images")
-          .getPublicUrl(pathToImage);
-        if (error) {
-          console.error(error);
-        } else {
-          console.log("Got public url", data);
-          setImageUrl(data.publicUrl);
+          .select("image_urls")
+          .eq("project_id", project.project_id);
+
+          console.log("Project ID: ", project.project_id);
+
+        if (imageError) {
+          console.error("Error fetching images", imageError);
+          return;
+        }
+
+        console.log("Got images", imageData);
+
+        // Fetch public URLs for all images
+        if (imageData && imageData.length > 0) {
+          const pathToImages = imageData.map((image) => image.image_urls);
+
+          const imageUrlsPromises = pathToImages.map(async (pathToImage) => {
+            const { data: publicUrlData, error: publicUrlError } =
+              await supabaseClient.storage
+                .from("images")
+                .getPublicUrl(pathToImage);
+
+            if (publicUrlError) {
+              console.error(publicUrlError);
+              return null;
+            }
+
+            console.log("Got public url", publicUrlData);
+            return publicUrlData.publicUrl;
+          });
+
+          const fetchedImageUrls = await Promise.all(imageUrlsPromises);
+          setImageUrls(fetchedImageUrls);
+          console.log("Fetched image URLs", fetchedImageUrls);
+          console.log("Image URLs", fetchedImageUrls); // Move this line here
         }
       } catch (error) {
         console.error(error);
       }
     }
-    fetchImageUrl();
-  }, []); // Empty dependency array to run this effect
 
-
+    fetchData();
+  }, []);
 
   async function uploadImage(e) {
     let file = e.target.files[0];
@@ -86,10 +134,9 @@ const Images = () => {
 
     if (data) {
       console.log("Data from upload:", data); // Add this line to log data
-      console.log("path: "+ data.path);
+      console.log("path: " + data.path);
       setImageUrl(data.path);
       insertData(data.path);
-
     } else {
       console.log("Error:", error);
     }
@@ -97,7 +144,6 @@ const Images = () => {
 
   return (
     <div>
-      Images Page
       <img src={imageUrl} />
       {/* <DropZone />
       <FileUpload /> */}
@@ -120,12 +166,30 @@ const Images = () => {
         alignItems="center"
         spacing={2}
       >
-        <Box>
-          {images.map((image) => {
+        {imageUrls.map((imageUrl) => {
+          return (
+            <Stack>
+            <Box
+              component="img"
+              sx={{
+                height: 233,
+                width: 350,
+                maxHeight: { xs: 233, md: 167 },
+                maxWidth: { xs: 350, md: 250 },
+              }}
+              alt="The house from the offer."
+              src={imageUrl}
+            />
+            </Stack>
+          );
+        })}
+
+        {/* <Box>
+          {imageUrls.map((imageUrl) => {
             return (
-              <Box key={CDNURL + project.project_id + "/" + image.name}>
+              <Box key={imageUrl}>
                 <Card>
-                  <img src={CDNURL + project.project_id + "/" + image.name} />
+                  <img src={imageUrl} alt="Image" />
                   <CardContent>
                     <Button>Delete</Button>
                   </CardContent>
@@ -133,7 +197,7 @@ const Images = () => {
               </Box>
             );
           })}
-        </Box>
+        </Box> */}
       </Stack>
     </div>
   );
