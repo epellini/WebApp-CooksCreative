@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
-  Box,
   Sheet,
-  Typography,
   Tabs,
   TabList,
   TabPanel,
@@ -10,33 +8,45 @@ import {
   Chip,
   Table,
 } from "@mui/joy";
-import { Skeleton } from "@mui/joy";
-import { supabaseClient } from "../../supabase-client";
 
-const ProjectTaskDetails = ({ projectid }) => {
-  const [tasks, setTasks] = useState([]);
-  const [index, setIndex] = useState(0);
+const TaskTableAll = ({ tasks, getTasks }) => {
+  const [open, setOpen] = React.useState(false);
+  const [index, setIndex] = React.useState(0);
+  const [selectedIndex, setSelectedIndex] = React.useState(1);
+  let [days, setDays] = useState(30);
 
-  async function getTasks() {
-    const { data, error } = await supabaseClient
-      .from("tasks")
-      .select("*")
-      .eq("project_id", projectid)
-      .order("task_id", { ascending: true });
+  const [members, setMembers] = React.useState([false, true, false]);
+  const toggleMember = (index) => (event) => {
+    const newMembers = [...members];
+    newMembers[index] = event.target.checked;
+    setMembers(newMembers);
+  };
 
-    if (error) {
-      console.error("Error fetching tasks:", error);
-    } else {
-      setTasks(data);
+  const completedTasks = tasks.filter((task) => {
+    const dayLength = days * 24 * 60 * 60 * 1000; // 30 days in milliseconds
+    const thirtyDaysAgoTimeStamp = Date.now() - dayLength;
+  
+    console.log('Task Date Created:', new Date(task.date_created).getTime());
+    console.log('Thirty Days Ago:', thirtyDaysAgoTimeStamp);
+  
+    // Check if the task is completed and its creation date is within the last 30 days
+    if (task.is_completed && new Date(task.date_created).getTime() >= thirtyDaysAgoTimeStamp) {
+      return true; // Keep the task in the filtered array
     }
-  }
+    return false; // Exclude the task from the filtered array
+  });
 
-  useEffect(() => {
+  const activeTasks = tasks.filter((task) => {
+    if (task.is_completed == false) {
+      return task;
+    }
+  })
+
+  const onHandleSubmit = () => {
+    setOpen(false);
+    //reload the tasks
     getTasks();
-  }, [projectid]);
-
-  const completedTasks = tasks.filter((task) => task.is_completed === true);
-  const activeTasks = tasks.filter((task) => task.is_completed === false);
+  };
 
   return (
     <React.Fragment>
@@ -204,4 +214,4 @@ const ProjectTaskDetails = ({ projectid }) => {
   );
 };
 
-export default ProjectTaskDetails;
+export default TaskTableAll;
