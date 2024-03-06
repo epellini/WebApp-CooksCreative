@@ -165,7 +165,7 @@ const ProjectTaskDetails = ({ projectid }) => {
               </thead>
 
               <tbody>
-                {activeTasks.map((task) => (
+                {completedTasks.map((task) => (
                   <tr key={task.task_id}>
                     <td
                       onClick={() => console.log("Task Clicked")}
