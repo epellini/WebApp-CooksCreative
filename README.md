@@ -1,8 +1,7 @@
-# React + Vite
+#Contracting Business Management Web Application
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Technologies and Languages: React | JavaScript | TypeScript |  PostgreSQL   |  Supabase |  Selenium
 
-Currently, two official plugins are available:
+Developed and deployed a web application for Cooks Creative Contracting Ltd., using React and JavaScript for the frontend and Supabase with PostgreSQL for backend efficiency.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Engineered the platform to significantly enhance operational efficiency by streamlining processes related to client management, project scheduling, and team coordination.
