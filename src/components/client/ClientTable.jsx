@@ -38,12 +38,15 @@ import EmailIcon from "@mui/icons-material/Email";
 import LocalPhoneIcon from "@mui/icons-material/LocalPhone";
 import Autocomplete from "@mui/joy/Autocomplete";
 import { Skeleton } from "@mui/joy";
+import HomeIcon from "@mui/icons-material/Home";
 
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabaseClient } from "../../supabase-client"; // Import the supabase client
-import { usePagination} from "../../hooks/usePagination";
+import { usePagination } from "../../hooks/usePagination";
 import { convertToCSV, downloadCSV } from "../../utils/CsvUtils";
+import FmdGoodIcon from "@mui/icons-material/FmdGood";
+import ClientForm from "./ClientForm";
 
 function RowMenu({ clientId }) {
   const navigate = useNavigate();
@@ -110,7 +113,6 @@ export default function ClientTable() {
     ? clients.filter((client) => client.client_id === selectedClient.client_id)
     : clients;
 
-
   // const [currentPage, setCurrentPage] = useState(1);
   // const [itemsPerPage, setItemsPerPage] = useState(10);
 
@@ -145,9 +147,8 @@ export default function ClientTable() {
     totalPages,
     handlePageChange,
     handlePrevious,
-    handleNext
+    handleNext,
   } = usePagination(filteredClients, 10);
-
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
@@ -161,19 +162,19 @@ export default function ClientTable() {
   };
 
   // This function copies the email of the client in clipboard and also redirects to email
-  function handleEmailClick(emailAddress) {
-    navigator.clipboard
-      .writeText(emailAddress)
-      .then(() => {
-        console.log("Email address copied to clipboard");
-      })
-      .catch((err) => {
-        console.error("Failed to copy email address: ", err);
-      });
+  // function handleEmailClick(emailAddress) {
+  //   navigator.clipboard
+  //     .writeText(emailAddress)
+  //     .then(() => {
+  //       console.log("Email address copied to clipboard");
+  //     })
+  //     .catch((err) => {
+  //       console.error("Failed to copy email address: ", err);
+  //     });
 
-    // Open default email client with the email address in the "To" field
-    window.location.href = `mailto:${emailAddress}`;
-  }
+  //   // Open default email client with the email address in the "To" field
+  //   window.location.href = `mailto:${emailAddress}`;
+  // }
 
   const handleExportSelected = () => {
     // Filter the clients to only those selected
@@ -188,72 +189,6 @@ export default function ClientTable() {
     downloadCSV(csvData, "SelectedClients.csv");
   };
 
-  // useEffect(() => {
-  //   //Fliter(find) client based on a search query
-  //   if (typeof searchQuery === 'string') {
-  //     const lowercasedQuery = searchQuery.toLowerCase();
-  //     const filteredData = clients.filter(
-  //       client =>
-  //         client.first_name.toLowerCase().includes(lowercasedQuery) ||
-  //         client.last_name.toLowerCase().includes(lowercasedQuery) ||
-  //         client.email.toLowerCase().includes(lowercasedQuery)
-  //     );
-  //     setFilteredClients(filteredData);
-  //   }
-
-  // }, [searchQuery, clients]);
-
-  // const filteredClients = selectedClient
-  //   ? clients.filter((client) =>
-  //       `${client.first_name} ${client.last_name}`.toLowerCase().includes(selectedClient)
-  //     )
-  //   : clients;
-
-  // FILTERS
-  // const renderFilters = () => (
-  //   <React.Fragment>
-  //     <FormControl size="sm">
-  //       {/* WILL NEED TO POPULATE THIS WITH DB DATA */}
-  //       <FormLabel>Status</FormLabel>
-  //       <Select
-  //         size="sm"
-  //         placeholder="Filter by status"
-  //         slotProps={{ button: { sx: { whiteSpace: "nowrap" } } }}
-  //       >
-  //         <Option value="completed">Completed</Option>
-  //         <Option value="in-progress">In Progress</Option>
-  //         <Option value="pending-approval">Pending Approval</Option>
-  //         <Option value="cancelled">Cancelled</Option>
-  //         <Option value="refunded">Refunded</Option>
-  //       </Select>
-  //     </FormControl>
-  //     <FormControl size="sm">
-  //       {/* WILL NEED TO POPULATE THIS WITH DB DATA */}
-  //       <FormLabel>Category</FormLabel>
-  //       <Select size="sm" placeholder="All">
-  //         <Option value="all">All</Option>
-  //         <Option value="refund">General Home</Option>
-  //         <Option value="purchase">Tiny Homes</Option>
-  //         <Option value="debit">Additions</Option>
-  //         <Option value="debit">Basements</Option>
-  //         <Option value="debit">Bathrooms</Option>
-  //       </Select>
-  //     </FormControl>
-  //     <FormControl size="sm">
-  //       {/* WILL NEED TO POPULATE THIS WITH DB DATA - ALSO NEED TO KNOW WHAT TO ADD HERE */}
-  //       <FormLabel>Customer</FormLabel>
-  //       <Select size="sm" placeholder="All">
-  //         <Option value="all">All</Option>
-  //         <Option value="olivia">Olivia Rhye</Option>
-  //         <Option value="steve">Steve Hampton</Option>
-  //         <Option value="ciaran">Ciaran Murray</Option>
-  //         <Option value="marina">Marina Macdonald</Option>
-  //         <Option value="charles">Charles Fulton</Option>
-  //         <Option value="jay">Jay Hoper</Option>
-  //       </Select>
-  //     </FormControl>
-  //   </React.Fragment>
-  // );
   return (
     <React.Fragment>
       <Sheet
@@ -327,12 +262,17 @@ export default function ClientTable() {
         </FormControl>
         {/* {renderFilters()} */}
       </Box>
+
       <Sheet
         className="OrderTableContainer"
         variant="outlined"
         sx={{
-          display: { xs: "none", sm: "initial" },
-          width: "100%", // if you want to make the table full width <----- HERE
+          display: { xs: "none", md: "initial" },
+          width: "100%",
+          maxWidth: {
+            lg: "100%",
+            xl: "100%",
+          },
           borderRadius: "sm",
           flexShrink: 1,
           overflow: "auto",
@@ -356,7 +296,7 @@ export default function ClientTable() {
           <thead>
             <tr>
               <th
-                style={{ width: 48, textAlign: "center", padding: "12px 6px" }}
+                style={{ width: 10, textAlign: "center", padding: "12px 6px" }}
               >
                 <Checkbox
                   size="sm"
@@ -375,47 +315,16 @@ export default function ClientTable() {
                   sx={{ verticalAlign: "text-bottom" }}
                 />
               </th>
-              <th style={{ width: 120, padding: "12px 6px" }}>
-                <Link
-                  underline="none"
-                  color="primary"
-                  component="button"
-                  // onClick={() => setOrder(order === 'asc' ? 'desc' : 'asc')}
-                  fontWeight="lg"
-                  endDecorator={<ArrowDropDownIcon />}
-                  sx={{
-                    "& svg": {
-                      transition: "0.2s",
-                      // transform:
-                      //     order === 'desc' ? 'rotate(0deg)' : 'rotate(180deg)',
-                    },
-                  }}
-                >
-                  Name
-                </Link>
-              </th>
-              <th
-                style={{ width: 180, padding: "12px 6px", textAlign: "left" }}
-              >
+              <th style={{ width: 50, padding: "12px 6px" }}>Name</th>
+              <th style={{ width: 70, padding: "12px 6px", textAlign: "left" }}>
                 Contact
               </th>{" "}
-              {/* the width used to be 140*/}
-              <th
-                style={{ width: 140, padding: "12px 6px", textAlign: "left" }}
-              >
+              <th style={{ width: 40, padding: "12px 6px", textAlign: "left" }}>
                 Address
               </th>
-              <th
-                style={{ width: 140, padding: "12px 6px", textAlign: "left" }}
-              >
-                Tags
-              </th>
-              <th style={{ width: 40, padding: "12px 6px", textAlign: "left" }}>
+              {/* <th style={{ width: 20, padding: "12px 6px", textAlign: "left" }}>
                 Utilities
-              </th>
-              <th
-                style={{ width: 40, padding: "12px 6px", textAlign: "left" }}
-              ></th>
+              </th> */}
             </tr>
           </thead>
 
@@ -462,70 +371,100 @@ export default function ClientTable() {
                         sx={{ verticalAlign: "text-bottom" }}
                       />
                     </td>
+
                     {/* Displaying client's first and last names information if available */}
                     <td style={{ textAlign: "left" }}>
-                      <Typography 
-                      level="body-xs" 
-                      onClick={() => navigate(`/clients/${client.client_id}`)}
-                      style={{ cursor: "pointer" }}
-                      >{`${client.first_name} ${client.last_name}`}</Typography>
+                      <Typography
+                        sx={{
+                          textAlign: "left",
+                          fontSize: {
+                            xs: "0.8rem",
+                            sm: "0.85rem",
+                          },
+                        }}
+                        onClick={() => navigate(`/clients/${client.client_id}`)}
+                        style={{ cursor: "pointer" }}
+                      >
+                        {`${client.first_name} ${client.last_name}`}
+                      </Typography>
                     </td>
-                    {/* Displaying client's contact information if available */}
                     <td>
-                      {/* This is working version with out icons */}
-                      {/* {client ? (
-                      <Typography level="body-xs">
-                        {`${client.phone_number} ${client.email}`}
-                        </Typography>
-                    ) : (
-                      <Typography level="body-xs">N/A</Typography>
-                    )} */}
                       <Box
                         display="flex"
                         flexDirection="column"
                         alignItems="flex-start"
                         gap={0.5}
                       >
-                        <Box display="flex" alignItems="left" gap={1}>
-                          <Typography variant="body-xs" component="span">
-                            <LocalPhoneIcon fontSize="small" sx={{ mr: 1 }} />
+                        {/* Phone number chip */}
+                        <a
+                          href={`tel:${client.phone_number}`}
+                          style={{ textDecoration: "none" }}
+                        >
+                          <Chip size="sm" startDecorator={<LocalPhoneIcon />}>
                             {client.phone_number}
-                          </Typography>
-                        </Box>
-                        <Box display="flex" alignItems="left" gap={1}>
-                          <Typography variant="body-xs" component="span">
-                            <EmailIcon fontSize="small" sx={{ mr: 1 }} />
+                          </Chip>
+                        </a>
+
+                        {/* Email chip */}
+                        <a
+                          href={`mailto:${client.email}`}
+                          style={{ textDecoration: "none" }}
+                        >
+                          <Chip size="sm" startDecorator={<EmailIcon />}>
                             {client.email}
-                          </Typography>
-                        </Box>
+                          </Chip>
+                        </a>
                       </Box>
                     </td>
-                    <td style={{ textAlign: "left" }}>
-                      <Typography level="body-xs">{`${client.address}`}</Typography>
-                    </td>
+
                     <td>
                       <Box
-                        sx={{
-                          display: "flex",
-                          gap: 2,
-                          alignItems: "center",
-                        }}
+                        display="flex"
+                        flexDirection="column"
+                        alignItems="flex-start"
+                        gap={0.5}
                       >
-                        {/* <Avatar size="sm">{project.client.first_name}</Avatar> */}
-                        <div>
-                          {/* <Typography level="body-xs">{project.client_id }</Typography> */}
-
-                          <Typography level="body-xs">{status.name}</Typography>
-                        </div>
-
-                        {/* {project.client ? (
-                        <Typography level="body-xs">{`${project.end_date}`}</Typography>
-                      ) : (
-                        <Typography level="body-xs">N/A</Typography>
-                      )} */}
+                        <Link
+                          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                            `${client.street}, ${client.city}, ${client.province} ${client.postal_code}`
+                          )}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          underline="hover"
+                          sx={{
+                            display: "flex", // Ensure the link covers the content
+                            flexDirection: "column", // Stack items vertically
+                            alignItems: "flex-start", // Align items to the start
+                            gap: 0.5, // Maintain a small gap between lines
+                          }}
+                        >
+                          <Typography
+                            sx={{
+                              textAlign: "left",
+                              fontSize: {
+                                xs: "0.8rem",
+                                sm: "0.85rem",
+                              },
+                            }}
+                          >
+                            {client.street}
+                          </Typography>
+                          <Typography
+                            sx={{
+                              textAlign: "left",
+                              fontSize: {
+                                xs: "0.8rem",
+                                sm: "0.85rem",
+                              },
+                            }}
+                          >
+                            {`${client.city}, ${client.province} ${client.postal_code}`}
+                          </Typography>
+                        </Link>
                       </Box>
                     </td>
-                    <td>
+
+                    {/* <td>
                       <Box sx={{ display: "flex", gap: 2, alignItems: "left" }}>
                         <Link
                           level="body-xs"
@@ -536,8 +475,7 @@ export default function ClientTable() {
                         </Link>
                         <RowMenu clientId={client.client_id} />
                       </Box>
-                    </td>
-                    <td></td>
+                    </td> */}
                   </tr>
                 );
               })
@@ -545,6 +483,14 @@ export default function ClientTable() {
           </tbody>
         </Table>
       </Sheet>
+
+      {/* Import to CSV button. Shows up when at least one client is selected  */}
+      {selected.length > 0 && (
+        <Button onClick={handleExportSelected} style={{ margin: "10px 0" }}>
+          Export Email List
+        </Button>
+      )}
+
       <Box
         className="Pagination-laptopUp"
         sx={{
@@ -557,36 +503,6 @@ export default function ClientTable() {
           },
         }}
       >
-        {/* <Button
-          size="sm"
-          variant="outlined"
-          color="neutral"
-          startDecorator={<KeyboardArrowLeftIcon />}
-        >
-          Previous
-        </Button>
-
-        <Box sx={{ flex: 1 }} />
-        {["1", "2", "3", "…", "8", "9", "10"].map((page) => (
-          <IconButton
-            key={page}
-            size="sm"
-            variant={Number(page) ? "outlined" : "plain"}
-            color="neutral"
-          >
-            {page}
-          </IconButton>
-        ))}
-        <Box sx={{ flex: 1 }} />
-
-        <Button
-          size="sm"
-          variant="outlined"
-          color="neutral"
-          endDecorator={<KeyboardArrowRightIcon />}
-        >
-          Next
-        </Button> */}
         <Button
           size="sm"
           variant="outlined"
@@ -597,20 +513,6 @@ export default function ClientTable() {
         >
           Previous
         </Button>
-
-        {/* <Box sx={{ flex: 1, display: "flex", justifyContent: "center" }}>
-          {pageNumbers.map((page) => (
-            <IconButton
-              key={page}
-              size="sm"
-              variant={currentPage === page ? "contained" : "outlined"}
-              color="neutral"
-              onClick={() => handlePageChange(page)}
-            >
-              {page}
-            </IconButton>
-          ))}
-        </Box> */}
 
         {/* This is working version, the UI is not what we want  */}
         {/* {[...Array(totalPages).keys()].map(number => (
@@ -635,14 +537,22 @@ export default function ClientTable() {
                 backgroundColor:
                   currentPage === number + 1 ? "primary.main" : "transparent",
                 color:
-                  currentPage === number + 1 ? "primary.contrastText" : "inherit",
+                  currentPage === number + 1
+                    ? "primary.contrastText"
+                    : "inherit",
                 "&:hover": {
                   backgroundColor:
-                    currentPage === number + 1 ? "primary.dark" : "action.hover",
+                    currentPage === number + 1
+                      ? "primary.dark"
+                      : "action.hover",
                 },
                 mx: 0.5, // Add some margin for spacing
-                border: currentPage === number + 1 ? '2px solid primary.dark' : '1px solid rgba(0, 0, 0, 0.23)', // Adjust for your theme
-                boxShadow: currentPage === number + 1 ? 'palette.primary.main' : 'none', // Optional: adds a glow effect for the current page
+                border:
+                  currentPage === number + 1
+                    ? "2px solid primary.dark"
+                    : "1px solid rgba(0, 0, 0, 0.23)", // Adjust for your theme
+                boxShadow:
+                  currentPage === number + 1 ? "palette.primary.main" : "none", // Optional: adds a glow effect for the current page
               }}
             >
               {number + 1}
@@ -661,13 +571,6 @@ export default function ClientTable() {
           Next
         </Button>
       </Box>
-
-      {/* Import to CSV button. Shows up when at least one client is selected  */}
-      {selected.length > 0 && (
-        <Button onClick={handleExportSelected} style={{ margin: "10px 0" }}>
-          Export selected to CSV
-        </Button>
-      )}
     </React.Fragment>
   );
 }
