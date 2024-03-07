@@ -20,7 +20,7 @@ import ClientDetails from './pages/Clients/ClientDetails.jsx';
 import ClientForm from './pages/Clients/ClientForm.jsx';
 import ForgotPassword from './pages/Auth/ForgotPassword.jsx';
 import AdminPanel from './pages/AdminPanel/AdminPanel.jsx';
-
+import ConfirmationPage from './pages/Auth/ConfirmationPage.jsx';
 
 function App() {
   return (
@@ -60,6 +60,9 @@ function App() {
            
           </Route> {/* END OF PROTECTED ROUTE */}
           
+
+          <Route path="/confirm-signup" element={<ConfirmationPage/>} />
+
             <Route path="/create-user" element={<CreateUserPage/>} />
             <Route path="/forgot-password" element={<ForgotPassword/>} />
           {/* NOT FOUND ROUTE */}
