@@ -35,31 +35,59 @@ const ProjectTaskDetails = ({ projectid }) => {
     getTasks();
   }, [projectid]);
 
-  const completedTasks = tasks.filter(task => task.is_completed === true);
-  const activeTasks = tasks.filter(task => task.is_completed === false);
+  const completedTasks = tasks.filter((task) => task.is_completed === true);
+  const activeTasks = tasks.filter((task) => task.is_completed === false);
 
   return (
     <React.Fragment>
-      <Sheet variant="outlined" sx={{
-        display: {
-          maxWidth: "1600px",
-          mx: "auto",
+      <Sheet
+        variant="outlined"
+        sx={{
+          display: {
+            maxWidth: "1600px",
+            mx: "auto",
+            borderRadius: "sm",
+            marginTop: "15px",
+            px: { xs: 2, md: 6 },
+            py: { xs: 2, md: 3 },
+          },
+          width: "100%",
           borderRadius: "sm",
-          marginTop: "15px",
-          px: { xs: 2, md: 6 },
-          py: { xs: 2, md: 3 },
-        },
-        width: "100%",
-        borderRadius: "sm",
-        flexShrink: 1,
-        overflow: "auto",
-        minHeight: 0,
-      }}>
-        <Tabs aria-label="Task Categories" value={index} onChange={(event, value) => setIndex(value)}>
+          flexShrink: 1,
+          overflow: "auto",
+          minHeight: 0,
+        }}
+      >
+        <Tabs
+          aria-label="Task Categories"
+          value={index}
+          onChange={(event, value) => setIndex(value)}
+        >
           <TabList>
-            <Tab>Active Tasks <Chip size="sm" variant="soft" color={index === 0 ? "primary" : "neutral"}>{activeTasks.length}</Chip></Tab>
-            <Tab>Completed Tasks <Chip size="sm" variant="soft" color={index === 1 ? "primary" : "neutral"}>{completedTasks.length}</Chip></Tab>
+            <Tab>
+              Active Tasks{" "}
+              <Chip
+                size="sm"
+                variant="soft"
+                color={index === 0 ? "primary" : "neutral"}
+              >
+                {activeTasks.length}
+              </Chip>
+            </Tab>
+            <Tab>
+              Completed Tasks{" "}
+              <Chip
+                size="sm"
+                variant="soft"
+                color={index === 1 ? "primary" : "neutral"}
+              >
+                {completedTasks.length}
+              </Chip>
+            </Tab>
           </TabList>
+
+
+          
 
           <TabPanel value={0}>
             <Table
@@ -73,6 +101,8 @@ const ProjectTaskDetails = ({ projectid }) => {
                   "var(--joy-palette-background-level1)",
                 "--TableCell-paddingY": "4px",
                 "--TableCell-paddingX": "8px",
+                border: "1px solid #CDD7E1", // Add border here
+                borderRadius: "5px",
               }}
             >
               {/* TABLE HEAD BEGINS HERE */}
@@ -84,46 +114,92 @@ const ProjectTaskDetails = ({ projectid }) => {
               </thead>
 
               <tbody>
-                {activeTasks.map(task => (
+                {activeTasks.map((task) => (
                   <tr key={task.task_id}>
-                    <td style={{ textAlign: 'left' }}>     <Typography
-                      level="body-xs"
-                      onClick={() =>
-                        console.log("Task Clicked")
-                      }
-                      style={{ cursor: "pointer" }}
-                    >{`${task.task_name}`}</Typography></td>
-                    <td style={{ textAlign: 'left' }}>
-                      {task.date_created ?
-                        new Intl.DateTimeFormat('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(task.date_created))
+                    <td
+                      onClick={() => console.log("Task Clicked")}
+                      style={{ textAlign: "left", cursor: "pointer" }}
+                    >
+                      {`${task.task_name}`}
+                    </td>
+                    <td style={{ textAlign: "left" }}>
+                      {task.date_created
+                        ? new Intl.DateTimeFormat("en-US", {
+                            weekday: "long",
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          }).format(new Date(task.date_created))
                         : "N/A"}
                     </td>
                   </tr>
                 ))}
               </tbody>
-
             </Table>
           </TabPanel>
 
           <TabPanel value={1}>
-            <table>
+            <Table
+              stickyHeader
+              hoverRow
+              sx={{
+                "--TableCell-headBackground":
+                  "var(--joy-palette-background-level1)",
+                "--Table-headerUnderlineThickness": "1px",
+                "--TableRow-hoverBackground":
+                  "var(--joy-palette-background-level1)",
+                "--TableCell-paddingY": "4px",
+                "--TableCell-paddingX": "8px",
+                border: "1px solid #CDD7E1", // Add border here
+                borderRadius: "5px",
+              }}
+            >
+              {/* TABLE HEAD BEGINS HERE */}
               <thead>
                 <tr>
-                  <th>Task Name</th>
-                  <th>Start Date</th>
-                  <th>End Date</th>
+                  <th style={{ width: 80, padding: "12px 6px" }}>Task Name</th>
+                  <th style={{ width: 60, padding: "12px 6px" }}>Completed By</th>
+                  <th style={{ width: 40, padding: "12px 6px" }}>Date Assigned</th>
+                  <th style={{ width: 40, padding: "12px 6px" }}>Date Completed</th>
                 </tr>
               </thead>
+
               <tbody>
-                {completedTasks.map(task => (
+                {completedTasks.map((task) => (
                   <tr key={task.task_id}>
-                    <td>{task.task_name}</td>
-                    <td>{task.start_date || "N/A"}</td>
-                    <td>{task.end_date || "N/A"}</td>
+                    <td
+                      onClick={() => console.log("Task Clicked")}
+                      style={{ textAlign: "left", cursor: "pointer" }}
+                    >
+                      {`${task.task_name}`}
+                    </td>
+                    <td style={{ textAlign: "left" }}>
+                      {task.completed_by ? task.completed_by : "N/A"}
+                    </td>
+                    <td style={{ textAlign: "left" }}>
+                      {task.date_created
+                        ? new Intl.DateTimeFormat("en-US", {
+                            weekday: "long",
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          }).format(new Date(task.date_created))
+                        : "N/A"}
+                    </td>
+                    <td style={{ textAlign: "left" }}>
+                      {task.date_completed
+                        ? new Intl.DateTimeFormat("en-US", {
+                            weekday: "long",
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          }).format(new Date(task.date_completed))
+                        : "N/A"}
+                    </td>
                   </tr>
                 ))}
               </tbody>
-            </table>
+            </Table>
           </TabPanel>
         </Tabs>
       </Sheet>
