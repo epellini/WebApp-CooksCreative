@@ -25,7 +25,8 @@ import PhoneIcon from "@mui/icons-material/Phone";
 import NoteIcon from "@mui/icons-material/Note";
 import LabelIcon from "@mui/icons-material/Label";
 import RoomIcon from "@mui/icons-material/Room";
-const ClientDetails = () => {
+
+const ClientDetailsPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [client, setClient] = useState({});
@@ -215,4 +216,4 @@ const ClientDetails = () => {
   );
 };
 
-export default ClientDetails;
+export default ClientDetailsPage;

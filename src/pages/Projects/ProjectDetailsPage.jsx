@@ -21,32 +21,24 @@ import FolderIcon from "@mui/icons-material/Folder";
 import ReplyRoundedIcon from "@mui/icons-material/ReplyRounded";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import EditNoteIcon from '@mui/icons-material/EditNote';
+import ProjectTasks from "../../components/project/ProjectTasks";
+
+import Images from "../../components/Images/Images";
 
 
-export default function ProjectDetailsComp() {
-  // const project = {
-  //   project_name: "Kitchen Remodeling Project",
-  //   client_id: "123",
-  //   project_description:
-  //     "A kitchen renovation project encompasses a complete overhaul of the existing kitchen space, focusing on enhancing both functionality and aesthetics. This transformation often includes the installation of new countertops, cabinets, flooring, and state-of-the-art appliances, tailored to the homeowner's preferences and needs. The goal is to create a more efficient, modern, and inviting cooking and dining area that adds value to the home and improves the quality of living.",
-  //   start_date: "2023-01-01",
-  //   end_date: "2023-12-31",
-  //   status: "Active",
-  //   type: "Development",
-  // };
-
+export default function ProjectDetailsPage() {
   const [project, setProject] = useState({
     project_name: "",
-    client_id: "",
+    client_id: null,
     project_description: "",
     start_date: "",
     end_date: "",
-    status_id: "",
-    category_id: "",
+    status_id: null,
+    category_id: null,
   });
   const [client, setClient] = useState({
     client: {
-      id: "",
+      id: null,
       first_name: "",
       last_name: "",
       email: "",
@@ -57,14 +49,14 @@ export default function ProjectDetailsComp() {
   });
   const [status, setStatus] = useState({
     status: {
-      category_id: "",
+      category_id: null,
       name: "",
     },
   });
 
   const [category, setCategory] = useState({
     category: {
-      id: "",
+      id: null,
       name: "",
     },
   });
@@ -112,6 +104,17 @@ export default function ProjectDetailsComp() {
             setStatus(statusData);
           }
 
+          const { data: taskData, error: taskError } = await supabase
+            .from("tasks")
+            .select("*")
+            .order("task_id", { ascending: false })
+          if (taskError) {
+            console.log("Error fetching task details:", taskError.message);
+          }
+          else {
+            console.log(taskData);
+          }
+
           const { data: categoryData, error: categoryError } = await supabase
             .from("category")
             .select("*")
@@ -123,11 +126,6 @@ export default function ProjectDetailsComp() {
           else {
             setCategory(categoryData);
           }
-
-
-
-          
-
         }
     }
     getProject();
@@ -160,14 +158,14 @@ export default function ProjectDetailsComp() {
 
   return (
     <Sheet
-      variant="outlined"
-      sx={{
-        minHeight: 500,
-        width: "100%",
-        borderRadius: "sm",
-        p: 2,
-        mb: 3,
-      }}
+    variant="outlined"
+    sx={{
+      minHeight: 500,
+      width: "100%",
+      borderRadius: "sm",
+      p: 2,
+      mb: 3,
+    }}
     >
       <Box
         sx={{
@@ -332,6 +330,8 @@ export default function ProjectDetailsComp() {
         </Typography>
       </Box>
 
+      <ProjectTasks projectid={id} />
+
       <Divider />
       <Typography textAlign="left" level="body-sm" mt={2} mb={2}>
         <Typography level="title-md" textColor="text.primary" mb={1}>
@@ -344,37 +344,7 @@ export default function ProjectDetailsComp() {
       <Typography textAlign="left" level="title-sm" mt={2} mb={2}>
         Photos
       </Typography>
-      <Box
-        sx={(theme) => ({
-          display: "flex",
-          flexWrap: "wrap",
-          gap: 2,
-          "& > div": {
-            boxShadow: "none",
-            "--Card-padding": "0px",
-            "--Card-radius": theme.vars.radius.sm,
-          },
-        })}
-      >
-        <Card variant="outlined">
-          <AspectRatio ratio="1" sx={{ minWidth: 80 }}>
-            <img
-              src="https://images.unsplash.com/photo-1527549993586-dff825b37782?auto=format&h=80"
-              srcSet="https://images.unsplash.com/photo-1527549993586-dff825b37782?auto=format&h=160 2x"
-              alt="Yosemite National Park"
-            />
-          </AspectRatio>
-        </Card>
-        <Card variant="outlined">
-          <AspectRatio ratio="1" sx={{ minWidth: 80 }}>
-            <img
-              src="https://images.unsplash.com/photo-1532614338840-ab30cf10ed36?auto=format&h=80"
-              srcSet="https://images.unsplash.com/photo-1532614338840-ab30cf10ed36?auto=format&h=160 2x"
-              alt="Yosemite National Park"
-            />
-          </AspectRatio>
-        </Card>
-      </Box>
+      <Images projectid={id} />
     </Sheet>
   );
 }

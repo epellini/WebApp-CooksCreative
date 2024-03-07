@@ -100,7 +100,7 @@ export default function ProjectTable() {
         setStatus(data.map((project) => project.status));
         setCategory(data.map((project) => project.category));
         console.log(clients);
-        console.log(categories);
+        console.log("categories" + categories);
         console.log();
         setLoading(false); // Set loading to false when data is fetched
       }
@@ -327,6 +327,7 @@ export default function ProjectTable() {
                 Status
               </th>
               <th
+            
                 style={{ width: 100, padding: "12px 6px", textAlign: "left" }}
               >
                 Start Date

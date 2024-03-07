@@ -35,7 +35,7 @@ import FileUpload from "../FileUpload";
 import { useNavigate, useParams } from "react-router-dom";
 import { supabaseClient } from "../../supabase-client";
 
-const BetterProjectForm = () => {
+const ProjectForm = () => {
   const [project, setProject] = useState({
     project_name: "",
     client_id: "",
@@ -368,9 +368,7 @@ const BetterProjectForm = () => {
                           {categoryOption.name}
                         </Option>
                       ))}
-                      <Option value="1">Kitchen</Option>
-                      <Option value="2">Bathroom</Option>
-                      <Option value="3">Living Room</Option>
+
                     </Select>
                   </FormControl>
                 </Stack>
@@ -509,9 +507,7 @@ const BetterProjectForm = () => {
                           {categoryOption.name}
                         </Option>
                       ))}
-                      <Option value="1">Kitchen</Option>
-                      <Option value="2">Bathroom</Option>
-                      <Option value="3">Living Room</Option>
+
                     </Select>
                   </FormControl>
                 </Stack>
@@ -585,4 +581,4 @@ const BetterProjectForm = () => {
   );
 };
 
-export default BetterProjectForm;
+export default ProjectForm;

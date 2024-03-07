@@ -1,9 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { createClient } from "@supabase/supabase-js";
-import List from "@mui/joy/List";
-import ListItemButton from "@mui/joy/ListItemButton";
-import Grid from "@mui/joy/Grid";
-import Stack from "@mui/joy/Stack";
 import Button from "@mui/joy/Button";
 import { Link } from "react-router-dom";
 import Box from "@mui/joy/Box";
@@ -13,21 +8,14 @@ import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 import DownloadRoundedIcon from "@mui/icons-material/DownloadRounded";
 import ProjectTable from "../../components/project/ProjectTable";
-import ProjectList from "../../components/project/ProjectList";
 import { CssVarsProvider } from "@mui/joy/styles";
 import CssBaseline from "@mui/joy/CssBaseline";
 import { useNavigate } from "react-router-dom";
 import { supabaseClient } from "../../supabase-client"; // Import the supabase client
 
-const ProjectsList = () => {
+const ProjectPage = () => {
   const [projects, setProjects] = useState([]);
-  const [projectName, setProjectName] = useState("");
-  const [client_id, setClient_id] = useState("");
-  const [project_description, setProject_description] = useState("");
-  const [start_date, setStart_date] = useState("");
-  const [end_date, setEnd_date] = useState("");
   const navigate = useNavigate();
-  const [complete, setComplete] = useState(false);
 
   useEffect(() => {
     getProjects();
@@ -69,48 +57,7 @@ const ProjectsList = () => {
     }
   }
 
-  async function addProject(e) {
-    e.preventDefault();
-    if (projectName.trim() !== "") {
-      const { data, error } = await supabase.from("projects").insert([
-        {
-          project_name: projectName,
-          client_id: client_id,
-          project_description: project_description,
-          start_date: start_date,
-          end_date: end_date,
-          complete: complete,
-        },
-      ]);
-      if (error) {
-        console.error("Error adding project:", error);
-      } else {
-        if (data) {
-          console.log("we have data");
-          // Update the project list in the state without reloading the page
-          setProjects([...projects, data[0]]);
-          //can choose to do something with the data here if we need to in the future
-          // Clear the input fields
-          setProjectName("");
-          setClient_id("");
-          setProject_description("");
-          setStart_date("");
-          setEnd_date("");
-          setComplete(false);
-        } else {
-          console.log("Project added successfully");
-          // Clear the input fields
-          setProjectName("");
-          setClient_id("");
-          setProject_description("");
-          setStart_date("");
-          setEnd_date("");
-          setComplete(false);
-          getProjects(); // Reload the project list
-        }
-      }
-    }
-  }
+
 
   return (
     <CssVarsProvider disableTransitionOnChange>
@@ -145,21 +92,11 @@ const ProjectsList = () => {
             <Link
               underline="none"
               color="neutral"
-              href="#some-link"
+              href="/"
               aria-label="Home"
             >
               <HomeRoundedIcon />
             </Link>
-            <Link
-              underline="hover"
-              color="neutral"
-              to={"/"}
-              fontSize={12}
-              fontWeight={500}
-            >
-              Dashboard
-            </Link>
-
             <Typography color="primary" fontWeight={500} fontSize={12}>
               Projects
             </Typography>
@@ -188,12 +125,13 @@ const ProjectsList = () => {
           New Project
         </Button>
       </Box>
+
+
       <ProjectTable projects={projects}/>
-      <ProjectList projects={projects}/>
     </Box>
     </Box>
     </CssVarsProvider>
   );
 };
 
-export default ProjectsList;
+export default ProjectPage;
