@@ -126,7 +126,256 @@ export default function TasksLayoutMain() {
         variant="outlined"
         sx={{
           display: {
+            xs: "none",
+            sm: "block", 
+            md: "block",
+            lg: "block",
+            xl: "block",
             maxWidth: "1600px",
+            mx: "auto",
+            borderRadius: "sm",
+            px: { xs: 2, md: 6 },
+            py: { xs: 2, md: 3 },
+          },
+          width: "100%", // if you want to make the table full width <----- HERE
+          borderRadius: "sm",
+          flexShrink: 1,
+          overflow: "auto",
+          minHeight: 0,
+        }}
+      >
+        <Dropdown>
+          <MenuButton>Select Number of Days</MenuButton>
+          <Menu>
+            <MenuItem
+              {...(selectedIndex === 0 && { selected: true, variant: "soft" })}
+              onClick={createHandleClose(0, 30)}
+            >
+              30
+            </MenuItem>
+            <MenuItem
+              selected={selectedIndex === 1}
+              onClick={createHandleClose(1, 60)}
+            >
+              60
+            </MenuItem>
+          </Menu>
+        </Dropdown>
+
+        {/* Add New Task */}
+
+        <React.Fragment>
+          <Button
+            variant="outlined"
+            color="neutral"
+            startDecorator={<Add />}
+            onClick={() => setOpen(true)}
+          >
+            New Task
+          </Button>
+          <Modal
+            className="formWindow"
+            open={open}
+            onClose={() => setOpen(false)}
+          >
+            <ModalDialog>
+              <TaskForm
+                open={open}
+                setOpen={setOpen}
+                onHandleSubmit={onHandleSubmit}
+              />
+            </ModalDialog>
+          </Modal>
+        </React.Fragment>
+
+{/* Complete Task*/}
+
+        <React.Fragment>
+          <Button
+            variant="outlined"
+            color="neutral"
+            startDecorator={<Add />}
+            onClick={() => setOpen(true)}
+          >
+            New Task
+          </Button>
+          <Modal
+            className="formWindow"
+            open={open}
+            onClose={() => setOpen(false)}
+          >
+            <ModalDialog>
+              <TaskForm
+                open={open}
+                setOpen={setOpen}
+                onHandleSubmit={onHandleSubmit}
+              />
+            </ModalDialog>
+          </Modal>
+        </React.Fragment>
+
+        <Tabs
+          aria-label="Pipeline"
+          value={index}
+          onChange={(event, value) => setIndex(value)}
+        >
+          <TabList>
+            <Tab indicatorInset>
+              Active Tasks{" "}
+              <Chip
+                size="sm"
+                variant="soft"
+                color={index === 0 ? "primary" : "neutral"}
+              >
+                {activeTasks.length}
+              </Chip>
+            </Tab>
+
+            <Tab indicatorInset>
+              Completed Tasks{" "}
+              <Chip
+                size="sm"
+                variant="soft"
+                color={index === 1 ? "primary" : "neutral"}
+              >
+                {completedTasks.length}
+              </Chip>
+            </Tab>
+          </TabList>
+
+          <TabPanel value={0}>
+            <Table
+              stickyHeader
+              hoverRow
+              sx={{
+                "--TableCell-headBackground":
+                  "var(--joy-palette-background-level1)",
+                "--Table-headerUnderlineThickness": "1px",
+                "--TableRow-hoverBackground":
+                  "var(--joy-palette-background-level1)",
+                "--TableCell-paddingY": "4px",
+                "--TableCell-paddingX": "8px",
+                border: "1px solid #CDD7E1", // Add border here
+                borderRadius: "5px",
+              }}
+            >
+              {/* TABLE HEAD BEGINS HERE */}
+              <thead>
+                <tr>
+                  <th style={{ width: 120, padding: "12px 6px" }}>Task Name</th>
+                  <th style={{ width: 60, padding: "12px 6px" }}>Created</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {Object.values(activeTasks).map((task) => (
+                  <tr key={task.task_id}>
+                    <td
+                      onClick={() => console.log("Task Clicked")}
+                      style={{ textAlign: "left", cursor: "pointer" }}
+                    >
+                      {`${task.task_name}`}
+                    </td>
+                    <td style={{ textAlign: "left" }}>
+                      {task.date_created
+                        ? new Intl.DateTimeFormat("en-US", {
+                            weekday: "short",
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                          }).format(new Date(task.date_created))
+                        : "N/A"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          </TabPanel>
+
+          <TabPanel value={1}>
+            <Table
+              stickyHeader
+              hoverRow
+              sx={{
+                "--TableCell-headBackground":
+                  "var(--joy-palette-background-level1)",
+                "--Table-headerUnderlineThickness": "1px",
+                "--TableRow-hoverBackground":
+                  "var(--joy-palette-background-level1)",
+                "--TableCell-paddingY": "4px",
+                "--TableCell-paddingX": "8px",
+                border: "1px solid #CDD7E1", // Add border here
+                borderRadius: "5px",
+              }}
+            >
+              {/* TABLE HEAD BEGINS HERE */}
+              <thead>
+                <tr>
+                  <th style={{ width: {xl: 70, md: 70}, padding: "12px 6px" }}>Name</th>
+                  <th style={{ width: {xl: 40, md: 40}, padding: "12px 6px" }}>Project</th>
+                  <th style={{ width: {xl: 20, md: 10}, padding: "12px 6px" }}>
+                     By
+                  </th>
+                  <th style={{ width: {xl: 20, md: 15}, padding: "12px 6px" }}>Assigned</th>
+                  <th style={{ width: {xl: 20, md: 15}, padding: "12px 6px" }}>Completed</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {Object.values(completedTasks).map((task, days) => (
+                  <tr key={task.task_id}>
+                    <td
+                      onClick={() => console.log("Task Clicked")}
+                      style={{ textAlign: "left", cursor: "pointer" }}
+                    >
+                      {`${task.task_name}`}
+                    </td>
+
+                    <td style={{ textAlign: "left" }}>
+                      {task.projects ? (
+                        <>{task.projects.project_name}</>
+                      ) : (
+                        <>No Project</>
+                      )}
+                    </td>
+
+                    <td style={{ textAlign: "left" }}>
+                      {task.completed_by ? task.completed_by : "N/A"}
+                    </td>
+                    <td style={{ textAlign: "left" }}>
+                      {task.date_created
+                        ? new Date(task.date_created)
+                            .toISOString()
+                            .split("T")[0]
+                        : "N/A"}
+                    </td>
+
+                    <td style={{ textAlign: "left" }}>
+                      {task.date_created
+                        ? new Date(task.date_completed)
+                            .toISOString()
+                            .split("T")[0]
+                        : "N/A"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          </TabPanel>
+        </Tabs>
+      </Sheet>
+
+ {/* Mobile View Table goes here? */}
+
+ <Sheet
+        className="OrderTableContainer"
+        variant="outlined"
+        sx={{
+          display: {
+            sm: "none", 
+            md: "none",
+            xl: "none",
+            lg: "none",
             mx: "auto",
             borderRadius: "sm",
             px: { xs: 2, md: 6 },
@@ -278,16 +527,10 @@ export default function TasksLayoutMain() {
               {/* TABLE HEAD BEGINS HERE */}
               <thead>
                 <tr>
-                  <th style={{ width: 80, padding: "12px 6px" }}>Task Name</th>
-                  <th style={{ width: 40, padding: "12px 6px" }}>Project</th>
-                  <th style={{ width: 60, padding: "12px 6px" }}>
-                    Completed By
-                  </th>
-                  <th style={{ width: 40, padding: "12px 6px" }}>
-                    Date Assigned
-                  </th>
-                  <th style={{ width: 40, padding: "12px 6px" }}>
-                    Date Completed
+                  <th style={{ width: 20, padding: "12px 6px" }}>Task</th>
+                  <th style={{ width: 20, padding: "12px 6px" }}>Project</th>
+                  <th style={{ width: 10, padding: "12px px" }}>
+                  <Typography >By</Typography>
                   </th>
                 </tr>
               </thead>
@@ -299,41 +542,23 @@ export default function TasksLayoutMain() {
                       onClick={() => console.log("Task Clicked")}
                       style={{ textAlign: "left", cursor: "pointer" }}
                     >
-                      {`${task.task_name}`}
+                      <Typography level="body-xs">{`${task.task_name}`}</Typography>
                     </td>
 
                     <td style={{ textAlign: "left" }}>
                       {task.projects ? (
-                        <>{task.projects.project_name}</>
+                        <><Typography level="body-xs">{task.projects.project_name}</Typography></>
                       ) : (
                         <>No Project</>
                       )}
                     </td>
 
                     <td style={{ textAlign: "left" }}>
+                    <Typography level="body-xs">
                       {task.completed_by ? task.completed_by : "N/A"}
-                    </td>
-                    <td style={{ textAlign: "left" }}>
-                      {task.date_created
-                        ? new Intl.DateTimeFormat("en-US", {
-                            weekday: "short",
-                            year: "numeric",
-                            month: "short",
-                            day: "numeric",
-                          }).format(new Date(task.date_created))
-                        : "N/A"}
+                      </Typography>
                     </td>
 
-                    <td style={{ textAlign: "left" }}>
-                      {task.date_completed
-                        ? new Intl.DateTimeFormat("en-US", {
-                            weekday: "short",
-                            year: "numeric",
-                            month: "short",
-                            day: "numeric",
-                          }).format(new Date(task.date_completed))
-                        : "N/A"}
-                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -341,6 +566,9 @@ export default function TasksLayoutMain() {
           </TabPanel>
         </Tabs>
       </Sheet>
+
+
+
     </React.Fragment>
   );
 }
