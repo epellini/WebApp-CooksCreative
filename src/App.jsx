@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Routes, Route } from "react-router-dom";
 import Home from "./pages/Home.jsx";
-import Clients from "./pages/Clients/Clients.jsx";
+import ClientsPage from "./pages/Clients/ClientsPage.jsx";
 import NotFound from "./pages/NotFound.jsx";
 import ProjectPage from "./pages/Projects/ProjectPage.jsx";
 import ProjectDetailsPage from "./pages/Projects/ProjectDetailsPage.jsx"; // Import the project details component
@@ -14,8 +14,8 @@ import Register from "./pages/Auth/Register";
 import CreateUserPage from "./pages/Auth/CreateUserPage.jsx";
 // Protected Route:
 import Protected from './components/Protected';
-import ClientDetails from './pages/Clients/ClientDetails.jsx';
-import ClientForm from './pages/Clients/ClientForm.jsx';
+import ClientDetailsPage from "./pages/Clients/ClientDetailsPage.jsx";
+import ClientForm from "./components/client/ClientForm.jsx";
 import ForgotPassword from './pages/Auth/ForgotPassword.jsx';
 import TasksPage from './pages/Tasks/TasksPage.jsx';
 import TaskForm from './components/tasks/TaskFormAdd.jsx';
@@ -45,8 +45,8 @@ function App() {
 
             {/* CLIENTS ROUTES */}
             <Route path="/clients" element={<Protected isAdminRoute={true} />}>
-              <Route index element={<Clients />} />
-              <Route path=":id" element={<ClientDetails />} />
+              <Route index element={<ClientsPage />} />
+              <Route path=":id" element={<ClientDetailsPage />} />
               <Route path="new" element={<ClientForm />} />
               <Route path="edit/:clientId" element={<ClientForm />} />
             </Route>
