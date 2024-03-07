@@ -1,4 +1,4 @@
-#Contracting Business Management Web Application
+Contracting Business Management Web Application
 
 Technologies and Languages: React | JavaScript | TypeScript |  PostgreSQL   |  Supabase |  Selenium
 
