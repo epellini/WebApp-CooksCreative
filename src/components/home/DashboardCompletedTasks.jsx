@@ -43,7 +43,7 @@ import { supabaseClient } from "../../supabase-client"; // Import the supabase c
 
 //task form
 
-export default function DashboardTasks() {
+export default function DashboardCompletedTasks() {
   const [tasks, setTasks] = useState([]); // State to hold the projects
   const [projects, setProjects] = useState([]); // State to hold the clients
 
@@ -61,6 +61,7 @@ export default function DashboardTasks() {
       setProjects(data.map((task) => task.projects));
     }
   }
+
 
   const completedTasks = tasks.filter((task) => {
     // Check if the task is completed and its creation date is within the last 30 days
@@ -94,24 +95,22 @@ export default function DashboardTasks() {
           minHeight: 0,
         }}
       >
-        <h1>Tasks</h1>
+        <h1>Completed Tasks</h1>
         <Table sx={{'& tr > *:not(:first-child)': { textAlign: 'left' } }}>
           <thead>
             <tr>
               <th>Task Name</th>
-              <th>Project Name</th>
-              <th>Date Created</th>
+              <th>Date Completed</th>
             </tr>
           </thead>
 
           <tbody>
-            {tasks.slice(0, 5).map((task) => (
+            {completedTasks.slice(0, 5).map((task) => (
               <tr>
                 <td>{task.task_name}</td>
-                <td>{task.projects.project_name}</td>
                 <td style={{ textAlign: 'left' }}>
-                      {task.date_created ?
-                        new Intl.DateTimeFormat('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(task.date_created))
+                      {task.date_completed ?
+                        new Intl.DateTimeFormat('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(task.date_completed))
                         : "N/A"}
                     </td>
               </tr>

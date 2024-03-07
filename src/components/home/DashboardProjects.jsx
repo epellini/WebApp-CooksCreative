@@ -34,17 +34,12 @@ import {
   TabPanel,
   Tab,
   tabClasses,
-    ListDivider,    
+  ListDivider,
+  Table
 } from "@mui/joy";
-import Checkbox, { checkboxClasses } from "@mui/joy/Checkbox";
-import Dropdown from "@mui/joy/Dropdown";
-import MenuButton from "@mui/joy/MenuButton";
-import MenuItem from "@mui/joy/MenuItem";
-import Menu from "@mui/joy/Menu";
 import { useEffect, useState } from "react";
 import { supabaseClient } from "../../supabase-client"; // Import the supabase client
-// ICONS:
-import Add from "@mui/icons-material/Add";
+
 
 //task form
 
@@ -96,63 +91,29 @@ export default function DashboardProjects() {
           minHeight: 0,
         }}
       >
-        <Divider sx={{ my: 2 }} />
         <h1>Projects</h1>
-        <List
-          orientation="vertical"
-          variant="outlined"
-          sx={{
-            flexGrow: 0,
-            mx: "auto",
-            "--ListItemDecorator-size": "48px",
-            "--ListItem-paddingY": "1rem",
-            borderRadius: "sm",
-          }}
-        >
+        <Table sx={{'& tr > *:not(:first-child)': { textAlign: 'left' } }}>
+          <thead>
+            <tr>
+              <th>Project Name</th>
+              <th>Client Name</th>
+              <th>Status</th>
+              <th>Category</th>
+            </tr>
+          </thead>
+
+          <tbody>
             {projects.slice(0, 5).map((project) => (
-                <ListItem key={project.id} sx={{ py: 2 }}>
-                    <Stack
-                        direction="row"
-                        justifyContent="space-between"
-                        alignItems="center"
-                    >
-                        <Typography variant="h6">{project.project_name}</Typography>
-                        <Stack direction="row" spacing={2}></Stack>
-                    </Stack>
-                    <Stack
-                        direction="row"
-                        justifyContent="space-between"
-                        alignItems="center"
-                    >
-                        <Typography variant="body2">{project.clients.first_name}</Typography>
-                    </Stack>
-
-                    <Stack
-                        direction="row"
-                        justifyContent="space-between"
-                        alignItems="center"
-                    >
-                        <Typography variant="body2">{project.status.name}</Typography>
-                    </Stack>
-
-                    <Stack
-                        direction="row"
-                        justifyContent="space-between"
-                        alignItems="center"
-                    >
-                        <Typography variant="body2">{project.category.name}</Typography>
-                    </Stack>
-
-                </ListItem>
-
+              <tr>
+                <td>{project.project_name}</td>
+                <td>{project.clients.first_name}</td>
+                <td>{project.status.name}</td>
+                <td>{project.category.name}</td>
+              </tr>
             ))}
-        </List>
+          </tbody>
 
-        <Divider sx={{ my: 2 }} />
-
-        <Divider sx={{ my: 2 }} />
-
-        <List></List>
+        </Table>
       </Sheet>
     </React.Fragment>
   );
