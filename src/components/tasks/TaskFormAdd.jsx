@@ -35,7 +35,7 @@ import FileUpload from "../FileUpload";
 import { useNavigate, useParams } from "react-router-dom";
 import { supabaseClient } from "../../supabase-client";
 
-const TaskForm = ({open, setOpen, onHandleSubmit}) => {
+const TaskFormAdd = ({open, setOpen, onHandleSubmit}) => {
   const [task, setTask] = useState({
     task_name: "",
     project_id: null,
@@ -424,4 +424,4 @@ const [users, setUsers] = useState([]);
   );
 };
 
-export default TaskForm;
+export default TaskFormAdd;

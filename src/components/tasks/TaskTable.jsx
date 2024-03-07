@@ -47,9 +47,9 @@ import { supabaseClient } from "../../supabase-client"; // Import the supabase c
 import Add from "@mui/icons-material/Add";
 
 //task form
-import TaskForm from "./TaskForm";
+import TaskForm from "./TaskFormAdd";
 
-export default function TasksLayoutMain() {
+export default function TaskTable() {
   const [open, setOpen] = React.useState(false);
   const [tasks, setTasks] = useState([]);
   const [users, setUsers] = useState([]);

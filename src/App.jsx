@@ -1,14 +1,12 @@
 import * as React from "react";
 import { Routes, Route } from "react-router-dom";
-import Sidebar from "./components/Sidebar"; // Import the Sidebar component
-import Header from "./components/Header";
 import Home from "./pages/Home.jsx";
 import Clients from "./pages/Clients/Clients.jsx";
 import NotFound from "./pages/NotFound.jsx";
-import Projects from "./pages/Projects/Projects.jsx";
-import ProjectDetailsComp from "./components/project/ProjectDetailsComp.jsx"; // Import the project details component
+import ProjectPage from "./pages/Projects/ProjectPage.jsx";
+import ProjectDetailsPage from "./pages/Projects/ProjectDetailsPage.jsx"; // Import the project details component
 // import ProjectForm from "./pages/Projects/ProjectForm.jsx"; // Import the project form component
-import BetterProjectForm from "./components/project/BetterProjectForm.jsx";
+import ProjectForm from "./components/project/ProjectForm.jsx";
 
 // Auth Pages:
 import Login from "./pages/Auth/Login";
@@ -20,7 +18,7 @@ import ClientDetails from './pages/Clients/ClientDetails.jsx';
 import ClientForm from './pages/Clients/ClientForm.jsx';
 import ForgotPassword from './pages/Auth/ForgotPassword.jsx';
 import TasksPage from './pages/Tasks/TasksPage.jsx';
-import TaskForm from './components/tasks/TaskForm.jsx';
+import TaskForm from './components/tasks/TaskFormAdd.jsx';
 
 
 function App() {
@@ -39,10 +37,10 @@ function App() {
 
             {/* PROJECTS ROUTES */}
             <Route path="/projects">
-              <Route index element={<Projects />} />
-              <Route path=":id" element={<ProjectDetailsComp />} />
-              <Route path="new" element={<BetterProjectForm />} />
-              <Route path="edit/:projectid" element={<BetterProjectForm />} />
+              <Route index element={<ProjectPage />} />
+              <Route path=":id" element={<ProjectDetailsPage />} />
+              <Route path="new" element={<ProjectForm />} />
+              <Route path="edit/:projectid" element={<ProjectForm />} />
             </Route>
 
             {/* CLIENTS ROUTES */}
@@ -58,8 +56,6 @@ function App() {
              <Route path="/tasks">
               <Route index element={<TasksPage/>}/>
               <Route path="new" element={<TaskForm/>}/>
-             
-
              </Route>
 
 

@@ -1,4 +1,4 @@
-import TasksLayoutMain from "../../components/tasks/TasksLayoutMain";
+import TasksLayoutMain from "../../components/tasks/TaskTable";
 import { CssVarsProvider } from "@mui/joy/styles";
 import CssBaseline from "@mui/joy/CssBaseline";
 import Box from "@mui/joy/Box";
@@ -11,6 +11,7 @@ import Button from "@mui/joy/Button";
 import DownloadRoundedIcon from "@mui/icons-material/DownloadRounded";
 import { Css } from "@mui/icons-material";
 import React, { useState, useEffect } from "react";
+import TaskTable from "../../components/tasks/TaskTable";
 
 
 const TasksPage = () => {
@@ -82,7 +83,7 @@ const TasksPage = () => {
           </Box>
 
 
-          <TasksLayoutMain />
+          <TaskTable />
         </Box>
       </Box>
     </CssVarsProvider>

@@ -13,7 +13,7 @@ import {
 import { Skeleton } from "@mui/joy";
 import { supabaseClient } from "../../supabase-client";
 
-const ProjectTaskDetails = ({ projectid }) => {
+const ProjectTasks = ({ projectid }) => {
   const [tasks, setTasks] = useState([]);
   const [index, setIndex] = useState(0);
 
@@ -207,4 +207,4 @@ const ProjectTaskDetails = ({ projectid }) => {
   );
 };
 
-export default ProjectTaskDetails;
+export default ProjectTasks;

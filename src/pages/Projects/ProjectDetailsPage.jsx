@@ -21,12 +21,12 @@ import FolderIcon from "@mui/icons-material/Folder";
 import ReplyRoundedIcon from "@mui/icons-material/ReplyRounded";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import EditNoteIcon from '@mui/icons-material/EditNote';
-import ProjectTaskDetails from "./ProjectTaskDetails";
+import ProjectTasks from "../../components/project/ProjectTasks";
 
-import Images from "../../pages/Images";
+import Images from "../../components/Images/Images";
 
 
-export default function ProjectDetailsComp() {
+export default function ProjectDetailsPage() {
   const [project, setProject] = useState({
     project_name: "",
     client_id: null,
@@ -330,7 +330,7 @@ export default function ProjectDetailsComp() {
         </Typography>
       </Box>
 
-      <ProjectTaskDetails projectid={id} />
+      <ProjectTasks projectid={id} />
 
       <Divider />
       <Typography textAlign="left" level="body-sm" mt={2} mb={2}>

@@ -1,11 +1,11 @@
 import React, { useEffect } from "react";
-import FileUpload from "../components/FileUpload";
-import DropZone from "../components/DropZone";
+import FileUpload from "../FileUpload";
+import DropZone from "../DropZone";
 import { FormGroup } from "@mui/material";
 import { FormControl } from "@mui/material";
 import Button from "@mui/joy/Button";
 import { v4 as uuidv4 } from "uuid";
-import { supabaseClient } from "../supabase-client";
+import { supabaseClient } from "../../supabase-client";
 import { useState } from "react";
 import { Stack } from "@mui/material";
 import { Card } from "@mui/material";
