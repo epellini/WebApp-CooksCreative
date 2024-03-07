@@ -368,9 +368,7 @@ const BetterProjectForm = () => {
                           {categoryOption.name}
                         </Option>
                       ))}
-                      <Option value="1">Kitchen</Option>
-                      <Option value="2">Bathroom</Option>
-                      <Option value="3">Living Room</Option>
+
                     </Select>
                   </FormControl>
                 </Stack>
@@ -509,9 +507,7 @@ const BetterProjectForm = () => {
                           {categoryOption.name}
                         </Option>
                       ))}
-                      <Option value="1">Kitchen</Option>
-                      <Option value="2">Bathroom</Option>
-                      <Option value="3">Living Room</Option>
+
                     </Select>
                   </FormControl>
                 </Stack>

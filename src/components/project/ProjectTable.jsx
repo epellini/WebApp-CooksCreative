@@ -100,7 +100,7 @@ export default function ProjectTable() {
         setStatus(data.map((project) => project.status));
         setCategory(data.map((project) => project.category));
         console.log(clients);
-        console.log(categories);
+        console.log("categories" + categories);
         console.log();
         setLoading(false); // Set loading to false when data is fetched
       }

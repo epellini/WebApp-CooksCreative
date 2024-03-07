@@ -19,7 +19,7 @@ const ProjectForm = () => {
     start_date: "",
     end_date: "",
     status_id: "",
-    type: "",
+    category_id: "",
   });
   const [status, setStatus] = useState({ name: "" });
   const { projectid } = useParams();
@@ -172,7 +172,7 @@ const ProjectForm = () => {
         />
       </Box>
       <Box>
-        <FormLabel htmlFor="type">Type</FormLabel>
+        <FormLabel htmlFor="type">Category</FormLabel>
         <Input
           id="type"
           name="type"
