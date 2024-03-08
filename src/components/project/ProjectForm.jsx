@@ -550,31 +550,6 @@ const ProjectForm = () => {
               </CardActions>
             </CardOverflow>
           </Card>
-
-          <Card>
-            <Box sx={{ mb: 1 }}>
-              <Typography level="title-md">Project Images</Typography>
-              <Typography level="body-sm">
-                Add before and after images here to showcase your project.
-              </Typography>
-            </Box>
-            <Divider />
-            <Stack spacing={2} sx={{ my: 1 }}>
-              <DropZone />
-              <FileUpload
-                icon={<InsertDriveFileRoundedIcon />}
-                fileName="kitchen-before.png"
-                fileSize="200 kB"
-                progress={100}
-              />
-              <FileUpload
-                icon={<VideocamRoundedIcon />}
-                fileName="kitchen-after.png"
-                fileSize="1 MB"
-                progress={40}
-              />
-            </Stack>
-          </Card>
         </Stack>
       </Box>
     </form>

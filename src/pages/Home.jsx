@@ -61,9 +61,7 @@ const Home = () => {
           <DashboardProjects />
 
         </Box>
-        <Box gridColumn="span 4">
-          <CategoryDb />
-        </Box>
+
         <Box gridColumn="span 8">
           <DashboardTasks />
 
