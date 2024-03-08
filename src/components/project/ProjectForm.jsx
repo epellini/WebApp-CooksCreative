@@ -35,7 +35,7 @@ import FileUpload from "../FileUpload";
 import { useNavigate, useParams } from "react-router-dom";
 import { supabaseClient } from "../../supabase-client";
 
-const BetterProjectForm = () => {
+const ProjectForm = () => {
   const [project, setProject] = useState({
     project_name: "",
     client_id: "",
@@ -173,12 +173,7 @@ const BetterProjectForm = () => {
           }}
         >
           <Box sx={{ px: { xs: 2, md: 6 } }}>
-            <Breadcrumbs
-              size="sm"
-              aria-label="breadcrumbs"
-              //separator={<ChevronRightRoundedIcon fontSize="sm" />}
-              sx={{ pl: 0 }}
-            >
+            <Breadcrumbs size="sm" aria-label="breadcrumbs" sx={{ pl: 0 }}>
               <Link underline="none" color="neutral" href="/" aria-label="Home">
                 <HomeRoundedIcon />
               </Link>
@@ -245,7 +240,15 @@ const BetterProjectForm = () => {
                       id="client_id"
                       name="client_id"
                       options={clients}
-                      getOptionLabel={(option) => option.first_name + " " + option.last_name + " "  + "(ID: " + option.client_id + ")"}
+                      getOptionLabel={(option) =>
+                        option.first_name +
+                        " " +
+                        option.last_name +
+                        " " +
+                        "(ID: " +
+                        option.client_id +
+                        ")"
+                      }
                       value={
                         clients.find(
                           (client) => client.client_id === project.client_id
@@ -272,15 +275,6 @@ const BetterProjectForm = () => {
                 </Stack>
 
                 <Stack spacing={1}>
-                  {/* <FormLabel>Project Name</FormLabel>
-                <FormControl
-                  sx={{
-                    display: { sm: "flex-column", md: "flex-row" },
-                    gap: 2,
-                  }}
-                >
-                  <Input size="sm" sx={{ flexGrow: 1 }} />
-                </FormControl> */}
                   <Box>
                     <FormLabel htmlFor="start_date">Start Date</FormLabel>
                     <Input
@@ -323,26 +317,6 @@ const BetterProjectForm = () => {
                     />
                   </FormControl>
                 </Stack>
-
-                {/* <ListDivider component="hr" /> */}
-
-                {/* <Stack direction="row" spacing={2}>
-                <FormControl>
-                  <FormLabel>Role</FormLabel>
-                  <Input size="sm" defaultValue="UI Developer" />
-                </FormControl>
-                <FormControl sx={{ flexGrow: 1 }}>
-                  <FormLabel>Email</FormLabel>
-                  <Input
-                    size="sm"
-                    type="email"
-                    startDecorator={<EmailRoundedIcon />}
-                    placeholder="email"
-                    defaultValue="siriwatk@test.com"
-                    sx={{ flexGrow: 1 }}
-                  />
-                </FormControl>
-              </Stack> */}
 
                 <Stack direction="row" spacing={2}>
                   <FormControl sx={{ flexGrow: 1 }}>
@@ -394,9 +368,7 @@ const BetterProjectForm = () => {
                           {categoryOption.name}
                         </Option>
                       ))}
-                      <Option value="1">Kitchen</Option>
-                      <Option value="2">Bathroom</Option>
-                      <Option value="3">Living Room</Option>
+
                     </Select>
                   </FormControl>
                 </Stack>
@@ -409,92 +381,156 @@ const BetterProjectForm = () => {
               spacing={2}
               sx={{ display: { xs: "flex", md: "none" }, my: 1 }}
             >
+              {/* MOBILE VIEW */}
               <Stack direction="row" spacing={2}>
-                <Stack direction="column" spacing={1}>
-                  <AspectRatio
-                    ratio="1"
-                    maxHeight={108}
-                    sx={{ flex: 1, minWidth: 108, borderRadius: "100%" }}
-                  >
-                    <img
-                      src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=286"
-                      srcSet="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=286&dpr=2 2x"
-                      loading="lazy"
-                      alt=""
-                    />
-                  </AspectRatio>
-                  <IconButton
-                    aria-label="upload new picture"
-                    size="sm"
-                    variant="outlined"
-                    color="neutral"
-                    sx={{
-                      bgcolor: "background.body",
-                      position: "absolute",
-                      zIndex: 2,
-                      borderRadius: "50%",
-                      left: 85,
-                      top: 180,
-                      boxShadow: "sm",
-                    }}
-                  >
-                    <EditRoundedIcon />
-                  </IconButton>
-                </Stack>
-
                 <Stack spacing={1} sx={{ flexGrow: 1 }}>
-                  <FormLabel>Name</FormLabel>
-                  <FormControl
-                    sx={{
-                      display: {
-                        sm: "flex-column",
-                        md: "flex-row",
-                      },
-                      gap: 2,
-                    }}
-                  ></FormControl>
+                  <FormControl sx={{ flexGrow: 1 }}>
+                    <FormLabel>Project Name</FormLabel>
+                    <Input
+                      size="sm"
+                      type="text"
+                      id="project_name"
+                      name="project_name"
+                      value={project.project_name}
+                      onChange={handleChange} // Pass the event object directly
+                      required
+                    />
+                  </FormControl>
                 </Stack>
               </Stack>
 
-              <FormControl>
-                <FormLabel>Role</FormLabel>
-                <Input size="sm" defaultValue="UI Developer" />
-              </FormControl>
               <FormControl sx={{ flexGrow: 1 }}>
-                <FormLabel>Email</FormLabel>
-                <Input
-                  size="sm"
-                  type="email"
-                  startDecorator={<EmailRoundedIcon />}
-                  placeholder="email"
-                  defaultValue="siriwatk@test.com"
-                  sx={{ flexGrow: 1 }}
+                <FormLabel>Client Name</FormLabel>
+                <Autocomplete
+                  id="client_id"
+                  name="client_id"
+                  options={clients}
+                  getOptionLabel={(option) =>
+                    option.first_name +
+                    " " +
+                    option.last_name +
+                    " " +
+                    "(ID: " +
+                    option.client_id +
+                    ")"
+                  }
+                  value={
+                    clients.find(
+                      (client) => client.client_id === project.client_id
+                    ) || null
+                  }
+                  onChange={(e, value) =>
+                    handleChange(e, value ? value.client_id : null, "client_id")
+                  }
+                  renderInput={(params) => (
+                    <Input
+                      {...params}
+                      size="sm"
+                      id="client_id"
+                      name="client_id"
+                      required
+                    />
+                  )}
                 />
               </FormControl>
+              <Box>
+                <FormLabel htmlFor="start_date">Start Date</FormLabel>
+                <Input
+                  id="start_date"
+                  name="start_date"
+                  type="date"
+                  value={project.start_date}
+                  onChange={handleChange}
+                  required
+                />
+              </Box>
+              <Box>
+                <FormLabel htmlFor="end_date">End Date</FormLabel>
+                <Input
+                  id="end_date"
+                  name="end_date"
+                  type="date"
+                  value={project.end_date}
+                  onChange={handleChange}
+                  required
+                />
+              </Box>
 
               <div>
-                <FormControl sx={{ display: { sm: "contents" } }}>
-                  <FormLabel>Timezone</FormLabel>
-                  <Select
-                    size="sm"
-                    startDecorator={<AccessTimeFilledRoundedIcon />}
-                    defaultValue="1"
-                  >
-                    <Option value="1">
-                      Indochina Time (Bangkok){" "}
-                      <Typography textColor="text.tertiary" ml={0.5}>
-                        — GMT+07:00
-                      </Typography>
-                    </Option>
-                    <Option value="2">
-                      Indochina Time (Ho Chi Minh City){" "}
-                      <Typography textColor="text.tertiary" ml={0.5}>
-                        — GMT+07:00
-                      </Typography>
-                    </Option>
-                  </Select>
-                </FormControl>
+                <Stack direction="row" spacing={2}>
+                  <FormControl sx={{ flexGrow: 1 }}>
+                    <FormLabel>Status</FormLabel>
+                    <Select
+                      placeholder="Select Status"
+                      id="status_id"
+                      name="status_id" // Add the name attribute
+                      value={project.status_id}
+                      onChange={(e, value) =>
+                        handleChange(e, value, "status_id")
+                      } // Pass the name along with the value
+                      required
+                    >
+                      {status.map((statusOption) => (
+                        <Option
+                          key={statusOption.status_id}
+                          value={statusOption.status_id}
+                          selected={
+                            statusOption.status_id === project.status_id
+                          } // Set selected attribute
+                        >
+                          {statusOption.name}
+                        </Option>
+                      ))}
+                    </Select>
+                  </FormControl>
+
+                  <FormControl sx={{ flexGrow: 1 }}>
+                    <FormLabel>Project Category</FormLabel>
+                    <Select
+                      placeholder="Select Category"
+                      id="category_id"
+                      name="category_id" // Add the name attribute
+                      value={project.category_id}
+                      onChange={(e, value) =>
+                        handleChange(e, value, "category_id")
+                      } // Pass the name along with the value
+                      required
+                    >
+                      {category.map((categoryOption) => (
+                        <Option
+                          key={categoryOption.category_id}
+                          value={categoryOption.category_id}
+                          selected={
+                            categoryOption.category_id === project.category_id
+                          } // Set selected attribute
+                        >
+                          {categoryOption.name}
+                        </Option>
+                      ))}
+
+                    </Select>
+                  </FormControl>
+                </Stack>
               </div>
+
+              <FormLabel>Project Description</FormLabel>
+              <FormControl
+                sx={{
+                  display: { sm: "flex-column", md: "flex-row" },
+                  gap: 2,
+                }}
+              >
+                <Textarea
+                  size="sm"
+                  minRows={4}
+                  sx={{ flexGrow: 1 }}
+                  id="project_description"
+                  name="project_description"
+                  value={project.project_description}
+                  onChange={handleChange}
+                  required
+                />
+              </FormControl>
             </Stack>
             <CardOverflow
               sx={{ borderTop: "1px solid", borderColor: "divider" }}
@@ -538,18 +574,6 @@ const BetterProjectForm = () => {
                 progress={40}
               />
             </Stack>
-            <CardOverflow
-              sx={{ borderTop: "1px solid", borderColor: "divider" }}
-            >
-              <CardActions sx={{ alignSelf: "flex-end", pt: 2 }}>
-                <Button size="sm" variant="outlined" color="neutral">
-                  Cancel
-                </Button>
-                <Button size="sm" variant="solid" type="submit">
-                  {projectid ? "Update Project" : "Add Project"}
-                </Button>
-              </CardActions>
-            </CardOverflow>
           </Card>
         </Stack>
       </Box>
@@ -557,4 +581,4 @@ const BetterProjectForm = () => {
   );
 };
 
-export default BetterProjectForm;
+export default ProjectForm;

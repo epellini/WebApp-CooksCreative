@@ -3,12 +3,12 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabaseClient } from "../../supabase-client"; // Import the supabase client
 import { Session } from "@supabase/supabase-js"; // Import the Session type
-import DarkModeRoundedIcon from '@mui/icons-material/DarkModeRounded';
-import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
-import BadgeRoundedIcon from '@mui/icons-material/BadgeRounded';
-import LocalDiningRounded from '@mui/icons-material/LocalDiningRounded';
+
+import {useAuth} from '../Auth/Auth';
 
 // MUI Joy imports
+import BadgeRoundedIcon from '@mui/icons-material/BadgeRounded';
+import LocalDiningRounded from '@mui/icons-material/LocalDiningRounded';
 import { CssVarsProvider, useColorScheme } from '@mui/joy/styles';
 import GlobalStyles from '@mui/joy/GlobalStyles';
 import CssBaseline from '@mui/joy/CssBaseline';
@@ -24,7 +24,7 @@ import Typography from '@mui/joy/Typography';
 import Stack from '@mui/joy/Stack';
 
 // Aliasing MUI Joy's Link to avoid conflict with React Router's Link
-const MuiLink = Link;
+//const MuiLink = Link;
 
 interface FormElements extends HTMLFormControlsCollection {
   email: HTMLInputElement;
@@ -38,31 +38,27 @@ interface SignInFormElement extends HTMLFormElement {
 function Login() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [session, setSession] = useState<Session | null>();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  //const { isAdmin, user } = useAuth();
 
-  useEffect(() => {
-    supabaseClient.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    });
-
-    supabaseClient.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-  }, []);
+  const { session, signOut } = useAuth();  // Use session and signOut from AuthProvider
 
   const handleLogin = async (email: string, password: string) => {
     setLoading(true);
     try {
-      const { error } = await supabaseClient.auth.signInWithPassword({
+      const { data, error } = await supabaseClient.auth.signInWithPassword({
         email,
         password,
       });
       if (error) throw error;
+
       navigate("/");
+      //window.location.reload();
+      //window.location.href = "/";  // Nasty fix but it works for now, found no issues
+
     } catch (err) {
-      throw err;
+       console.error("Login error:", err.message);
     } finally {
       setEmail("");
       setPassword("");
@@ -82,7 +78,7 @@ function Login() {
        {session ? ( <>
        
          <div>
-         <h2>Welcome back, {session.user?.email}</h2>
+         <h2>Welcome back</h2>
          </div>
        
        </>
@@ -141,7 +137,7 @@ function Login() {
             <IconButton variant="soft" color="primary" size="sm">
               <BadgeRoundedIcon />
             </IconButton>
-            <Typography level="title-lg">Company logo</Typography>
+            <Typography level="title-lg">Cooks Creative Contracting</Typography>
           </Box>
         </Box>
         <Box
@@ -170,21 +166,15 @@ function Login() {
           <Stack gap={4} sx={{ mb: 2 }}>
             <Stack gap={1}>
               <Typography level="h3">Sign in</Typography>
-              <Typography level="body-sm">
-                New to company?{' '}
-                <Link to="#replace-with-a-link">
-                  Sign up!
-                </Link>
-              </Typography>
             </Stack>
-            <Button
+            {/* <Button
               variant="soft"
               color="neutral"
               fullWidth
              // startDecorator={<GoogleIcon />}
             >
               Continue with Google
-            </Button>
+            </Button> */}
           </Stack>
           <Divider
             sx={(theme) => ({
@@ -197,7 +187,7 @@ function Login() {
               },
             })}
           >
-            or
+            
           </Divider>
           <Stack gap={4} sx={{ mt: 2 }}>
             <form
@@ -229,10 +219,16 @@ function Login() {
                     alignItems: 'center',
                   }}
                 >
-                  <Checkbox size="sm" label="Remember me" name="persistent" />
-                  <Link to="#replace-with-a-link">
+                  <Box   sx={{
+                    display: 'flex',
+                    textAlign: 'center',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                  }}>
+                  <Link to="/forgot-password">
                     Forgot your password?
                   </Link>
+                  </Box>
                 </Box>
                 <Button fullWidth type='submit'>
                   Sign in
@@ -243,7 +239,7 @@ function Login() {
         </Box>
         <Box component="footer" sx={{ py: 3 }}>
           <Typography level="body-xs" textAlign="center">
-            © Your company {new Date().getFullYear()}
+            © Cooks Creative Contracting {new Date().getFullYear()}
           </Typography>
         </Box>
       </Box>
@@ -265,10 +261,10 @@ function Login() {
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
         backgroundImage:
-          'url(https://www.iwastesomuchtime.com/wp-content/uploads-webpc/uploads/sites/68/2023/01/Construction-Memes-6-86522.png.webp)',
+          'url(https://images.unsplash.com/photo-1535732759880-bbd5c7265e3f?q=80&w=2564&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)',
         [theme.getColorSchemeSelector('dark')]: {
           backgroundImage:
-            'url(https://www.iwastesomuchtime.com/wp-content/uploads-webpc/uploads/sites/68/2023/01/Construction-Memes-6-86522.png.webp)',
+            'url(https://images.unsplash.com/photo-1535732759880-bbd5c7265e3f?q=80&w=2564&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)',
         },
         
       })} 

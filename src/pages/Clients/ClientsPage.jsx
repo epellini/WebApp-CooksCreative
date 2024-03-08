@@ -16,43 +16,11 @@ import Breadcrumbs from "@mui/joy/Breadcrumbs";
 import { CssVarsProvider } from "@mui/joy/styles";
 import CssBaseline from "@mui/joy/CssBaseline";
 
-const ClientsList = () => {
+const ClientsPage = () => {
   const [clients, setClients] = useState([]);
   const supabase = supabaseClient; // Use your Supabase client
   const navigate = useNavigate();
 
-  // useEffect(() => {
-  //   const fetchClients = async () => {
-  //     const { data, error } = await supabase
-  //       .from('clients')
-  //       .select('*');
-
-  //     if (error) {
-  //       console.log('Error fetching clients:', error.message);
-  //     } else {
-  //       setClients(data);
-  //     }
-  //   };
-
-  //   fetchClients();
-  // }, [supabase]);
-
-  // // Function to delete a client by client_id
-  // const deleteClient = async (client_id) => {
-  //   const { error } = await supabase
-  //     .from('clients')
-  //     .delete()
-  //     .eq('client_id', client_id);
-
-  //   if (error) {
-  //     alert(`Error deleting client: ${error.message}`);
-  //   } else {
-  //     // Refresh the clients list after deletion
-  //     const updatedClients = clients.filter(client => client.client_id !== client_id);
-  //     setClients(updatedClients);
-  //     alert('Client successfully deleted');
-  //   }
-  //};
   return (
     <CssVarsProvider disableTransitionOnChange>
       <CssBaseline />
@@ -86,7 +54,7 @@ const ClientsList = () => {
               <Link
                 underline="none"
                 color="neutral"
-                href="#some-link"
+                href="/"
                 aria-label="Home"
               >
                 <HomeRoundedIcon />
@@ -126,33 +94,14 @@ const ClientsList = () => {
               startDecorator={<DownloadRoundedIcon />}
               size="sm"
             >
-              New Cleint
+              Add Client
             </Button>
           </Box>
-          <ClientTable cleints={clients} />
+          <ClientTable clients={clients} />
         </Box>
       </Box>
     </CssVarsProvider>
-
-    // <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-    //   <Button onClick={() => navigate('/clients/new')}>Add New Client</Button>
-    //   <List sx={{ width: '100%' }}>
-    //     {clients.map((client) => (
-    //       <ListItem key={client.client_id} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-    //         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-    //           <Typography>ID: {client.client_id}</Typography>
-    //           <Typography>Name: {client.first_name} {client.last_name}</Typography>
-    //         </Box>
-    //         <Stack direction="row" spacing={2}>
-    //           <Link to={`/clients/${client.client_id}`}>Details</Link>
-    //           <Link to={`/clients/edit/${client.client_id}`}>Edit</Link>
-    //           <Button onClick={() => deleteClient(client.client_id)}>Delete</Button>
-    //         </Stack>
-    //       </ListItem>
-    //     ))}
-    //   </List>
-    // </Box>
   );
 };
 
-export default ClientsList;
+export default ClientsPage;

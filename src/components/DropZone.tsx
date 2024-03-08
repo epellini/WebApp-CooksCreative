@@ -1,14 +1,42 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import * as React from 'react';
 import Card, { CardProps } from '@mui/joy/Card';
-import Link from '@mui/joy/Link';
 import Typography from '@mui/joy/Typography';
-import AspectRatio from '@mui/joy/AspectRatio';
+import Button from '@mui/joy/Button';
 
-import FileUploadRoundedIcon from '@mui/icons-material/FileUploadRounded';
+export default function DropZone(props: CardProps & { onFilesAdded: (files: FileList) => void, icon?: React.ReactElement }) {
+  const { icon, onFilesAdded, sx, ...other } = props;
 
-export default function DropZone(props: CardProps & { icon?: React.ReactElement }) {
-  const { icon, sx, ...other } = props;
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  const handleFileInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      onFilesAdded(files);
+      
+    }
+  };
+
+  const handleClick = (event) => {
+    
+    event.stopPropagation();
+    
+    fileInputRef.current?.click();
+  };
+
+  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+  event.preventDefault();
+  event.stopPropagation();
+  const files = event.dataTransfer.files;
+  if (files && files.length > 0) {
+    onFilesAdded(files);
+  }
+  };
+
+  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+  };
+
   return (
     <Card
       variant="soft"
@@ -26,26 +54,24 @@ export default function DropZone(props: CardProps & { icon?: React.ReactElement 
         },
         ...(Array.isArray(sx) ? sx : [sx]),
       ]}
+      onClick={handleClick}
+      onDrop={handleDrop}
+      onDragOver={handleDragOver}
     >
-      <AspectRatio
-        ratio="1"
-        variant="solid"
-        color="primary"
-        sx={{
-          minWidth: 32,
-          borderRadius: '50%',
-          '--Icon-fontSize': '16px',
-        }}
-      >
-        <div>{icon ?? <FileUploadRoundedIcon />}</div>
-      </AspectRatio>
+      <input
+        ref={fileInputRef}
+        type="file"
+        multiple
+        style={{ display: 'none' }}
+        onChange={handleFileInput}
+      />
       <Typography level="body-sm" textAlign="center">
-        <Link component="button" overlay>
-          Click to upload
-        </Link>{' '}
-        or drag and drop
-        <br /> SVG, PNG, JPG or GIF (max. 800x400px)
+        <Button type="button" onClick={handleClick}>
+          Add Image
+        </Button>
+        {' '}
       </Typography>
     </Card>
   );
+
 }

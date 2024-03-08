@@ -16,13 +16,13 @@ import Option from "@mui/joy/Option";
 import Table from "@mui/joy/Table";
 import Sheet from "@mui/joy/Sheet";
 import Checkbox from "@mui/joy/Checkbox";
+import Badge from "@mui/joy/Badge";
 import IconButton, { iconButtonClasses } from "@mui/joy/IconButton";
 import Typography from "@mui/joy/Typography";
 import Menu from "@mui/joy/Menu";
 import MenuButton from "@mui/joy/MenuButton";
 import MenuItem from "@mui/joy/MenuItem";
 import Dropdown from "@mui/joy/Dropdown";
-import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import SearchIcon from "@mui/icons-material/Search";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded";
@@ -34,10 +34,12 @@ import MoreHorizRoundedIcon from "@mui/icons-material/MoreHorizRounded";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import { useNavigate } from "react-router-dom";
 import Autocomplete from "@mui/joy/Autocomplete";
+import { MoreVertOutlined } from "@mui/icons-material";
 
 import { useEffect, useState } from "react";
 import { supabaseClient } from "../../supabase-client"; // Import the supabase client
 import { Skeleton } from "@mui/joy";
+import { usePagination } from "../../hooks/usePagination";
 
 function RowMenu({ projectId }) {
   const navigate = useNavigate();
@@ -67,11 +69,17 @@ function RowMenu({ projectId }) {
 
 export default function ProjectTable() {
   const [projects, setProjects] = useState([]);
+  const [clients, setClients] = useState([]);
   const [selected, setSelected] = useState([]);
-  const [status, setStatus] = useState([]);
+  const [statuses, setStatus] = useState([]);
+  const [categories, setCategory] = useState([]);
   const [open, setOpen] = React.useState(false);
   const [loading, setLoading] = useState(true);
   const [selectedProject, setSelectedProject] = useState(null);
+  const [selectedClient, setSelectedClient] = useState(null);
+  const [selectedStatus, setSelectedStatus] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function getProjects() {
@@ -87,105 +95,94 @@ export default function ProjectTable() {
         console.error("Error fetching projects:", error);
       } else {
         setProjects(data);
+        setClients(data.map((project) => project.clients));
+        setStatus(data.map((project) => project.status));
+        setCategory(data.map((project) => project.category));
+        console.log(clients);
+        console.log("categories" + categories);
         console.log();
         setLoading(false); // Set loading to false when data is fetched
       }
     }
     getProjects();
   }, []);
-    // Filtered projects based on selected project name
-    const filteredProjects = selectedProject
-    ? projects.filter((project) =>
-        project.project_name.toLowerCase().includes(selectedProject.toLowerCase())
-      )
-    : projects;
 
-  // FILTERS
-  const renderFilters = () => (
-    <React.Fragment>
-      <FormControl size="sm">
-        {/* WILL NEED TO POPULATE THIS WITH DB DATA */}
-        <FormLabel>Status</FormLabel>
-        <Select
-          size="sm"
-          placeholder="Filter by status"
-          slotProps={{ button: { sx: { whiteSpace: "nowrap" } } }}
-        >
-          <Option value="completed">Completed</Option>
-          <Option value="in-progress">In Progress</Option>
-          <Option value="pending-approval">Pending Approval</Option>
-          <Option value="cancelled">Cancelled</Option>
-          <Option value="refunded">Refunded</Option>
-        </Select>
-      </FormControl>
-      <FormControl size="sm">
-        {/* WILL NEED TO POPULATE THIS WITH DB DATA */}
-        <FormLabel>Category</FormLabel>
-        <Select size="sm" placeholder="All">
-          <Option value="all">All</Option>
-          <Option value="refund">General Home</Option>
-          <Option value="purchase">Tiny Homes</Option>
-          <Option value="debit">Additions</Option>
-          <Option value="debit">Basements</Option>
-          <Option value="debit">Bathrooms</Option>
-        </Select>
-      </FormControl>
-      <FormControl size="sm">
-        {/* WILL NEED TO POPULATE THIS WITH DB DATA - ALSO NEED TO KNOW WHAT TO ADD HERE */}
-        <FormLabel>Customer</FormLabel>
-        <Select size="sm" placeholder="All">
-          <Option value="all">All</Option>
-          <Option value="olivia">Olivia Rhye</Option>
-          <Option value="steve">Steve Hampton</Option>
-          <Option value="ciaran">Ciaran Murray</Option>
-          <Option value="marina">Marina Macdonald</Option>
-          <Option value="charles">Charles Fulton</Option>
-          <Option value="jay">Jay Hoper</Option>
-        </Select>
-      </FormControl>
-    </React.Fragment>
-  );
+  const filteredProjects = projects.filter((project) => {
+    const clientMatches =
+      !selectedClient ||
+      `${project.clients.first_name} ${project.clients.last_name}`.toLowerCase() ===
+      `${selectedClient.first_name} ${selectedClient.last_name}`.toLowerCase();
+
+    const statusMatches =
+      !selectedStatus ||
+      project.status.name.toLowerCase() === selectedStatus.name.toLowerCase();
+
+    const categoryMatches =
+      !selectedCategory ||
+      project.category.name.toLowerCase() ===
+      selectedCategory.name.toLowerCase();
+
+    return (
+      clientMatches &&
+      (!selectedStatus || statusMatches) &&
+      (!selectedCategory || categoryMatches)
+    );
+  });
+
+  const {
+    currentItems: currentProjects,
+    currentPage,
+    totalPages,
+    handlePageChange,
+    handlePrevious,
+    handleNext,
+  } = usePagination(filteredProjects, 10);
+
+  const handleSelectAllClick = (event) => {
+    if (event.target.checked) {
+      //select all projects
+      const newSelected = projects.map((project) => project.project_id.toString());
+      setSelected(newSelected);
+    } else {
+      //clear selection 
+      setSelected([]);
+    }
+  }
+
+  const getStatusColor = (statusName) => {
+    switch (statusName.toLowerCase()) {
+      case "completed":
+        return "success";
+      case "active":
+        return "warning";
+      case "cancelled":
+        return "danger";
+    }
+  };
+
   return (
     <React.Fragment>
       <Sheet
         className="SearchAndFilters-mobile"
         sx={{
-          display: { xs: "flex", sm: "none" },
+          display: { xs: "none", sm: "none" },
           my: 1,
           gap: 1,
         }}
       >
-      <input type="text" style={{ display: "none" }} />
-        <IconButton
-          size="sm"
-          variant="outlined"
-          color="neutral"
-          onClick={() => setOpen(true)}
-        >
-          <FilterAltIcon />
-        </IconButton>
-        <Modal open={open} onClose={() => setOpen(false)}>
-          <ModalDialog aria-labelledby="filter-modal" layout="fullscreen">
-            <ModalClose />
-            <Typography id="filter-modal" level="h2">
-              Filters
-            </Typography>
-            <Divider sx={{ my: 2 }} />
-            <Sheet sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-              {renderFilters()}
-              <Button color="primary" onClick={() => setOpen(false)}>
-                Submit
-              </Button>
-            </Sheet>
-          </ModalDialog>
-        </Modal>
       </Sheet>
       <Box
         className="SearchAndFilters-tabletUp"
         sx={{
           borderRadius: "sm",
           py: 2,
-          display: { xs: "none", sm: "flex" },
+          display: {
+            xs: "none",
+            sm: "none",
+            md: "flex",
+            lg: "flex",
+            xl: "flex",
+          },
           flexWrap: "wrap",
           gap: 1.5,
           "& > *": {
@@ -194,22 +191,83 @@ export default function ProjectTable() {
         }}
       >
         <FormControl sx={{ flex: 1 }} size="sm">
-          <FormLabel>Search for project</FormLabel>
+          <FormLabel>Search By Client Name</FormLabel>
           <Autocomplete
             size="sm"
-            options={projects.map((project) => project.project_name)}
-            value={selectedProject}
-            onChange={(event, newValue) => setSelectedProject(newValue)}
+            placeholder="Search"
+            options={clients.filter(
+              (client, index, self) =>
+                index ===
+                self.findIndex(
+                  (c) =>
+                    c.first_name === client.first_name &&
+                    c.last_name === client.last_name
+                )
+            )}
+            getOptionLabel={(option) =>
+              `${option.first_name} ${option.last_name}`
+            }
+            value={selectedClient}
+            onChange={(event, newValue) => {
+              setSelectedClient(newValue);
+              setSelectedProject(
+                newValue ? `${newValue.first_name} ${newValue.last_name}` : null
+              ); // Update selectedProject
+              console.log("Selected client:", newValue);
+            }}
             renderInput={(params) => <Input {...params} />}
           />
         </FormControl>
-        {renderFilters()}
+        <FormControl sx={{ flex: 1 }} size="sm">
+          <FormLabel>Search By Category Name</FormLabel>
+          <Autocomplete
+            size="sm"
+            placeholder="Search"
+            options={categories.filter(
+              (category, index, self) =>
+                index === self.findIndex((c) => c.name === category.name)
+            )}
+            getOptionLabel={(option) => option.name}
+            value={selectedCategory}
+            onChange={(event, newValue) => {
+              setSelectedCategory(newValue);
+              setSelectedProject(newValue ? `${newValue.name}` : null); // Update selectedProject
+              console.log("Selected category:", newValue);
+            }}
+            renderInput={(params) => <Input {...params} />}
+          />
+        </FormControl>
+        <FormControl sx={{ flex: 1 }} size="sm">
+          <FormLabel>Search By Status</FormLabel>
+          <Autocomplete
+            size="sm"
+            placeholder="Search"
+            options={statuses.filter(
+              (status, index, self) =>
+                index === self.findIndex((s) => s.name === status.name)
+            )}
+            getOptionLabel={(option) => option.name}
+            value={selectedStatus}
+            onChange={(event, newValue) => {
+              setSelectedStatus(newValue);
+              setSelectedProject(newValue ? `${newValue.name}` : null); // Update selectedProject
+              console.log("Selected status:", newValue);
+            }}
+            renderInput={(params) => <Input {...params} />}
+          />
+        </FormControl>
       </Box>
       <Sheet
         className="OrderTableContainer"
         variant="outlined"
         sx={{
-          display: { xs: "none", sm: "initial" },
+          display: {
+            xs: "none",
+            sm: "none",
+            md: "initial",
+            lg: "initial",
+            xl: "initial",
+          },
           width: "100%", // if you want to make the table full width <----- HERE
           borderRadius: "sm",
           flexShrink: 1,
@@ -231,49 +289,12 @@ export default function ProjectTable() {
             "--TableCell-paddingX": "8px",
           }}
         >
-          {/* ADD CHANGES HERE MY BOY  */}
+          {/* TABLE HEAD BEGINS HERE */}
           <thead>
             <tr>
-              <th
-                style={{ width: 48, textAlign: "center", padding: "12px 6px" }}
-              >
-                <Checkbox
-                  size="sm"
-                  indeterminate={
-                    selected.length > 0 && selected.length !== projects.length
-                  }
-                  checked={selected.length === projects.length}
-                  onChange={(event) => {
-                    // setSelected(
-                    //   event.target.checked ? projects.map((project) => projects.project_id) : [],
-                    // );
-                  }}
-                  color={
-                    selected.length > 0 || selected.length === projects.length
-                      ? "primary"
-                      : undefined
-                  }
-                  sx={{ verticalAlign: "text-bottom" }}
-                />
-              </th>
+
               <th style={{ width: 120, padding: "12px 6px" }}>
-                <Link
-                  underline="none"
-                  color="primary"
-                  component="button"
-                  // onClick={() => setOrder(order === 'asc' ? 'desc' : 'asc')}
-                  fontWeight="lg"
-                  endDecorator={<ArrowDropDownIcon />}
-                  sx={{
-                    "& svg": {
-                      transition: "0.2s",
-                      // transform:
-                      //     order === 'desc' ? 'rotate(0deg)' : 'rotate(180deg)',
-                    },
-                  }}
-                >
-                  Project
-                </Link>
+                Project
               </th>
               <th style={{ width: 100, padding: "12px 6px" }}>Client Name</th>
               <th
@@ -282,6 +303,7 @@ export default function ProjectTable() {
                 Status
               </th>
               <th
+            
                 style={{ width: 100, padding: "12px 6px", textAlign: "left" }}
               >
                 Start Date
@@ -305,97 +327,90 @@ export default function ProjectTable() {
 
           {/*  */}
           <tbody>
-          {loading ? (
-    Array.from(new Array(5)).map((_, index) => ( // Assuming 5 rows of skeletons
-    <tr key={index}>
-      <td style={{ textAlign: "center", width: 48 }}>
-        <Skeleton variant="rectangular" width={24} height={24} />
-      </td>
-      <td>
-        <Skeleton variant="text" width="100%" /> {/* Project */}
-      </td>
-      <td>
-        <Skeleton variant="text" width="100%" /> {/* Client Name */}
-      </td>
-      <td style={{ textAlign: "center" }}>
-        <Skeleton variant="rectangular" width="80%" height={20} /> {/* Status */}
-      </td>
-      <td>
-        <Skeleton variant="text" width="70%" /> {/* Start Date */}
-      </td>
-      <td>
-        <Skeleton variant="text" width="70%" /> {/* End Date */}
-      </td>
-      <td>
-        <Skeleton variant="text" width="100%" /> {/* Category */}
-      </td>
-      <td style={{ textAlign: "right" }}>
-        <Skeleton variant="circular" width={24} height={24} /> {/* Actions */}
-      </td>
-    </tr>
-  ))
-) : (
-              filteredProjects.map((project) => {
-                console.log("Project:", project); // Log the project object to inspect its structure
-                return (
-                  <tr key={project.project_id}>
-                    <td
-                      style={{
-                        textAlign: "center",
-                        width: 120,
-                      }}
-                    >
-                      <Checkbox
-                        size="sm"
-                        checked={selected.includes(
-                          project.project_id.toString()
-                        )}
-                        color={
-                          selected.includes(project.project_id.toString())
-                            ? "primary"
-                            : undefined
-                        }
-                        onChange={(event) => {
-                          setSelected((prevSelected) =>
-                            event.target.checked
-                              ? prevSelected.concat(
-                                  project.project_id.toString()
-                                )
-                              : prevSelected.filter(
-                                  (id) => id !== project.project_id.toString()
-                                )
-                          );
-                        }}
-                        slotProps={{ checkbox: { sx: { textAlign: "left" } } }}
-                        sx={{ verticalAlign: "text-bottom" }}
+            {loading
+              ? Array.from(new Array(5)).map(
+                (
+                  _,
+                  index // Assuming 5 rows of skeletons
+                ) => (
+                  <tr key={index}>
+                    <td style={{ textAlign: "center", width: 48 }}>
+                      <Skeleton
+                        variant="rectangular"
+                        width={24}
+                        height={24}
                       />
                     </td>
+                    <td>
+                      <Skeleton variant="text" width="100%" /> {/* Project */}
+                    </td>
+                    <td>
+                      <Skeleton variant="text" width="100%" />{" "}
+                      {/* Client Name */}
+                    </td>
+                    <td style={{ textAlign: "center" }}>
+                      <Skeleton
+                        variant="rectangular"
+                        width="80%"
+                        height={20}
+                      />{" "}
+                      {/* Status */}
+                    </td>
+                    <td>
+                      <Skeleton variant="text" width="70%" />{" "}
+                      {/* Start Date */}
+                    </td>
+                    <td>
+                      <Skeleton variant="text" width="70%" /> {/* End Date */}
+                    </td>
+                    <td>
+                      <Skeleton variant="text" width="100%" />{" "}
+                      {/* Category */}
+                    </td>
+                    <td style={{ textAlign: "right" }}>
+                      <Skeleton variant="circular" width={24} height={24} />{" "}
+                      {/* Actions */}
+                    </td>
+                  </tr>
+                )
+              )
+              : currentProjects.map((project) => {
+                return (
+                  <tr key={project.project_id}>
                     <td style={{ textAlign: "left" }}>
                       {project ? (
-                        <Typography level="body-xs">{`${project.project_name}`}</Typography>
+                        <Typography
+                          level="body-xs"
+                          onClick={() =>
+                            navigate(`/projects/${project.project_id}`)
+                          }
+                          style={{ cursor: "pointer" }}
+                        >{`${project.project_name}`}</Typography>
                       ) : (
                         <Typography level="body-xs">N/A</Typography>
                       )}
                     </td>
                     <td style={{ textAlign: "left" }}>
-                      {/* Logging client data */}
-                      {console.log("Client data:", project.clients)}
-                      {console.log("Status data:", project.status)}
                       {/* Displaying client's first name and last name if available */}
                       {project.clients ? (
-                        <Typography level="body-xs">{`${project.clients.first_name} ${project.clients.last_name}`}</Typography>
+                        <Typography
+                          level="body-xs"
+                          onClick={() =>
+                            navigate(`/projects/${project.project_id}`)
+                          }
+                          style={{ cursor: "pointer" }}
+                        >{`${project.clients.first_name} ${project.clients.last_name}`}</Typography>
                       ) : (
                         <Typography level="body-xs">N/A</Typography>
                       )}
                     </td>
-                    {/* <td>
-                    <Typography level="body-xs">{project.project_id}</Typography>
-                  </td>
-                  <td>
-                    <Typography level="body-xs">{project.client_id ? `${project.client_id.first_name} ${project.client_id.last_name}` : 'N/A' }</Typography>
-                  </td>*/}
+
                     <td style={{ textAlign: "center" }}>
                       <Chip
+                        onClick={() =>
+                          navigate(`/projects/${project.project_id}`)
+                        }
+                        style={{ cursor: "pointer" }}
                         variant="soft"
                         size="sm"
                         startDecorator={
@@ -411,10 +426,10 @@ export default function ProjectTable() {
                           project.status.name == "Completed"
                             ? "success"
                             : project.status.name == "Active"
-                            ? "neutral"
-                            : project.status.name == "Cancelled"
-                            ? "danger"
-                            : "default" // Use default color for "N/A" or other statuses
+                              ? "neutral"
+                              : project.status.name == "Cancelled"
+                                ? "danger"
+                                : "default" // Use default color for "N/A" or other statuses
                         }
                       >
                         {project.status.name}
@@ -422,28 +437,40 @@ export default function ProjectTable() {
                     </td>
 
                     <td style={{ textAlign: "left" }}>
-                      {/* <Avatar size="sm">{project.client.first_name}</Avatar> */}
-                      {/* <div> */}
-                      {/* <Typography level="body-xs">{project.client_id }</Typography> */}
-
-                      {/* <Typography level="body-xs">{status.name}</Typography> */}
-                      {/* </div> */}
                       {project ? (
-                        <Typography level="body-xs">{`${project.start_date}`}</Typography>
+                        <Typography
+                          onClick={() =>
+                            navigate(`/projects/${project.project_id}`)
+                          }
+                          style={{ cursor: "pointer" }}
+                          level="body-xs"
+                        >{`${project.start_date}`}</Typography>
                       ) : (
                         <Typography level="body-xs">N/A</Typography>
                       )}
                     </td>
                     <td style={{ textAlign: "left" }}>
                       {project ? (
-                        <Typography level="body-xs">{`${project.end_date}`}</Typography>
+                        <Typography
+                          onClick={() =>
+                            navigate(`/projects/${project.project_id}`)
+                          }
+                          style={{ cursor: "pointer" }}
+                          level="body-xs"
+                        >{`${project.end_date}`}</Typography>
                       ) : (
                         <Typography level="body-xs">N/A</Typography>
                       )}
                     </td>
                     <td style={{ textAlign: "left" }}>
                       {project ? (
-                        <Typography level="body-xs">{`${project.category.name}`}</Typography>
+                        <Typography
+                          onClick={() =>
+                            navigate(`/projects/${project.project_id}`)
+                          }
+                          style={{ cursor: "pointer" }}
+                          level="body-xs"
+                        >{`${project.category.name}`}</Typography>
                       ) : (
                         <Typography level="body-xs">N/A</Typography>
                       )}
@@ -460,11 +487,136 @@ export default function ProjectTable() {
                     </td>
                   </tr>
                 );
-              })
-            )}
+              })}
           </tbody>
         </Table>
       </Sheet>
+
+      {/* Mobile View Table goes here? */}
+      <Sheet
+        textAlign="left"
+        className="OrderTableContainer-mobile"
+        variant="outlined"
+        sx={{
+          display: {
+            xs: "flex",
+            sm: "flex",
+            md: "none",
+            lg: "none",
+            xl: "none",
+          },
+          width: "100%",
+          borderRadius: "sm",
+          flexShrink: 1,
+          overflow: "auto",
+          minHeight: 0,
+        }}
+      >
+        <Table
+          aria-labelledby="tableTitle-mobile"
+          size="small"
+          sx={{
+            "--TableCell-paddingY": "6px",
+            "--TableCell-paddingX": "8px",
+          }}
+        >
+          <thead>
+            <tr>
+              <th style={{ width: 48, textAlign: "center" }}></th>
+              <th>Project</th>
+              <th>Client</th>
+              <th style={{ textAlign: "center" }} >Status</th>
+              <th style={{ width: 48, textAlign: "center" }}></th>
+            </tr>
+          </thead>
+          <tbody>
+            {loading
+              ? Array.from(new Array(5)).map((_, index) => (
+                <tr key={index}>
+                  <td colSpan={5} style={{ textAlign: "left" }}>
+                    <Skeleton variant="text" width="100%" height={30} />
+                  </td>
+                </tr>
+              ))
+              : currentProjects.map((project) => (
+                <tr key={project.project_id}>
+                  <td style={{ textAlign: "left" }}>
+                    <Checkbox
+                      size="sm"
+                      checked={selected.includes(
+                        project.project_id.toString()
+                      )}
+                      onChange={(event) => {
+                        if (event.target.checked) {
+                          setSelected([
+                            ...selected,
+                            project.project_id.toString(),
+                          ]);
+                        } else {
+                          setSelected(
+                            selected.filter(
+                              (id) => id !== project.project_id.toString()
+                            )
+                          );
+                        }
+                      }}
+                    />
+                  </td>
+                  <td
+                    onClick={() =>
+                      navigate(`/projects/${project.project_id}`)
+                    }
+                    style={{ cursor: "pointer" }}
+                  >
+                    <Typography
+                      sx={{
+                        textAlign: "left",
+                        fontSize: {
+                          xs: "0.8rem",
+                          sm: "0.85rem",
+                        },
+                      }}
+                    >
+                      {project.project_name}
+                    </Typography>
+                  </td>
+                  <td>
+                    <Typography
+                      sx={{
+                        textAlign: "left",
+                        fontSize: {
+                          xs: "0.8rem",
+                          sm: "0.85rem",
+                        },
+                      }}
+                    >
+                      {project.clients.first_name} {project.clients.last_name}
+                    </Typography>
+                  </td>
+                  <td style={{ justifyContent: 'center', alignItems: 'center' }}>
+                    <Badge
+                      alignItems="center"
+                      variant="outlined"
+                      label={project.status.name}
+                      color={getStatusColor(project.status.name)}
+                    />
+                  </td>
+                  <td>
+                    <Box
+                      sx={{ display: "flex", gap: 2, alignItems: "center" }}
+                    >
+                      {/* <Link level="body-xs" component="button" >
+                        Download
+                      </Link> */}
+                      <RowMenu projectId={project.project_id} />
+                    </Box>
+                  </td>
+                </tr>
+              ))}
+          </tbody>
+        </Table>
+      </Sheet>
+
       <Box
         className="Pagination-laptopUp"
         sx={{
@@ -482,32 +634,60 @@ export default function ProjectTable() {
           variant="outlined"
           color="neutral"
           startDecorator={<KeyboardArrowLeftIcon />}
+          onClick={handlePrevious}
+          disabled={currentPage === 1}
         >
           Previous
         </Button>
 
-        <Box sx={{ flex: 1 }} />
-        {["1", "2", "3", "…", "8", "9", "10"].map((page) => (
-          <IconButton
-            key={page}
-            size="sm"
-            variant={Number(page) ? "outlined" : "plain"}
-            color="neutral"
-          >
-            {page}
-          </IconButton>
-        ))}
-        <Box sx={{ flex: 1 }} />
+        <Box sx={{ flex: 1, display: "flex", justifyContent: "center" }}>
+          {[...Array(totalPages).keys()].map((number) => (
+            <IconButton
+              key={number + 1}
+              size="sm"
+              color="neutral"
+              variant="outlined"
+              onClick={() => handlePageChange(number + 1)}
+              sx={{
+                backgroundColor:
+                  currentPage === number + 1 ? "primary.main" : "transparent",
+                color:
+                  currentPage === number + 1
+                    ? "primary.contrastText"
+                    : "inherit",
+                "&:hover": {
+                  backgroundColor:
+                    currentPage === number + 1
+                      ? "primary.dark"
+                      : "action.hover",
+                },
+                mx: 0.5, // Add some margin for spacing
+                border:
+                  currentPage === number + 1
+                    ? "2px solid primary.dark"
+                    : "1px solid rgba(0, 0, 0, 0.23)", // Adjust for your theme
+                boxShadow:
+                  currentPage === number + 1 ? "palette.primary.main" : "none", // Optional: adds a glow effect for the current page
+              }}
+            >
+              {number + 1}
+            </IconButton>
+          ))}
+        </Box>
 
         <Button
           size="sm"
           variant="outlined"
           color="neutral"
           endDecorator={<KeyboardArrowRightIcon />}
+          onClick={handleNext}
+          disabled={currentPage === totalPages}
         >
           Next
         </Button>
       </Box>
+
+
     </React.Fragment>
   );
 }
