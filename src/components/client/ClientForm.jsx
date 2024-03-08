@@ -15,6 +15,8 @@ import Card from "@mui/joy/Card";
 import Textarea from "@mui/joy/Textarea";
 import CardOverflow from "@mui/joy/CardOverflow";
 import CardActions from "@mui/joy/CardActions";
+import Select from "@mui/joy/Select";
+import Option from "@mui/joy/Option";
 
 import { supabaseClient } from "../../supabase-client";
 
@@ -23,9 +25,12 @@ const ClientForm = () => {
   const [client, setClient] = useState({
     first_name: "",
     last_name: "",
-    address: "",
-    email: "",
     phone_number: "",
+    email: "",
+    street: "",
+    city: "",
+    province: "",
+    postal_code: "",
     notes: "",
     tag: "",
   });
@@ -51,9 +56,11 @@ const ClientForm = () => {
           setClient({
             first_name: data.first_name,
             last_name: data.last_name,
-            address: data.address,
-            email: data.email,
             phone_number: data.phone_number,
+            email: data.email,
+            street: data.street,
+            city: data.city,
+            province: data.province,
             notes: data.notes,
             tag: data.tag,
           });
@@ -79,9 +86,11 @@ const ClientForm = () => {
     const updates = {
       first_name: client.first_name,
       last_name: client.last_name,
-      address: client.address,
-      email: client.email,
       phone_number: client.phone_number,
+      email: client.email,
+      street: client.street,
+      city: client.city,
+      province: client.province,
       notes: client.notes,
       tag: client.tag,
       ...(clientId ? { client_id: clientId } : {}), // Including client_id if in edit mode
@@ -165,7 +174,7 @@ const ClientForm = () => {
             <Stack
               direction="row"
               spacing={3}
-              sx={{ display: { xs: "none", md: "flex" }, my: 1 }}
+              sx={{ display: { xs: "none", md: "flex"}, my: 1 }}
             >
               <Stack direction="column" spacing={1}></Stack>
               <Stack spacing={2} sx={{ flexGrow: 2 }}>
@@ -197,28 +206,7 @@ const ClientForm = () => {
                 </Stack>
 
                 <Stack spacing={1}>
-                  {" "}
-                  <FormControl>
-                    <FormLabel htmlFor="address">Address</FormLabel>
-                    <Input
-                      id="address"
-                      name="address"
-                      value={client.address}
-                      onChange={handleChange}
-                      required
-                    />
-                  </FormControl>
-                  <FormControl>
-                    <FormLabel htmlFor="email">Email</FormLabel>
-                    <Input
-                      id="email"
-                      name="email"
-                      value={client.email}
-                      onChange={handleChange}
-                      required
-                    />
-                  </FormControl>
-                  <FormControl>
+                  <FormControl sx={{ flexGrow: 1 }}>
                     <FormLabel htmlFor="phone_number">Phone Number</FormLabel>
                     <Input
                       id="phone_number"
@@ -228,6 +216,65 @@ const ClientForm = () => {
                       required
                     />
                   </FormControl>
+                  <FormControl sx={{ flexGrow: 1 }}>
+                    <FormLabel htmlFor="email">Email</FormLabel>
+                    <Input
+                      id="email"
+                      name="email"
+                      value={client.email}
+                      onChange={handleChange}
+                      required
+                    />
+                  </FormControl>
+                </Stack>
+
+                <Stack spacing={1}>
+                  <Stack direction="row" spacing={2}>
+                    <FormControl sx={{ flexGrow: 1 }}>
+                      <FormLabel htmlFor="street">Street</FormLabel>
+                      <Input
+                        id="street"
+                        name="street"
+                        value={client.street}
+                        onChange={handleChange}
+                        required
+                      />
+                    </FormControl>
+
+                    <FormControl sx={{ flexGrow: 1 }}>
+                      <FormLabel htmlFor="city">City</FormLabel>
+                      <Input
+                        id="city"
+                        name="city"
+                        value={client.city}
+                        onChange={handleChange}
+                        required
+                      />
+                    </FormControl>
+
+                    <FormControl sx={{ flexGrow: 1 }}>
+                      <FormLabel htmlFor="province">Postal Code</FormLabel>
+                      <Input
+                        id="province"
+                        name="province" // Make sure this matches the state property
+                        value={client.province}
+                        onChange={handleChange}
+                        required
+                      />
+                    </FormControl>
+
+                    <FormControl sx={{ flexGrow: 1 }}>
+                      <FormLabel htmlFor="postal-code">Postal Code</FormLabel>
+                      <Input
+                        id="postal-code"
+                        name="postal_code" // Make sure this matches the state property
+                        value={client.postal_code}
+                        onChange={handleChange}
+                        required
+                      />
+                    </FormControl>
+                  </Stack>
+
                   <FormControl>
                     <FormLabel htmlFor="notes">Notes</FormLabel>
                     <Textarea
@@ -261,7 +308,7 @@ const ClientForm = () => {
               sx={{ display: { xs: "flex", md: "none" }, my: 1 }}
             >
               {/* MOBILE VIEW */}
-              <Stack direction="row" spacing={2}>
+                <Stack direction="row" spacing={2}>
                 <Stack spacing={1} sx={{ flexGrow: 1 }}>
                   <FormControl sx={{ flexGrow: 1 }}>
                     <FormLabel>First Name</FormLabel>
@@ -287,65 +334,103 @@ const ClientForm = () => {
                       required
                     />
                   </FormControl>
+                </Stack>
 
-                  <Stack spacing={1}>
-                    {" "}
-                    <FormControl>
-                      <FormLabel htmlFor="address">Address</FormLabel>
+                <Stack direction="row" spacing={2}>
+                  <FormControl sx={{ flexGrow: 1 }}>
+                    <FormLabel htmlFor="phone_number">Phone Number</FormLabel>
+                    <Input
+                      id="phone_number"
+                      name="phone_number"
+                      value={client.phone_number}
+                      onChange={handleChange}
+                      required
+                    />
+                  </FormControl>
+                  <FormControl sx={{ flexGrow: 1 }}>
+                    <FormLabel htmlFor="email">Email</FormLabel>
+                    <Input
+                      id="email"
+                      name="email"
+                      value={client.email}
+                      onChange={handleChange}
+                      required
+                    />
+                  </FormControl>
+                </Stack>
+
+                <Stack spacing={1}>
+                  <Stack direction="row" spacing={2}>
+                    <FormControl sx={{ flexGrow: 1 }}>
+                      <FormLabel htmlFor="street">Street</FormLabel>
                       <Input
-                        id="address"
-                        name="address"
-                        value={client.address}
+                        id="street"
+                        name="street"
+                        value={client.street}
                         onChange={handleChange}
                         required
                       />
                     </FormControl>
-                    <FormControl>
-                      <FormLabel htmlFor="email">Email</FormLabel>
+
+                    <FormControl sx={{ flexGrow: 1 }}>
+                      <FormLabel htmlFor="city">City</FormLabel>
                       <Input
-                        id="email"
-                        name="email"
-                        value={client.email}
+                        id="city"
+                        name="city"
+                        value={client.city}
                         onChange={handleChange}
                         required
                       />
                     </FormControl>
-                    <FormControl>
-                      <FormLabel htmlFor="phone_number">Phone Number</FormLabel>
+
+                    <FormControl sx={{ flexGrow: 1 }}>
+                      <FormLabel htmlFor="province">Postal Code</FormLabel>
                       <Input
-                        id="phone_number"
-                        name="phone_number"
-                        value={client.phone_number}
+                        id="province"
+                        name="province" // Make sure this matches the state property
+                        value={client.province}
                         onChange={handleChange}
                         required
                       />
                     </FormControl>
-                    <FormControl>
-                      <FormLabel htmlFor="tag">Tag</FormLabel>
+
+                    <FormControl sx={{ flexGrow: 1 }}>
+                      <FormLabel htmlFor="postal-code">Postal Code</FormLabel>
                       <Input
-                        id="tag"
-                        name="tag"
-                        value={client.tag}
-                        onChange={handleChange}
-                        required
-                      />
-                    </FormControl>
-                    <FormControl>
-                      <FormLabel htmlFor="notes">Notes</FormLabel>
-                      <Textarea
-                        size="sm"
-                        minRows={4}
-                        sx={{ flexGrow: 1 }}
-                        id="notes"
-                        name="notes"
-                        value={client.notes}
+                        id="postal-code"
+                        name="postal_code" // Make sure this matches the state property
+                        value={client.postal_code}
                         onChange={handleChange}
                         required
                       />
                     </FormControl>
                   </Stack>
+
+                  <FormControl>
+                    <FormLabel htmlFor="notes">Notes</FormLabel>
+                    <Textarea
+                      size="sm"
+                      minRows={4}
+                      sx={{ flexGrow: 1 }}
+                      id="notes"
+                      name="notes"
+                      value={client.notes}
+                      onChange={handleChange}
+                      required
+                    />
+                  </FormControl>
+                  <FormControl>
+                    <FormLabel htmlFor="tag">Tag</FormLabel>
+                    <Input
+                      id="tag"
+                      name="tag"
+                      value={client.tag}
+                      onChange={handleChange}
+                      required
+                    />
+                  </FormControl>
                 </Stack>
-              </Stack>
+                </Stack>
             </Stack>
 
             <CardOverflow
