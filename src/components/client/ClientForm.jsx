@@ -159,6 +159,7 @@ const ClientForm = () => {
             py: { xs: 2, md: 3 },
           }}
         >
+                <Card>
           <Box sx={{ mb: 1 }}>
             <Typography level="title-md">Client Information</Typography>
             <Typography level="body-sm">
@@ -418,6 +419,7 @@ const ClientForm = () => {
               </Button>
             </CardActions>
           </CardOverflow>
+        </Card>
         </Stack>
       </Box>
     </form>
