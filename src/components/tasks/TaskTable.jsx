@@ -113,6 +113,12 @@ export default function TaskTable() {
     }
   });
 
+  const archivedTasks = tasks.filter((task) => {
+    if (task.is_archived == true) {
+      return task;
+    }
+  });
+
   const onHandleSubmit = () => {
     setOpen(false);
     //reload the tasks
@@ -127,7 +133,7 @@ export default function TaskTable() {
         sx={{
           display: {
             xs: "none",
-            sm: "block", 
+            sm: "block",
             md: "block",
             lg: "block",
             xl: "block",
@@ -188,7 +194,7 @@ export default function TaskTable() {
           </Modal>
         </React.Fragment>
 
-{/* Complete Task*/}
+        {/* Complete Task*/}
 
         <React.Fragment>
           <Button
@@ -239,6 +245,17 @@ export default function TaskTable() {
                 color={index === 1 ? "primary" : "neutral"}
               >
                 {completedTasks.length}
+              </Chip>
+            </Tab>
+
+            <Tab indicatorInset>
+              Archived Tasks{" "}
+              <Chip
+                size="sm"
+                variant="soft"
+                color={index === 2 ? "primary" : "neutral"}
+              >
+                {archivedTasks.length}
               </Chip>
             </Tab>
           </TabList>
@@ -311,13 +328,31 @@ export default function TaskTable() {
               {/* TABLE HEAD BEGINS HERE */}
               <thead>
                 <tr>
-                  <th style={{ width: {xl: 70, md: 70}, padding: "12px 6px" }}>Name</th>
-                  <th style={{ width: {xl: 40, md: 40}, padding: "12px 6px" }}>Project</th>
-                  <th style={{ width: {xl: 20, md: 10}, padding: "12px 6px" }}>
-                     By
+                  <th
+                    style={{ width: { xl: 70, md: 70 }, padding: "12px 6px" }}
+                  >
+                    Name
                   </th>
-                  <th style={{ width: {xl: 20, md: 15}, padding: "12px 6px" }}>Assigned</th>
-                  <th style={{ width: {xl: 20, md: 15}, padding: "12px 6px" }}>Completed</th>
+                  <th
+                    style={{ width: { xl: 40, md: 40 }, padding: "12px 6px" }}
+                  >
+                    Project
+                  </th>
+                  <th
+                    style={{ width: { xl: 20, md: 10 }, padding: "12px 6px" }}
+                  >
+                    By
+                  </th>
+                  <th
+                    style={{ width: { xl: 20, md: 15 }, padding: "12px 6px" }}
+                  >
+                    Assigned
+                  </th>
+                  <th
+                    style={{ width: { xl: 20, md: 15 }, padding: "12px 6px" }}
+                  >
+                    Completed
+                  </th>
                 </tr>
               </thead>
 
@@ -362,17 +397,106 @@ export default function TaskTable() {
               </tbody>
             </Table>
           </TabPanel>
+
+          <TabPanel value={2}>
+            <Table
+              stickyHeader
+              hoverRow
+              sx={{
+                "--TableCell-headBackground":
+                  "var(--joy-palette-background-level1)",
+                "--Table-headerUnderlineThickness": "1px",
+                "--TableRow-hoverBackground":
+                  "var(--joy-palette-background-level1)",
+                "--TableCell-paddingY": "4px",
+                "--TableCell-paddingX": "8px",
+                border: "1px solid #CDD7E1", // Add border here
+                borderRadius: "5px",
+              }}
+            >
+              {/* TABLE HEAD BEGINS HERE */}
+              <thead>
+                <tr>
+                  <th
+                    style={{ width: { xl: 70, md: 70 }, padding: "12px 6px" }}
+                  >
+                    Name
+                  </th>
+                  <th
+                    style={{ width: { xl: 40, md: 40 }, padding: "12px 6px" }}
+                  >
+                    Project
+                  </th>
+                  <th
+                    style={{ width: { xl: 20, md: 10 }, padding: "12px 6px" }}
+                  >
+                    By
+                  </th>
+                  <th
+                    style={{ width: { xl: 20, md: 15 }, padding: "12px 6px" }}
+                  >
+                    Assigned
+                  </th>
+                  <th
+                    style={{ width: { xl: 20, md: 15 }, padding: "12px 6px" }}
+                  >
+                    Completed
+                  </th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {Object.values(archivedTasks).map((task, days) => (
+                  <tr key={task.task_id}>
+                    <td
+                      onClick={() => console.log("Task Clicked")}
+                      style={{ textAlign: "left", cursor: "pointer" }}
+                    >
+                      {`${task.task_name}`}
+                    </td>
+
+                    <td style={{ textAlign: "left" }}>
+                      {task.projects ? (
+                        <>{task.projects.project_name}</>
+                      ) : (
+                        <>No Project</>
+                      )}
+                    </td>
+
+                    <td style={{ textAlign: "left" }}>
+                      {task.completed_by ? task.completed_by : "N/A"}
+                    </td>
+                    <td style={{ textAlign: "left" }}>
+                      {task.date_created
+                        ? new Date(task.date_created)
+                            .toISOString()
+                            .split("T")[0]
+                        : "N/A"}
+                    </td>
+
+                    <td style={{ textAlign: "left" }}>
+                      {task.date_created
+                        ? new Date(task.date_completed)
+                            .toISOString()
+                            .split("T")[0]
+                        : "N/A"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          </TabPanel>
         </Tabs>
       </Sheet>
 
- {/* Mobile View Table goes here? */}
+      {/* Mobile View Table goes here? */}
 
- <Sheet
+      <Sheet
         className="OrderTableContainer"
         variant="outlined"
         sx={{
           display: {
-            sm: "none", 
+            sm: "none",
             md: "none",
             xl: "none",
             lg: "none",
@@ -530,7 +654,7 @@ export default function TaskTable() {
                   <th style={{ width: 20, padding: "12px 6px" }}>Task</th>
                   <th style={{ width: 20, padding: "12px 6px" }}>Project</th>
                   <th style={{ width: 10, padding: "12px px" }}>
-                  <Typography >By</Typography>
+                    <Typography>By</Typography>
                   </th>
                 </tr>
               </thead>
@@ -547,18 +671,21 @@ export default function TaskTable() {
 
                     <td style={{ textAlign: "left" }}>
                       {task.projects ? (
-                        <><Typography level="body-xs">{task.projects.project_name}</Typography></>
+                        <>
+                          <Typography level="body-xs">
+                            {task.projects.project_name}
+                          </Typography>
+                        </>
                       ) : (
                         <>No Project</>
                       )}
                     </td>
 
                     <td style={{ textAlign: "left" }}>
-                    <Typography level="body-xs">
-                      {task.completed_by ? task.completed_by : "N/A"}
+                      <Typography level="body-xs">
+                        {task.completed_by ? task.completed_by : "N/A"}
                       </Typography>
                     </td>
-
                   </tr>
                 ))}
               </tbody>
@@ -566,9 +693,6 @@ export default function TaskTable() {
           </TabPanel>
         </Tabs>
       </Sheet>
-
-
-
     </React.Fragment>
   );
 }
