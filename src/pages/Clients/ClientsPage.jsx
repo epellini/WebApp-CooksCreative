@@ -21,38 +21,6 @@ const ClientsPage = () => {
   const supabase = supabaseClient; // Use your Supabase client
   const navigate = useNavigate();
 
-  // useEffect(() => {
-  //   const fetchClients = async () => {
-  //     const { data, error } = await supabase
-  //       .from('clients')
-  //       .select('*');
-
-  //     if (error) {
-  //       console.log('Error fetching clients:', error.message);
-  //     } else {
-  //       setClients(data);
-  //     }
-  //   };
-
-  //   fetchClients();
-  // }, [supabase]);
-
-  // // Function to delete a client by client_id
-  // const deleteClient = async (client_id) => {
-  //   const { error } = await supabase
-  //     .from('clients')
-  //     .delete()
-  //     .eq('client_id', client_id);
-
-  //   if (error) {
-  //     alert(`Error deleting client: ${error.message}`);
-  //   } else {
-  //     // Refresh the clients list after deletion
-  //     const updatedClients = clients.filter(client => client.client_id !== client_id);
-  //     setClients(updatedClients);
-  //     alert('Client successfully deleted');
-  //   }
-  //};
   return (
     <CssVarsProvider disableTransitionOnChange>
       <CssBaseline />
@@ -86,7 +54,7 @@ const ClientsPage = () => {
               <Link
                 underline="none"
                 color="neutral"
-                href="#some-link"
+                href="/"
                 aria-label="Home"
               >
                 <HomeRoundedIcon />
