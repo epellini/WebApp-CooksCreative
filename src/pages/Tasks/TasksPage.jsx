@@ -12,6 +12,7 @@ import DownloadRoundedIcon from "@mui/icons-material/DownloadRounded";
 import { Css } from "@mui/icons-material";
 import React, { useState, useEffect } from "react";
 import TaskTable from "../../components/tasks/TaskTable";
+import Confetti from "../../components/tasks/confetti.jsx";
 
 
 const TasksPage = () => {
@@ -84,6 +85,8 @@ const TasksPage = () => {
 
 
           <TaskTable />
+
+          <Confetti />
         </Box>
       </Box>
     </CssVarsProvider>
