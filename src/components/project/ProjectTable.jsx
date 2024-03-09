@@ -215,7 +215,10 @@ export default function ProjectTable() {
               ); // Update selectedProject
               console.log("Selected client:", newValue);
             }}
-            renderInput={(params) => <Input {...params} />}
+            // Pass the renderInput function directly to inputProps
+            inputProps={{
+              renderInput: (params) => <Input {...params} />,
+            }}
           />
         </FormControl>
         <FormControl sx={{ flex: 1 }} size="sm">
@@ -303,7 +306,7 @@ export default function ProjectTable() {
                 Status
               </th>
               <th
-            
+
                 style={{ width: 100, padding: "12px 6px", textAlign: "left" }}
               >
                 Start Date

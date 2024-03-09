@@ -57,7 +57,7 @@ export default function TaskTable() {
   const [clients, setClients] = useState([]);
   const options = ["The Godfather", "Pulp Fiction"];
   const [index, setIndex] = React.useState(0);
-  const [selectedIndex, setSelectedIndex] = React.useState(1);
+  const [selectedIndex, setSelectedIndex] =useState(0);
   let [days, setDays] = useState(30);
 
   const createHandleClose = (index, value) => () => {
@@ -94,8 +94,8 @@ export default function TaskTable() {
     const dayLength = days * 24 * 60 * 60 * 1000; // 30 days in milliseconds
     const thirtyDaysAgoTimeStamp = Date.now() - dayLength;
 
-    console.log("Task Date Created:", new Date(task.date_created).getTime());
-    console.log("Thirty Days Ago:", thirtyDaysAgoTimeStamp);
+    // console.log("Task Date Created:", new Date(task.date_created).getTime());
+    // console.log("Thirty Days Ago:", thirtyDaysAgoTimeStamp);
 
     // Check if the task is completed and its creation date is within the last 30 days
     if (

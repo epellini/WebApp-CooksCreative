@@ -12,6 +12,8 @@ import {
 } from "@mui/joy";
 import { Skeleton } from "@mui/joy";
 import { supabaseClient } from "../../supabase-client";
+import TaskFormAdd from "../tasks/TaskFormAdd";
+import ProjectTaskForm from "./ProjectTaskForm";
 
 const ProjectTasks = ({ projectid }) => {
   const [tasks, setTasks] = useState([]);
@@ -83,6 +85,9 @@ const ProjectTasks = ({ projectid }) => {
               >
                 {completedTasks.length}
               </Chip>
+            </Tab>
+            <Tab>
+              Add Task{" "}
             </Tab>
           </TabList>
 
@@ -200,6 +205,10 @@ const ProjectTasks = ({ projectid }) => {
                 ))}
               </tbody>
             </Table>
+          </TabPanel>
+          <TabPanel value={2}>
+              <ProjectTaskForm projectid={projectid} />
+           
           </TabPanel>
         </Tabs>
       </Sheet>
