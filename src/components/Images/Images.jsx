@@ -39,9 +39,11 @@ const Images = (projectid) => {
 
   const viewImage = (imageUrl) => {
     const link = document.createElement("a");
+    link.target = "_blank";
     link.href = imageUrl;
     document.body.appendChild(link);
     link.click();
+    document.body.removeChild(link);
   };
 
   const downloadImage = async (imageUrl) => {
@@ -202,12 +204,6 @@ const Images = (projectid) => {
         )
       )}
       <FormGroup>
-        <FormControl>
-          <Button variant="contained" color="primary" onClick={handleSubmit}>
-            Submit
-          </Button>
-        </FormControl>
-
         <Button
           component="label"
           role={undefined}
@@ -281,7 +277,6 @@ const Images = (projectid) => {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "space-evenly",
-                  padding: "2px",
                 }}
               >
                 <Button color="danger" onClick={() => deleteImage(imageUrl)}>
