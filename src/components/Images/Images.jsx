@@ -125,8 +125,41 @@ const Images = (projectid) => {
   };
 
   const deleteImage = async (imageUrl) => {
-    setSnackbarMessage("THOMAS DO THIS DO FOR MEEE!");
+
+    const urlParts = imageUrl.split('/');
+    const imagePathIndex = urlParts.findIndex(part => part === 'images') + 1;
+    const imagePath = urlParts.slice(imagePathIndex).join('/');
+    console.log("Image Path: ", imagePath);
+
+    const {error: dbError} = await supabaseClient
+    .from('images')
+    .delete()
+    .match({image_urls: imagePath});
+
+    if (dbError) {
+      console.error('Error deleting image URL from the database:', dbError);
+      setSnackbarMessage("Failed to delete image URL from the database.");
+      setOpenSnackbar(true);
+      return;
+    }
+
+    // Step 2: Delete the image from storage
+    const {error: storageError} = await supabaseClient
+    .storage
+    .from('images')
+    .remove([imagePath]);
+
+    if (storageError) {
+      console.error('Error deleting image file from storage:', storageError);
+      setSnackbarMessage("Failed to delete image file from storage.");
+      setOpenSnackbar(true);
+      return;
+    }
+
+    setSnackbarMessage("Image deleted successfully!");
     setOpenSnackbar(true);
+
+    setRefresh(prev => !prev); // Trigger useEffect to fetch updated image URLs
   };
 
   // const deleteImage = async (imageUrl) => {
