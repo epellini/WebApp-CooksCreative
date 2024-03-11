@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, forwardRef, useImperativeHandle } from "react";
 import { CardContent, CardMedia, FormGroup } from "@mui/material";
 import { FormControl } from "@mui/material";
 import Button from "@mui/joy/Button";
@@ -13,7 +13,8 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Snackbar from "@mui/joy/Snackbar";
 import Grid from "@mui/material/Grid";
 
-const Images = (projectid) => {
+
+const Images = (projectid, ref) => {
   const [images, setImages] = useState([]);
   const [project, setProject] = useState({ project_id: projectid.projectid });
   const [imageUrl, setImageUrl] = useState("");
@@ -62,6 +63,14 @@ const Images = (projectid) => {
       console.error("Error downloading the image:", error);
     }
   };
+
+    // Add this to expose the file input click functionality to parent components
+    useImperativeHandle(ref, () => ({
+      triggerFileInputClick: () => {
+        document.getElementById('upload-image-input').click();
+      }
+    }));
+  
 
   useEffect(() => {
     async function fetchData() {
@@ -296,4 +305,4 @@ const Images = (projectid) => {
   );
 };
 
-export default Images;
+export default forwardRef(Images);

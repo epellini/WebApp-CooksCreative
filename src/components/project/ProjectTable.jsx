@@ -136,7 +136,7 @@ export default function ProjectTable() {
     handlePageChange,
     handlePrevious,
     handleNext,
-  } = usePagination(filteredProjects, 10);
+  } = usePagination(filteredProjects, 15);
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
