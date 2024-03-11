@@ -36,6 +36,7 @@ const TasksPage = () => {
             flexDirection: "column",
             minWidth: 0,
             height: "100dvh",
+            overflowY: "auto",
             gap: 1,
           }}
         >

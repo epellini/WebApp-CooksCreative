@@ -57,8 +57,6 @@ const ProjectPage = () => {
     }
   }
 
-
-
   return (
     <CssVarsProvider disableTransitionOnChange>
         <CssBaseline />
