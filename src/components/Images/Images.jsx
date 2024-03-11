@@ -7,10 +7,11 @@ import { supabaseClient } from "../../supabase-client";
 import { Stack } from "@mui/material";
 import { Box } from "@mui/material";
 import SvgIcon from "@mui/joy/SvgIcon";
-import { styled } from "@mui/joy";
+import { Typography, styled } from "@mui/joy";
 import Card from "@mui/joy/Card";
 import CircularProgress from "@mui/material/CircularProgress";
 import Snackbar from "@mui/joy/Snackbar";
+import Grid from "@mui/material/Grid";
 
 const Images = (projectid) => {
   const [images, setImages] = useState([]);
@@ -160,31 +161,6 @@ const Images = (projectid) => {
     setRefresh(prev => !prev); // Trigger useEffect to fetch updated image URLs
   };
 
-  // const deleteImage = async (imageUrl) => {
-  //   // Extracting the required portion of the URL
-  //   const pathSegments = imageUrl.split('/');
-  //   const imagePath = `${pathSegments[pathSegments.length - 3]}/${pathSegments[pathSegments.length - 1]}` +'.png';
-  //   console.log("Image Path: ", imagePath);
-
-  //   // Constructing the full path for deletion
-  //   const fullPath = `${imagePath}`;
-
-  //   console.log("Full Path: ", fullPath);
-
-  //   // Removing the image
-  //   const { data, error } = await supabaseClient.storage
-  //     .from("images")
-  //     .remove(['project-images/30640403-1327-4f0e-a9bb-3ceab3d12c2c.png']);
-
-  //   if (error) {
-  //     console.error("Error deleting image", error);
-  //     return;
-  //   }
-
-  //   console.log("Data: ", data);
-
-  //   console.log("Image deleted successfully");
-  // };
 
   const handleSubmit = async (file) => {
     const { data, error } = await supabaseClient.storage
@@ -234,13 +210,8 @@ const Images = (projectid) => {
           />
         )
       )}
-      <FormGroup>
-        <FormControl>
-          <Button variant="contained" color="primary" onClick={handleSubmit}>
-            Submit
-          </Button>
-        </FormControl>
-
+      <FormGroup >
+        <Typography margin={2} level="h2">Image Gallery</Typography>
         <Button
           component="label"
           role={undefined}
@@ -275,59 +246,52 @@ const Images = (projectid) => {
           />
         </Button>
       </FormGroup>
-      <h2>Images</h2>
-      <Stack
-        direction="row"
-        flexWrap="wrap"
-        justifyContent="center"
-        alignItems="center"
-        spacing={2}
-      >
+      <Grid container marginTop={2} spacing={2} justifyContent="center">
         {imageUrls.map((imageUrl) => (
-          <Card
-            variant="outlined"
-            key={imageUrl}
-            sx={{
-              width: 225,
-              height: "auto",
-              display: "flex",
-              flexDirection: "column",
-            }}
-          >
-            <CardMedia
-              component="img"
-              src={imageUrl}
-              alt="Uploaded"
+          <Grid item xs={12} sm={6} md={4} lg={3} key={imageUrl}>
+            <Card
+              variant="outlined"
               sx={{
-                borderRadius: "8px",
-                height: 200,
-                objectFit: "cover",
-                cursor: "pointer",
+                height: "auto",
+                display: "flex",
+                flexDirection: "column",
               }}
-              onClick={() => viewImage(imageUrl)}
-            />
-            <CardContent
-              sx={{ padding: "2px", "&:last-child": { paddingBottom: "2px" } }}
             >
-              <Box
+              <CardMedia
+                component="img"
+                src={imageUrl}
+                alt="Uploaded"
                 sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-evenly",
-                  padding: "2px",
+                  borderRadius: "8px",
+                  height: 200,
+                  objectFit: "cover",
+                  cursor: "pointer",
                 }}
+                onClick={() => viewImage(imageUrl)}
+              />
+              <CardContent
+                sx={{ padding: "2px", "&:last-child": { paddingBottom: "2px" } }}
               >
-                <Button color="danger" onClick={() => deleteImage(imageUrl)}>
-                  Delete
-                </Button>
-                <Button color="primary" onClick={() => downloadImage(imageUrl)}>
-                  Download
-                </Button>
-              </Box>
-            </CardContent>
-          </Card>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-evenly",
+                    padding: "2px",
+                  }}
+                >
+                  <Button color="danger" onClick={() => deleteImage(imageUrl)}>
+                    Delete
+                  </Button>
+                  <Button color="primary" onClick={() => downloadImage(imageUrl)}>
+                    Download
+                  </Button>
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
         ))}
-      </Stack>
+      </Grid>
     </div>
   );
 };

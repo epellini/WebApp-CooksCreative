@@ -152,9 +152,9 @@ export default function ProjectTable() {
   const getStatusColor = (statusName) => {
     switch (statusName.toLowerCase()) {
       case "completed":
-        return "success";
-      case "active":
         return "warning";
+      case "active":
+        return "success";
       case "cancelled":
         return "danger";
     }
