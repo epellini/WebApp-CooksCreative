@@ -41,7 +41,7 @@ import * as React from "react";
 import DashboardProjects from "../components/home/DashboardProjects";
 import DashboardTasks from "../components/home/DashboardTasks";
 import DashboardCompletedTasks from "../components/home/DashBoardCompletedTasks";
-import AddCategory from "../components/databasemanagement/AddCategory";
+import CategoryDb from "../components/databasemanagement/CategoryDb";
 // import Button from "@mui/joy/Button";
 // import { useAuth } from "../pages/Auth/Auth";
 
@@ -61,9 +61,7 @@ const Home = () => {
           <DashboardProjects />
 
         </Box>
-        <Box gridColumn="span 4">
-          <AddCategory />
-        </Box>
+
         <Box gridColumn="span 8">
           <DashboardTasks />
 

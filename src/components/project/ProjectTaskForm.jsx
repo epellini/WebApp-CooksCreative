@@ -18,6 +18,7 @@ import Link from "@mui/joy/Link";
 import Card from "@mui/joy/Card";
 import CardActions from "@mui/joy/CardActions";
 import CardOverflow from "@mui/joy/CardOverflow";
+import TextField from "@mui/joy/TextField"
 
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 import EmailRoundedIcon from "@mui/icons-material/EmailRounded";
@@ -30,42 +31,44 @@ import Autocomplete from "@mui/joy/Autocomplete";
 
 import DropZone from "../DropZone";
 import FileUpload from "../FileUpload";
-
 //Thomas added imports
 import { useNavigate, useParams } from "react-router-dom";
 import { supabaseClient } from "../../supabase-client";
 
-const TaskFormAdd = ({open, setOpen, onHandleSubmit}) => {
+
+
+const ProjectTaskForm = ({projectid}) => {
   const [task, setTask] = useState({
     task_name: "",
-    project_id: null,
+    project_id: projectid,
     completion_notes: "",
     is_completed: false,
     completed_by: "",
   });
   const [loading, setLoading] = useState(true);
   const { taskid } = useParams();
+  const [tasks, setTasks] = useState([]);
+  const [projects, setProjects] = useState([]);
+  const [users, setUsers] = useState([]);
 
   const navigate = useNavigate();
   const supabase = supabaseClient;
-  const [projects, setProjects] = useState([]);
-  const [tasks, setTasks] = useState([]);   
-const [users, setUsers] = useState([]);
+  const [project, setProject] = useState([]);
 
   useEffect(() => {
     async function fetchData() {
       try {
         setLoading(true);
-        const { data: taskData, error: tasksError } = await supabase
+        const { data: tasksData, error: tasksError } = await supabase
           .from("tasks")
           .select("*")
-          .eq("task_id", taskid || "")
-          .single();
+          .order("task_id", {ascending: true});
 
         const { data: projectsData, error: projectsError } = await supabase
           .from("projects")
           .select("*")
-          .order("project_id", { ascending: true });
+          .eq("project_id", projectid || "")
+          .single();
 
           const { data: usersData, error: usersError } = await supabase
             .from("users")
@@ -76,13 +79,13 @@ const [users, setUsers] = useState([]);
         if (tasksError) {
           console.error("Error fetching tasks:", tasksError);
         } else {
-          setTasks(taskData || {});
+          setTasks(tasksData || []);
         }
 
         if (projectsError) {
-          console.error("Error fetching projects:", projectsError);
+          console.error("Error fetching project:", projectsError);
         } else {
-          setProjects(projectsData || []);
+          setProject(projectsData || {});
         }
         if (usersError) {
             console.error("Error fetching users:", usersError);
@@ -97,23 +100,21 @@ const [users, setUsers] = useState([]);
       }
     }
 
-    fetchData();
-  }, [taskid]);
-  const handleChange = (e, value, name) => {
-    // Check if e is null or undefined
-    console.log("value", value);
-    console.log("e", e);
-    console.log("name", name);
 
+    fetchData();
+  }, [projectid]);
+  const handleChange = (e, value, name) => {
     if (!e) {
       return;
     }
+
+
     // Check if value is null or undefined before updating the state
     if (value !== null && value !== undefined) {
       // Handle select change
       setTask((prevState) => ({
         ...prevState,
-        [name]: value, // Use the name parameter to dynamically set the state key
+        [name]: value,
       }));
     } else if (e.target) {
       // Handle input change
@@ -127,7 +128,6 @@ const [users, setUsers] = useState([]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("task", task.task_name);
     if (task.task_name.trim() !== "") {
       try {
         let result = null;
@@ -145,9 +145,10 @@ const [users, setUsers] = useState([]);
         if (result.error) {
           console.error("Error adding task:", result.error);
         } else {
-            // navigate("/tasks");
-            onHandleSubmit();
           console.log("Task added successfully");
+          {window.location.reload()}
+          
+
         }
       } catch (error) {
         console.error("Error adding task:", error);
@@ -167,11 +168,6 @@ const [users, setUsers] = useState([]);
             zIndex: 9995,
           }}
         >
-          <Box sx={{ px: { xs: 2, md: 6 } }}>
-            <Typography level="h2" component="h1" sx={{ mt: 1, mb: 2 }}>
-              {taskid ? "Update Task" : "Add Task"}
-            </Typography>
-          </Box>
         </Box>
         <Stack
           spacing={4}
@@ -184,13 +180,6 @@ const [users, setUsers] = useState([]);
           }}
         >
           <Card>
-            <Box sx={{ mb: 1 }}>
-              <Typography level="title-md">Task Information</Typography>
-              <Typography level="body-sm">
-                Add a title, description, and other details to your Task.
-              </Typography>
-            </Box>
-            <Divider />
             <Stack
               direction="row"
               spacing={3}
@@ -212,42 +201,6 @@ const [users, setUsers] = useState([]);
                     />
                   </FormControl>
                 </Stack>
-                <FormControl sx={{ flexGrow: 1 }}>
-                    <FormLabel>Project Name</FormLabel>
-                    <Autocomplete
-                      id="project_id"
-                      name="project_id"
-                      options={projects}
-                      getOptionLabel={(option) =>
-                        option.project_name +
-                        " " +
-                        "(ID: " +
-                        option.project_id +
-                        ")"
-                      }
-                      value={
-                        projects.find(
-                          (project) => project.project_id === task.project_id
-                        ) || null
-                      }
-                      onChange={(e, value) =>
-                        handleChange(
-                          e,
-                          value ? value.project_id : null,
-                          "project_id"
-                        )
-                      }
-                      renderInput={(params) => (
-                        <Input
-                          {...params}
-                          size="sm"
-                          id="project_id"
-                          name="project_id"
-                          required
-                        />
-                      )}
-                    />
-                  </FormControl>
                   <FormControl sx={{ flexGrow: 1 }}>
                     <FormLabel>Completed</FormLabel>
                     <Select
@@ -264,69 +217,8 @@ const [users, setUsers] = useState([]);
                         <Option value={false}>No</Option>
                     </Select>
                     </FormControl>
-                    
-                    
-
                 <Stack spacing={1}>
-                  {/* <Box>
-                    <FormLabel htmlFor="time_stamp">Start Date</FormLabel>
-                    <Input
-                      id="time_stamp"
-                      name="time_stamp"
-                      type="date"
-                      value={task.time_stamp}
-                      onChange={handleChange}
-                      required
-                    />
-                  </Box> */}
-
-                  {/* <FormLabel>Task Notes</FormLabel>
-                  <FormControl
-                    sx={{
-                      display: { sm: "flex-column", md: "flex-row" },
-                      gap: 2,
-                    }}
-                  >
-                    <Textarea
-                      size="sm"
-                      minRows={4}
-                      sx={{ flexGrow: 1 }}
-                      id="completion_notes"
-                      name="completion_notes"
-                      value={task.completion_notes}
-                      onChange={handleChange}
-                      required
-                    />
-                  </FormControl> */}
                 </Stack>
-
-                {/* <Stack direction="row" spacing={2}>
-                  <FormControl sx={{ flexGrow: 1 }}>
-                    <FormLabel>User</FormLabel>
-                    <Select
-                      placeholder="Select User"
-                      id="status_id"
-                      name="status_id" // Add the name attribute
-                      value={project.status_id}
-                      onChange={(e, value) =>
-                        handleChange(e, value, "status_id")
-                      } // Pass the name along with the value
-                      required
-                    >
-                      {status.map((statusOption) => (
-                        <Option
-                          key={statusOption.status_id}
-                          value={statusOption.status_id}
-                          selected={
-                            statusOption.status_id === project.status_id
-                          } // Set selected attribute
-                        >
-                          {statusOption.name}
-                        </Option>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Stack> */}
               </Stack>
             </Stack>
             <Stack
@@ -352,8 +244,7 @@ const [users, setUsers] = useState([]);
                 </Stack>
               </Stack>
               <div>
-              </div>
-
+            </div>
 
             </Stack>
             <CardOverflow
@@ -378,6 +269,9 @@ const [users, setUsers] = useState([]);
       </Box>
     </form>
   );
-};
+}
 
-export default TaskFormAdd;
+
+
+
+export default ProjectTaskForm;

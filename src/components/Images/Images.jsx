@@ -1,78 +1,69 @@
-import React, { useEffect } from "react";
-import FileUpload from "../FileUpload";
-import DropZone from "../DropZone";
-import { FormGroup } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { CardContent, CardMedia, FormGroup } from "@mui/material";
 import { FormControl } from "@mui/material";
 import Button from "@mui/joy/Button";
 import { v4 as uuidv4 } from "uuid";
 import { supabaseClient } from "../../supabase-client";
-import { useState } from "react";
 import { Stack } from "@mui/material";
-import { Card } from "@mui/material";
-import CardContent from "@mui/joy/CardContent";
-import Box from "@mui/joy/Box";
-import AspectRatio from "@mui/joy/AspectRatio";
+import { Box } from "@mui/material";
+import SvgIcon from "@mui/joy/SvgIcon";
+import { Typography, styled } from "@mui/joy";
+import Card from "@mui/joy/Card";
+import CircularProgress from "@mui/material/CircularProgress";
+import Snackbar from "@mui/joy/Snackbar";
+import Grid from "@mui/material/Grid";
 
 const Images = (projectid) => {
   const [images, setImages] = useState([]);
   const [project, setProject] = useState({ project_id: projectid.projectid });
-  const [fileName, setFileName] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [imageUrls, setImageUrls] = useState([]);
-  
-  const insertData = async (imageUrl) => {
-    const { data, error } = await supabaseClient
-      .from("images")
-      .insert([{ image_urls: imageUrl, project_id: project.project_id }]);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [refresh, setRefresh] = useState(false);
 
-    if (error) {
-      console.error("Error inserting image", error);
-    }
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+
+  const [isUploading, setIsUploading] = useState(false);
+
+  const VisuallyHiddenInput = styled("input")`
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    height: 1px;
+    overflow: hidden;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    white-space: nowrap;
+    width: 1px;
+  `;
+
+  const viewImage = (imageUrl) => {
+    const link = document.createElement("a");
+    link.target = "_blank";
+    link.href = imageUrl;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
-  const getImages = async (pathToImage) => {
-    const { data: publicUrlData, error: publicUrlError } =
-      await supabaseClient.storage.from("images").getPublicUrl(pathToImage);
-    if (publicUrlError) {
-      console.error(publicUrlError);
-      return;
+  const downloadImage = async (imageUrl) => {
+    try {
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const filename = imageUrl.split("/").pop().split("#")[0].split("?")[0];
+      const link = document.createElement("a");
+      link.href = downloadUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(downloadUrl);
+    } catch (error) {
+      console.error("Error downloading the image:", error);
     }
-    console.log("Got public url", publicUrlData);
-    setImages(publicUrlData);
   };
-
-  async function getProjects() {
-    const { data, error } = await supabaseClient.from("projects").select("*");
-    if (error) {
-      console.error("Error fetching projects", error);
-    } else {
-      console.log("Got projects", data);
-      setProject(data);
-    }
-  }
-
-  //might need this for loading the project from the project number on project details page.
-  async function getImageFromProject() {
-    const { data, error } = await supabaseClient
-      .from("images")
-      .select("image_urls")
-      .eq("project_id", project.project_id);
-    if (error) {
-      console.error("Error fetching images", error);
-    } else {
-      console.log("Got images", data);
-      console.log("Image Url: ", data[0].image_urls);
-      setProjectImageUrl(data[0].image_urls);
-    }
-  }
-
-  const CDNURL =
-    "https://khqunikzqiyqnqgpcaml.supabase.co/storage/v1/object/public/images/project-images/";
-
-  // let project = {
-  //   // delete after testing
-  //   project_id: "162",
-  // };
 
   useEffect(() => {
     async function fetchData() {
@@ -83,14 +74,12 @@ const Images = (projectid) => {
           .select("image_urls")
           .eq("project_id", project.project_id);
 
-          console.log("Project ID: ", project.project_id);
+        console.log("imageData: ", imageData);
 
         if (imageError) {
           console.error("Error fetching images", imageError);
           return;
         }
-
-        console.log("Got images", imageData);
 
         // Fetch public URLs for all images
         if (imageData && imageData.length > 0) {
@@ -107,14 +96,12 @@ const Images = (projectid) => {
               return null;
             }
 
-            console.log("Got public url", publicUrlData);
             return publicUrlData.publicUrl;
           });
 
           const fetchedImageUrls = await Promise.all(imageUrlsPromises);
           setImageUrls(fetchedImageUrls);
-          console.log("Fetched image URLs", fetchedImageUrls);
-          console.log("Image URLs", fetchedImageUrls); // Move this line here
+          console.log(fetchedImageUrls);
         }
       } catch (error) {
         console.error(error);
@@ -122,83 +109,191 @@ const Images = (projectid) => {
     }
 
     fetchData();
-  }, []);
+  }, [refresh]); // Trigger useEffect when refresh state changes
 
-  async function uploadImage(e) {
-    let file = e.target.files[0];
-    console.log(file);
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) {
+      return;
+    }
 
+    setSelectedFile(file);
+    const url = URL.createObjectURL(file);
+    setImageUrl(url);
+    setIsUploading(true); // Indicate upload is starting
+    await handleSubmit(file); // Now passing the file directly
+    setIsUploading(false);
+  };
+
+  const deleteImage = async (imageUrl) => {
+
+    const urlParts = imageUrl.split('/');
+    const imagePathIndex = urlParts.findIndex(part => part === 'images') + 1;
+    const imagePath = urlParts.slice(imagePathIndex).join('/');
+    console.log("Image Path: ", imagePath);
+
+    const {error: dbError} = await supabaseClient
+    .from('images')
+    .delete()
+    .match({image_urls: imagePath});
+
+    if (dbError) {
+      console.error('Error deleting image URL from the database:', dbError);
+      setSnackbarMessage("Failed to delete image URL from the database.");
+      setOpenSnackbar(true);
+      return;
+    }
+
+    // Step 2: Delete the image from storage
+    const {error: storageError} = await supabaseClient
+    .storage
+    .from('images')
+    .remove([imagePath]);
+
+    if (storageError) {
+      console.error('Error deleting image file from storage:', storageError);
+      setSnackbarMessage("Failed to delete image file from storage.");
+      setOpenSnackbar(true);
+      return;
+    }
+
+    setSnackbarMessage("Image deleted successfully!");
+    setOpenSnackbar(true);
+
+    setRefresh(prev => !prev); // Trigger useEffect to fetch updated image URLs
+  };
+
+
+  const handleSubmit = async (file) => {
     const { data, error } = await supabaseClient.storage
       .from("images")
-      .upload("project-images/" + project.project_id + "/" + uuidv4(), file);
+      .upload(`project-images/${project.project_id}/${uuidv4()}`, file);
 
     if (data) {
-      console.log("Data from upload:", data); // Add this line to log data
-      console.log("path: " + data.path);
-      setImageUrl(data.path);
-      insertData(data.path);
+      const path = data.path;
+      await supabaseClient.from("images").insert({
+        image_urls: path,
+        project_id: project.project_id,
+      });
+      setImageUrls([...imageUrls, path]);
+      setSelectedFile(null); 
+      setImageUrl(""); 
+      setRefresh(!refresh);
+      setSnackbarMessage("Image Uploaded Successfully!");
+      setOpenSnackbar(true);
     } else {
-      console.log("Error:", error);
+      console.error("Error uploading image", error);
     }
-  }
+  };
 
   return (
     <div>
-      <img src={imageUrl} />
-      {/* <DropZone />
-      <FileUpload /> */}
-      <FormGroup>
-        <FormControl>
-          <input
+      <Snackbar
+        open={openSnackbar}
+        onClose={() => setOpenSnackbar(false)}
+        autoHideDuration={5000} 
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+      >
+        {snackbarMessage}
+      </Snackbar>{" "}
+      {isUploading ? (
+        <CircularProgress />
+      ) : (
+        imageUrl && (
+          <img
+            src={imageUrl}
+            alt="Preview"
+            style={{
+              height: 233,
+              width: 350,
+              maxHeight: { xs: 233, md: 167 },
+              maxWidth: { xs: 350, md: 250 },
+            }}
+          />
+        )
+      )}
+      <FormGroup >
+        <Typography margin={2} level="h2">Image Gallery</Typography>
+        <Button
+          component="label"
+          role={undefined}
+          tabIndex={-1}
+          variant="outlined"
+          color="neutral"
+          startDecorator={
+            <SvgIcon>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z"
+                />
+              </svg>
+            </SvgIcon>
+          }
+        >
+          Upload an image
+          <VisuallyHiddenInput
             type="file"
             accept="image/png, image/jpeg"
-            onChange={(e) => uploadImage(e)}
+            onChange={handleFileChange}
+            style={{ display: "none" }}
+            id="upload-image-input"
           />
-        </FormControl>
-        <Button variant="contained" color="primary">
-          Submit
         </Button>
       </FormGroup>
-      <h2>Images</h2>
-      <Stack
-        direction="row"
-        justifyContent="center"
-        alignItems="center"
-        spacing={2}
-      >
-        {imageUrls.map((imageUrl) => {
-          return (
-            <Stack>
-            <Box
-              component="img"
+      <Grid container marginTop={2} spacing={2} justifyContent="center">
+        {imageUrls.map((imageUrl) => (
+          <Grid item xs={12} sm={6} md={4} lg={3} key={imageUrl}>
+            <Card
+              variant="outlined"
               sx={{
-                height: 233,
-                width: 350,
-                maxHeight: { xs: 233, md: 167 },
-                maxWidth: { xs: 350, md: 250 },
+                height: "auto",
+                display: "flex",
+                flexDirection: "column",
               }}
-              alt="The house from the offer."
-              src={imageUrl}
-            />
-            </Stack>
-          );
-        })}
-
-        {/* <Box>
-          {imageUrls.map((imageUrl) => {
-            return (
-              <Box key={imageUrl}>
-                <Card>
-                  <img src={imageUrl} alt="Image" />
-                  <CardContent>
-                    <Button>Delete</Button>
-                  </CardContent>
-                </Card>
-              </Box>
-            );
-          })}
-        </Box> */}
-      </Stack>
+            >
+              <CardMedia
+                component="img"
+                src={imageUrl}
+                alt="Uploaded"
+                sx={{
+                  borderRadius: "8px",
+                  height: 200,
+                  objectFit: "cover",
+                  cursor: "pointer",
+                }}
+                onClick={() => viewImage(imageUrl)}
+              />
+              <CardContent
+                sx={{ padding: "2px", "&:last-child": { paddingBottom: "2px" } }}
+              >
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-evenly",
+                    padding: "2px",
+                  }}
+                >
+                  <Button color="danger" onClick={() => deleteImage(imageUrl)}>
+                    Delete
+                  </Button>
+                  <Button color="primary" onClick={() => downloadImage(imageUrl)}>
+                    Download
+                  </Button>
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
     </div>
   );
 };

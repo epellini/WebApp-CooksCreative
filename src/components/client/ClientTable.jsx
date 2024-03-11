@@ -22,7 +22,6 @@ import Menu from "@mui/joy/Menu";
 import MenuButton from "@mui/joy/MenuButton";
 import MenuItem from "@mui/joy/MenuItem";
 import Dropdown from "@mui/joy/Dropdown";
-import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import SearchIcon from "@mui/icons-material/Search";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded";
@@ -46,6 +45,7 @@ import { supabaseClient } from "../../supabase-client"; // Import the supabase c
 import { usePagination } from "../../hooks/usePagination";
 import { convertToCSV, downloadCSV } from "../../utils/CsvUtils";
 import FmdGoodIcon from "@mui/icons-material/FmdGood";
+import RoomIcon from '@mui/icons-material/Room'; 
 import ClientForm from "./ClientForm";
 
 function RowMenu({ clientId }) {
@@ -205,29 +205,6 @@ export default function ClientTable() {
           startDecorator={<SearchIcon />}
           sx={{ flexGrow: 1 }}
         />
-        <IconButton
-          size="sm"
-          variant="outlined"
-          color="neutral"
-          onClick={() => setOpen(true)}
-        >
-          <FilterAltIcon />
-        </IconButton>
-        <Modal open={open} onClose={() => setOpen(false)}>
-          <ModalDialog aria-labelledby="filter-modal" layout="fullscreen">
-            <ModalClose />
-            <Typography id="filter-modal" level="h2">
-              Filters
-            </Typography>
-            <Divider sx={{ my: 2 }} />
-            <Sheet sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-              {/* {renderFilters()} */}
-              <Button color="primary" onClick={() => setOpen(false)}>
-                Submit
-              </Button>
-            </Sheet>
-          </ModalDialog>
-        </Modal>
       </Sheet>
       <Box
         className="SearchAndFilters-tabletUp"
@@ -484,6 +461,219 @@ export default function ClientTable() {
         </Table>
       </Sheet>
 
+
+      {/* Mobile View */}
+
+      <Sheet
+        className="OrderTableContainer"
+        variant="outlined"
+        sx={{
+          display: { xs: "initial", md: "none" },
+          width: "100%",
+          maxWidth: {
+            lg: "100%",
+            xl: "100%",
+          },
+          borderRadius: "sm",
+          flexShrink: 1,
+          overflow: "auto",
+          minHeight: 0,
+        }}
+      >
+        <Table
+          aria-labelledby="tableTitle"
+          stickyHeader
+          hoverRow
+          sx={{
+            "--TableCell-headBackground":
+              "var(--joy-palette-background-level1)",
+            "--Table-headerUnderlineThickness": "1px",
+            "--TableRow-hoverBackground":
+              "var(--joy-palette-background-level1)",
+            "--TableCell-paddingY": "4px",
+            "--TableCell-paddingX": "8px",
+          }}
+        >
+          <thead>
+            <tr>
+              <th
+                style={{ width: 1, textAlign: "center", padding: "12px 3px" }}
+              >
+                <Checkbox
+                  size="sm"
+                  indeterminate={
+                    selected.length > 0 && selected.length !== clients.length
+                  }
+                  checked={
+                    clients.length > 0 && selected.length === clients.length
+                  }
+                  onChange={handleSelectAllClick}
+                  color={
+                    selected.length > 0 || selected.length === clients.length
+                      ? "primary"
+                      : undefined
+                  }
+                  sx={{ verticalAlign: "text-bottom" }}
+                />
+              </th>
+              <th style={{ width: 25, padding: "12px 6px" }}>Name</th>
+          
+              <th style={{ width: 50, padding: "12px 6px", textAlign: "left" }}>
+                Contact
+              </th>
+              {/* <th style={{ width: 20, padding: "12px 6px", textAlign: "left" }}>
+                Utilities
+              </th> */}
+            </tr>
+          </thead>
+
+          {/*  */}
+          <tbody>
+            {loading ? (
+              <tr>
+                <td colSpan="6">
+                  {" "}
+                  <Skeleton variant="text" width="100%" height={50} />
+                  <Skeleton variant="text" width="100%" height={50} />
+                </td>
+              </tr>
+            ) : (
+              currentClients.map((client) => {
+                // filteredClients.map((client) => {
+                //console.log("Clients:", client);
+                return (
+                  <tr key={client.client_id}>
+                    <td
+                      style={{
+                        textAlign: "center",
+                        width: 120,
+                      }}
+                    >
+                      <Checkbox
+                        size="sm"
+                        checked={selected.includes(client.client_id.toString())}
+                        color={
+                          selected.includes(client.client_id.toString())
+                            ? "primary"
+                            : undefined
+                        }
+                        onChange={(event) => {
+                          setSelected((prevSelected) =>
+                            event.target.checked
+                              ? prevSelected.concat(client.client_id.toString())
+                              : prevSelected.filter(
+                                  (id) => id !== client.client_id.toString()
+                                )
+                          );
+                        }}
+                        slotProps={{ checkbox: { sx: { textAlign: "left" } } }}
+                        sx={{ verticalAlign: "text-bottom" }}
+                      />
+                    </td>
+
+                    {/* Displaying client's first and last names information if available */}
+                    <td style={{ textAlign: "left" }}>
+                      <Typography
+                        sx={{
+                          textAlign: "left",
+                          fontSize: {
+                            xs: "0.8rem",
+                            sm: "0.85rem",
+                          },
+                        }}
+                        onClick={() => navigate(`/clients/${client.client_id}`)}
+                        style={{ cursor: "pointer" }}
+                      >
+                        {`${client.first_name} ${client.last_name}`}
+                      </Typography>
+
+
+                      <Box
+  display="flex"
+  flexDirection="column"
+  alignItems="flex-start"
+  gap={0.5}
+>
+  <Link
+    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+      `${client.street}, ${client.city}, ${client.province} ${client.postal_code}`
+    )}`}
+    target="_blank"
+    rel="noopener noreferrer"
+    underline="hover"
+    sx={{
+      display: "flex",
+      flexDirection: "row", // Adjust if you want the icon next to text or standalone
+      alignItems: "center", // Center align the icon with the text if you decide to add text
+      gap: 0.5,
+    }}
+  >
+    <RoomIcon /> {/* This displays the icon */}
+    Directions
+    {/* Optionally, add Typography with text here if you want both an icon and text */}
+  </Link>
+</Box>
+
+
+
+
+
+                      </td>
+                      <td>
+                      <Box
+                        display="flex"
+                        flexDirection="column"
+                        alignItems="flex-start"
+                        gap={0.5}
+                      >
+                        {/* Phone number chip */}
+                        <a
+                          href={`tel:${client.phone_number}`}
+                          style={{ textDecoration: "none" }}
+                        >
+                          <Chip size="sm" startDecorator={<LocalPhoneIcon />}>
+                            {client.phone_number}
+                          </Chip>
+                        </a>
+
+                        {/* Email chip */}
+                        <a
+                          href={`mailto:${client.email}`}
+                          style={{ textDecoration: "none" }}
+                        >
+                          <Chip size="sm" startDecorator={<EmailIcon />}>
+                            {client.email}
+                          </Chip>
+                        </a>
+                      </Box>
+                    </td>
+
+                 
+
+                    {/* <td>
+                      <Box sx={{ display: "flex", gap: 2, alignItems: "left" }}>
+                        <Link
+                          level="body-xs"
+                          component="button"
+                          onClick={() => handleEmailClick(client.email)}
+                        >
+                          Email
+                        </Link>
+                        <RowMenu clientId={client.client_id} />
+                      </Box>
+                    </td> */}
+                  </tr>
+                );
+              })
+            )}
+          </tbody>
+        </Table>
+      </Sheet>
+
+
+
+
+
       {/* Import to CSV button. Shows up when at least one client is selected  */}
       {selected.length > 0 && (
         <Button onClick={handleExportSelected} style={{ margin: "10px 0" }}>
@@ -498,7 +688,7 @@ export default function ClientTable() {
           gap: 1,
           [`& .${iconButtonClasses.root}`]: { borderRadius: "50%" },
           display: {
-            xs: "none",
+            xs: "flex",
             md: "flex",
           },
         }}
