@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabaseClient } from "../../supabase-client";
-
+import { Link } from "react-router-dom";
 import Box from "@mui/joy/Box";
 import Card from "@mui/joy/Card";
 import CardContent from "@mui/joy/CardContent";
@@ -13,14 +13,16 @@ import Chip from "@mui/joy/Chip";
 import Stack from "@mui/joy/Stack";
 import IconButton from "@mui/joy/IconButton";
 import Grid from "@mui/joy/Grid";
+import Sheet from "@mui/joy/Sheet";
 import Divider from "@mui/joy/Divider";
-import { Link } from "react-router-dom";
+import Snackbar from "@mui/joy/Snackbar";
 
+import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 import ConstructionIcon from "@mui/icons-material/Construction";
 import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
+import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
 import HomeIcon from "@mui/icons-material/Home";
 import EmailIcon from "@mui/icons-material/Email";
 import PhoneIcon from "@mui/icons-material/Phone";
@@ -131,7 +133,157 @@ const ClientDetailsPage = () => {
             </Typography>
           </Breadcrumbs>
 
-          <Box sx={{ maxWidth: 600, mx: "auto", mt: 4, p: 2 }}>
+          <Box sx={{ display: "flex" }}>
+            <Sheet
+              variant="outlined"
+              sx={{
+                minHeight: 500,
+                width: "100%",
+                borderRadius: "sm",
+                p: 2,
+                mb: 3,
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  flexWrap: "wrap",
+                  gap: 2,
+                }}
+              >
+                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                  <Typography
+                    level="h2"
+                    textColor="text.primary"
+                    mb={0.5}
+                    sx={{ paddingRight: 3 }}
+                  >
+                    {client.first_name} {client.last_name}'s Details
+                  </Typography>
+
+                  <Box sx={{ ml: 2 }}></Box>
+                </Box>
+                <Box
+                  sx={{
+                    display: "flex",
+                    height: "32px",
+                    flexDirection: "row",
+                    gap: 1.5,
+                  }}
+                >
+                  <Button
+                    size="sm"
+                    variant="soft"
+                    color="neutral"
+                    startDecorator={<EditIcon />}
+                    onClick={handleEdit}
+                  >
+                    Edit CLient
+                  </Button>
+
+                  <Snackbar
+                    color="success"
+                    open={open[1]}
+                    onClose={() => handleSnackbarClose(1)}
+                    anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                    startDecorator={<CheckCircleRoundedIcon />}
+                    endDecorator={
+                      <Button
+                        onClick={() => handleSnackbarClose(1)}
+                        size="sm"
+                        variant="soft"
+                        color="neutral"
+                      >
+                        Dismiss
+                      </Button>
+                    }
+                  >
+                    Your client has been edited.
+                  </Snackbar>
+
+                  <Button
+                    size="sm"
+                    variant="soft"
+                    color="danger"
+                    startDecorator={<DeleteRoundedIcon />}
+                    onClick={handleDelete}
+                  >
+                    Delete
+                  </Button>
+                  <Snackbar
+                    color="danger"
+                    open={open[2]}
+                    onClose={() => handleSnackbarClose(2)}
+                    anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                    startDecorator={<CheckCircleRoundedIcon />}
+                    endDecorator={
+                      <Button
+                        onClick={() => handleSnackbarClose(2)}
+                        size="sm"
+                        variant="soft"
+                        color="neutral"
+                      >
+                        Dismiss
+                      </Button>
+                    }
+                  >
+                    Your project has been deleted.
+                  </Snackbar>
+                </Box>
+              </Box>
+              <Divider sx={{ mt: 2 }} />
+              <Box
+                sx={{
+                  py: 2,
+                  display: "flex",
+                  flexDirection: { xs: "column", md: "row" },
+                  alignItems: "start",
+                }}
+              >
+                <Box
+                  sx={{
+                    flexBasis: "60%", // Assign 60% of the width to this container
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "start",
+                  }}
+                >
+                  <Typography level="title-md" textColor="text.primary">
+                    Client: {client.first_name} {client.last_name}
+                    <Typography
+                      variant="body2"
+                      component="span"
+                      display="inline"
+                      style={{ fontSize: "smaller" }}
+                    >
+                      (Client ID: {client.client_id})
+                    </Typography>
+                  </Typography>
+
+                  <Box
+                    sx={{
+                      mt: 1,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                      flexWrap: "wrap",
+                    }}
+                  >
+                    <Typography
+                      mt={1}
+                      level="title-md"
+                      textColor="text.primary"
+                      component="span"
+                      sx={{ mr: 1, display: "inline-block" }}
+                    >
+                      Address: {client.street}, {client.province}, {client.postal_code}
+                    </Typography>
+                  </Box>
+                </Box>
+              </Box>
+            </Sheet>
             <Typography variant="h3" gutterBottom>
               {client.first_name} {client.last_name}'s Details
             </Typography>
@@ -254,7 +406,7 @@ const ClientDetailsPage = () => {
                   Edit
                 </Button>
                 <Button
-                  startDecorator={<DeleteIcon />}
+                  startDecorator={<DeleteRoundedIcon />}
                   color="danger"
                   variant="outlined"
                   onClick={handleDelete}
