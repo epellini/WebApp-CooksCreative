@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabaseClient } from "../../supabase-client";
-import { useParams } from "react-router-dom"; 
+import { useParams } from "react-router-dom";
 import Box from "@mui/joy/Box";
 import Chip from "@mui/joy/Chip";
 import Card from "@mui/joy/Card";
@@ -14,17 +14,25 @@ import AspectRatio from "@mui/joy/AspectRatio";
 import Divider from "@mui/joy/Divider";
 import Avatar from "@mui/joy/Avatar";
 import Tooltip from "@mui/joy/Tooltip";
+import Badge from "@mui/joy/Badge";
 
 import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
 import ForwardToInboxRoundedIcon from "@mui/icons-material/ForwardToInboxRounded";
 import FolderIcon from "@mui/icons-material/Folder";
 import ReplyRoundedIcon from "@mui/icons-material/ReplyRounded";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
-import EditNoteIcon from '@mui/icons-material/EditNote';
+import EditNoteIcon from "@mui/icons-material/EditNote";
 import ProjectTasks from "../../components/project/ProjectTasks";
 
 import Images from "../../components/Images/Images";
-
+import { CssVarsProvider } from "@mui/joy/styles";
+import CssBaseline from "@mui/joy/CssBaseline";
+import Breadcrumbs from "@mui/joy/Breadcrumbs";
+import Link from "@mui/joy/Link";
+import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
+import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
+import DownloadRoundedIcon from "@mui/icons-material/DownloadRounded";
+import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 
 export default function ProjectDetailsPage() {
   const [project, setProject] = useState({
@@ -64,75 +72,92 @@ export default function ProjectDetailsPage() {
   const navigate = useNavigate();
   const supabase = supabaseClient;
   const { id } = useParams();
+  const imagesRef = React.useRef(null);
 
+  const getStatusColor = (statusName) => {
+    if (!statusName) return "default"; // Handle undefined or empty string
+    switch (statusName.toLowerCase()) {
+      case "completed":
+        return "warning";
+      case "active":
+        return "success";
+      case "cancelled":
+        return "danger";
+      default:
+        return "default"; // Default case if statusName is not matched
+    }
+  };
 
   useEffect(() => {
     const getProject = async () => {
-        if(id){
-          const { data: projectData, error: projectError } = await supabase
-            .from("projects")
-            .select("*")
-            .eq("project_id", id)
-            .single();
-          if (projectError) {
-            console.log("Error fetching project details:", projectError.message);
-          } else {
-            setProject(projectData);
-          }
-
-          const { data: clientData, error: clientError } = await supabase
-            .from("clients")
-            .select("*")
-            .eq("client_id", projectData.client_id)
-            .single();
-            console.log(clientData);
-          if (clientError) {
-            console.log("Error fetching client details:", clientError.message);
-          } else {
-            setClient(clientData);
-          }
-
-          const { data: statusData, error: statusError } = await supabase
-            .from("status")
-            .select("*")
-            .eq("status_id", projectData.status_id)
-            .single();
-          if (statusError) {
-            console.log("Error fetching status details:", statusError.message);
-          }
-          else {
-            setStatus(statusData);
-          }
-
-          const { data: taskData, error: taskError } = await supabase
-            .from("tasks")
-            .select("*")
-            .order("task_id", { ascending: false })
-          if (taskError) {
-            console.log("Error fetching task details:", taskError.message);
-          }
-          else {
-            console.log(taskData);
-          }
-
-          const { data: categoryData, error: categoryError } = await supabase
-            .from("category")
-            .select("*")
-            .eq("category_id", projectData.category_id)
-            .single();
-          if (categoryError) {
-            console.log("Error fetching category details:", categoryError.message);
-          }
-          else {
-            setCategory(categoryData);
-          }
+      if (id) {
+        const { data: projectData, error: projectError } = await supabase
+          .from("projects")
+          .select("*")
+          .eq("project_id", id)
+          .single();
+        if (projectError) {
+          console.log("Error fetching project details:", projectError.message);
+        } else {
+          setProject(projectData);
         }
-    }
+
+        const { data: clientData, error: clientError } = await supabase
+          .from("clients")
+          .select("*")
+          .eq("client_id", projectData.client_id)
+          .single();
+        console.log(clientData);
+        if (clientError) {
+          console.log("Error fetching client details:", clientError.message);
+        } else {
+          setClient(clientData);
+        }
+
+        const { data: statusData, error: statusError } = await supabase
+          .from("status")
+          .select("*")
+          .eq("status_id", projectData.status_id)
+          .single();
+        if (statusError) {
+          console.log("Error fetching status details:", statusError.message);
+        } else {
+          setStatus(statusData);
+        }
+
+        const { data: taskData, error: taskError } = await supabase
+          .from("tasks")
+          .select("*")
+          .order("task_id", { ascending: false });
+        if (taskError) {
+          console.log("Error fetching task details:", taskError.message);
+        } else {
+          console.log(taskData);
+        }
+
+        const { data: categoryData, error: categoryError } = await supabase
+          .from("category")
+          .select("*")
+          .eq("category_id", projectData.category_id)
+          .single();
+        if (categoryError) {
+          console.log(
+            "Error fetching category details:",
+            categoryError.message
+          );
+        } else {
+          setCategory(categoryData);
+        }
+      }
+    };
     getProject();
   }, []); // Fetch projects when the component mounts
 
   async function deleteProject(project_id) {
-    const { error } = await supabase.from("projects").delete().match({ project_id });
+    const { error } = await supabase
+      .from("projects")
+      .delete()
+      .match({ project_id });
     if (error) {
       console.error("Error deleting project:", error);
     } else {
@@ -157,194 +182,279 @@ export default function ProjectDetailsPage() {
   };
 
   return (
-    <Sheet
-    variant="outlined"
-    sx={{
-      minHeight: 500,
-      width: "100%",
-      borderRadius: "sm",
-      p: 2,
-      mb: 3,
-    }}
-    >
+    <CssVarsProvider disableTransitionOnChange>
+      <CssBaseline />
       <Box
+        component="main"
+        className="MainContent"
         sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          flexWrap: "wrap",
-          gap: 2,
-        }}
-      >
-        <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-          <Typography level="h2" textColor="text.primary" mb={0.5}>
-            {project.project_name}
-          </Typography>
-          <Box sx={{ ml: 2 }}></Box>
-        </Box>
-        <Box
-          sx={{
-            display: "flex",
-            height: "32px",
-            flexDirection: "row",
-            gap: 1.5,
-          }}
-        >
-          <Button
-            size="sm"
-            variant="plain"
-            color="neutral"
-            startDecorator={<EditNoteIcon />}
-            onClick={() => navigate(`/projects/edit/${project.project_id}`)}
-          >
-            Edit Project
-          </Button>
-          <Snackbar
-            color="success"
-            open={open[1]}
-            onClose={() => handleSnackbarClose(1)}
-            anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-            startDecorator={<CheckCircleRoundedIcon />}
-            endDecorator={
-              <Button
-                onClick={() => handleSnackbarClose(1)}
-                size="sm"
-                variant="soft"
-                color="neutral"
-              >
-                Dismiss
-              </Button>
-            }
-          >
-            Your project has been edited.
-          </Snackbar>
-          <Button
-            size="sm"
-            variant="plain"
-            color="danger"
-            startDecorator={<DeleteRoundedIcon />}
-            onClick={() => deleteProject(project.project_id)}
-          >
-            Delete
-          </Button>
-          <Snackbar
-            color="danger"
-            open={open[2]}
-            onClose={() => handleSnackbarClose(2)}
-            anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-            startDecorator={<CheckCircleRoundedIcon />}
-            endDecorator={
-              <Button
-                onClick={() => handleSnackbarClose(2)}
-                size="sm"
-                variant="soft"
-                color="neutral"
-              >
-                Dismiss
-              </Button>
-            }
-          >
-            Your project has been deleted.
-          </Snackbar>
-        </Box>
-      </Box>
-      <Divider sx={{ mt: 2 }} />
-      <Box
-        sx={{
-          py: 2,
+          px: { xs: 2, md: 6 },
+          pt: {
+            xs: "calc(12px + var(--Header-height))",
+            sm: "calc(12px + var(--Header-height))",
+            md: 3,
+          },
+          pb: { xs: 2, sm: 2, md: 3 },
+          flex: 1,
           display: "flex",
           flexDirection: "column",
-          alignItems: "start",
+          minWidth: 0,
+          height: "100dvh",
+          overflowY: "auto",
+          gap: 1,
         }}
       >
-
-
-        <Typography level="title-md" textColor="text.primary">
-          Project Client: {client.first_name} {client.last_name}
-          <Typography
-            variant="body2"
-            component="span"
-            display="inline"
-            style={{ fontSize: "smaller" }}
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          <Breadcrumbs
+            size="sm"
+            aria-label="breadcrumbs"
+            separator={<ChevronRightRoundedIcon fontSize="sm" />}
+            sx={{ pl: 0 }}
           >
-            (Client ID: {project.client_id})
-          </Typography>
-        </Typography>
+            <Link underline="none" color="neutral" href="/" aria-label="Home">
+              <HomeRoundedIcon />
+            </Link>
+            <Typography color="primary" fontWeight={500} fontSize={12}>
+              <Link href="/projects">Projects</Link>
+            </Typography>
+          </Breadcrumbs>
+        </Box>
         <Box
           sx={{
-            mt: 1,
             display: "flex",
-            alignItems: "center",
+            mb: 1,
             gap: 1,
+            flexDirection: { xs: "column", sm: "row" },
+            alignItems: { xs: "start", sm: "center" },
             flexWrap: "wrap",
+            justifyContent: "space-between",
           }}
-        >
-          <div>
-            <Typography
-              level="title-md"
-              textColor="text.primary"
-              component="span"
-              sx={{ mr: 1, display: "inline-block" }}
+        ></Box>
+
+        <Box sx={{ display: "flex" }}>
+          <Sheet
+            variant="outlined"
+            sx={{
+              minHeight: 500,
+              width: "100%",
+              borderRadius: "sm",
+              p: 2,
+              mb: 3,
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                flexWrap: "wrap",
+                gap: 2,
+              }}
             >
-              Project Start Date: 
-            </Typography>
-            <Tooltip size="sm" variant="outlined">
-              <Chip size="sm" variant="soft" color="primary">
-                {project.start_date}
-              </Chip>
-            </Tooltip>
-          </div>
-          <div>
-            <Typography
-              component="span"
-              level="title-md"
-              textColor="text.primary"
-              sx={{ mr: 1, display: "inline-block" }}
+              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                <Typography
+                  level="h2"
+                  textColor="text.primary"
+                  mb={0.5}
+                  sx={{ paddingRight: 3 }}
+                >
+                  {project.project_name}
+                </Typography>
+                <Chip
+                  size="lg"
+                  variant="soft"
+                  color={getStatusColor(status.name)}
+                >
+                  {status.name}
+                </Chip>
+                <Box sx={{ ml: 2 }}></Box>
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  height: "32px",
+                  flexDirection: "row",
+                  gap: 1.5,
+                }}
+              >
+                <Button
+                  size="sm"
+                  variant="soft"
+                  color="neutral"
+                  startDecorator={<EditNoteIcon />}
+                  onClick={() =>
+                    navigate(`/projects/edit/${project.project_id}`)
+                  }
+                >
+                  Edit Project
+                </Button>
+
+                <Button
+                  size="sm"
+                  variant="soft"
+                  color="primary"
+                  startDecorator={<AddPhotoAlternateIcon />} // Import this icon from @mui/icons-material
+                  onClick={() => imagesRef.current.triggerFileInputClick()}
+                >
+                  Add Image
+                </Button>
+
+                <Snackbar
+                  color="success"
+                  open={open[1]}
+                  onClose={() => handleSnackbarClose(1)}
+                  anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                  startDecorator={<CheckCircleRoundedIcon />}
+                  endDecorator={
+                    <Button
+                      onClick={() => handleSnackbarClose(1)}
+                      size="sm"
+                      variant="soft"
+                      color="neutral"
+                    >
+                      Dismiss
+                    </Button>
+                  }
+                >
+                  Your project has been edited.
+                </Snackbar>
+
+                {/* Need to add a Modal View to ask for confirmation before deleting a project */}
+                <Button
+                  size="sm"
+                  variant="soft"
+                  color="danger"
+                  startDecorator={<DeleteRoundedIcon />}
+                  onClick={() => deleteProject(project.project_id)}
+                >
+                  Delete
+                </Button>
+                <Snackbar
+                  color="danger"
+                  open={open[2]}
+                  onClose={() => handleSnackbarClose(2)}
+                  anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                  startDecorator={<CheckCircleRoundedIcon />}
+                  endDecorator={
+                    <Button
+                      onClick={() => handleSnackbarClose(2)}
+                      size="sm"
+                      variant="soft"
+                      color="neutral"
+                    >
+                      Dismiss
+                    </Button>
+                  }
+                >
+                  Your project has been deleted.
+                </Snackbar>
+              </Box>
+            </Box>
+            <Divider sx={{ mt: 2 }} />
+            <Box
+              sx={{
+                py: 2,
+                display: "flex",
+                flexDirection: { xs: "column", md: "row" },
+                alignItems: "start",
+              }}
             >
-              Project End Date:
-            </Typography>
-            <Tooltip size="sm" variant="outlined">
-              <Chip size="sm" variant="soft" color="primary">
-                {project.end_date}
-              </Chip>
-            </Tooltip>
-          </div>
+              <Box
+                sx={{
+                  flexBasis: "60%", // Assign 60% of the width to this container
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "start",
+                }}
+              >
+                <Typography level="title-md" textColor="text.primary">
+                  Client: {client.first_name} {client.last_name}
+                  <Typography
+                    variant="body2"
+                    component="span"
+                    display="inline"
+                    style={{ fontSize: "smaller" }}
+                  >
+                    (Client ID: {project.client_id})
+                  </Typography>
+                </Typography>
+                <Box
+                  sx={{
+                    mt: 1,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1,
+                    flexWrap: "wrap",
+                  }}
+                >
+                  <div>
+                    <Typography
+                      level="title-md"
+                      textColor="text.primary"
+                      component="span"
+                      sx={{ mr: 1, display: "inline-block" }}
+                    >
+                      Project Start Date:
+                    </Typography>
+                    <Tooltip size="sm" variant="outlined">
+                      <Chip size="sm" variant="soft" color="primary">
+                        {project.start_date}
+                      </Chip>
+                    </Tooltip>
+                  </div>
+                  <div>
+                    <Typography
+                      component="span"
+                      level="title-md"
+                      textColor="text.primary"
+                      sx={{ mr: 1, display: "inline-block" }}
+                    >
+                      Project End Date:
+                    </Typography>
+                    <Tooltip size="sm" variant="outlined">
+                      <Chip size="sm" variant="soft" color="primary">
+                        {project.end_date}
+                      </Chip>
+                    </Tooltip>
+                  </div>
+                </Box>
+
+                <Typography
+                  mt={1}
+                  level="title-md"
+                  textColor="text.primary"
+                  component="span"
+                  sx={{ mr: 1, display: "inline-block" }}
+                >
+                  Project Category: {category.name}
+                </Typography>
+              </Box>
+
+              <Typography textAlign="left" level="body-sm" mt={2} mb={2}>
+                <Typography level="title-md" textColor="text.primary" mb={1}>
+                  Project Description:
+                </Typography>
+                <br></br>
+                {project.project_description}
+              </Typography>
+            </Box>
+
+            <Box
+              sx={{
+                mt: {
+                  xs: 1, // On extra small and small screens
+                  sm: 2, // On small screens
+                  lg: 6, // On large screens and above
+                },
+              }}
+            />
+
+            <ProjectTasks projectid={id} />
+
+            <Images projectid={id} ref={imagesRef} />
+          </Sheet>
         </Box>
-        <Typography
-          mt={1}
-          level="title-md"
-          textColor="text.primary"
-          component="span"
-          sx={{ mr: 1, display: "inline-block" }}
-        >
-          Project Status: {status.name}
-        </Typography>
-        <Typography
-          mt={1}
-          level="title-md"
-          textColor="text.primary"
-          component="span"
-          sx={{ mr: 1, display: "inline-block" }}
-        >
-          Project Category: {category.name}
-        </Typography>
       </Box>
-
-      <ProjectTasks projectid={id} />
-
-      <Divider />
-      <Typography textAlign="left" level="body-sm" mt={2} mb={2}>
-        <Typography level="title-md" textColor="text.primary" mb={1}>
-          Project Description:
-        </Typography>
-        <br></br>
-        {project.project_description}
-      </Typography>
-      <Divider />
-      <Typography textAlign="left" level="title-sm" mt={2} mb={2}>
-        Photos
-      </Typography>
-      <Images projectid={id} />
-    </Sheet>
+    </CssVarsProvider>
   );
 }
