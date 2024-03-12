@@ -16,7 +16,9 @@ import Grid from "@mui/joy/Grid";
 import Divider from "@mui/joy/Divider";
 import { Link } from "react-router-dom";
 
-import ConstructionIcon from '@mui/icons-material/Construction';
+import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
+import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
+import ConstructionIcon from "@mui/icons-material/Construction";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import HomeIcon from "@mui/icons-material/Home";
@@ -25,7 +27,8 @@ import PhoneIcon from "@mui/icons-material/Phone";
 import NoteIcon from "@mui/icons-material/Note";
 import LabelIcon from "@mui/icons-material/Label";
 import RoomIcon from "@mui/icons-material/Room";
-
+import CssBaseline from "@mui/joy/CssBaseline";
+import { CssVarsProvider } from "@mui/joy/styles";
 const ClientDetailsPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -78,141 +81,199 @@ const ClientDetailsPage = () => {
   }
 
   return (
-    <Box sx={{ maxWidth: 600, mx: "auto", mt: 4, p: 2 }}>
-      <Typography variant="h3" gutterBottom>
-        {client.first_name} {client.last_name}'s Details
-      </Typography>
-      <Card elevation={4} sx={{ p: 2, mb: 2 }}>
-        <CardContent>
-          <Typography variant="h6">Contact Information</Typography>
-          <Box
-            sx={{ display: "flex", flexDirection: "column", gap: 1.5, mt: 2 }}
+    <CssVarsProvider disableTransitionOnChange>
+      <CssBaseline />
+      <Box sx={{ display: "flex", minHeight: "100dvh" }}>
+        <Box
+          component="main"
+          className="MainContent"
+          sx={{
+            px: { xs: 2, md: 6 },
+            pt: {
+              xs: "calc(12px + var(--Header-height))",
+              sm: "calc(12px + var(--Header-height))",
+              md: 3,
+            },
+            pb: { xs: 2, sm: 2, md: 3 },
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            minWidth: 0,
+            height: "100dvh",
+            gap: 1,
+          }}
+        >
+          <Breadcrumbs
+            size="sm"
+            aria-label="breadcrumbs"
+            separator={<ChevronRightRoundedIcon fontSize="small" />}
+            sx={{ mb: 2 }} // Add margin bottom for spacing
           >
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-              }}
+            <Link
+              component={Link}
+              to="/"
+              underline="none"
+              color="neutral"
+              aria-label="Home"
             >
-              <Chip startDecorator={<RoomIcon />} />
-              <Typography
-                sx={{ display: "flex", alignItems: "center", gap: 1 }}
-              >
-                {client.address}
-              </Typography>
-            </Box>
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-              }}
+              <HomeRoundedIcon />
+            </Link>
+            <Link
+              component={Link}
+              to="/clients"
+              underline="hover"
+              color="neutral"
             >
-              <Chip startDecorator={<EmailIcon />} />
-              <Typography
-                sx={{ display: "flex", alignItems: "center", gap: 1 }}
-              >
-                {client.email}
-              </Typography>
-            </Box>
+              Clients
+            </Link>
+            <Typography color="primary" fontWeight={500}>
+              Details
+            </Typography>
+          </Breadcrumbs>
 
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-              }}
-            >
-              <Chip startDecorator={<PhoneIcon />} />
-              <Typography
-                sx={{ display: "flex", alignItems: "center", gap: 1 }}
-              >
-                {client.phone_number}
-              </Typography>
-            </Box>
-
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-              }}
-            >
-              <Chip startDecorator={<NoteIcon />} />
-              <Typography
-                sx={{ display: "flex", alignItems: "center", gap: 1 }}
-              >
-                {client.notes}
-              </Typography>
-            </Box>
-
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-              }}
-            >
-              <Chip startDecorator={<LabelIcon />} />
-              <Typography
-                sx={{ display: "flex", alignItems: "center", gap: 1 }}
-              >
-                {client.tag}
-              </Typography>
-            </Box>
-
-            <Divider/>
-
-            <Box sx={{ display: "flex", flexDirection: "row", gap: 2 }}>
-              <Chip startDecorator={<ConstructionIcon />} />
-              {projects.map((project, index) => (
+          <Box sx={{ maxWidth: 600, mx: "auto", mt: 4, p: 2 }}>
+            <Typography variant="h3" gutterBottom>
+              {client.first_name} {client.last_name}'s Details
+            </Typography>
+            <Card elevation={4} sx={{ p: 2, mb: 2 }}>
+              <CardContent>
+                <Typography variant="h6">Contact Information</Typography>
                 <Box
-                  key={index}
                   sx={{
                     display: "flex",
-                    flexDirection: "row",
-                    alignItems: "center",
-                    gap: 1,
+                    flexDirection: "column",
+                    gap: 1.5,
+                    mt: 2,
                   }}
                 >
-                  <Typography
-                    sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
+                    }}
                   >
-                    {project.project_name}
-                    {index < projects.length - 1 && ","}
-                  </Typography>
+                    <Chip startDecorator={<RoomIcon />} />
+                    <Typography
+                      sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                    >
+                      {client.address}
+                    </Typography>
+                  </Box>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Chip startDecorator={<EmailIcon />} />
+                    <Typography
+                      sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                    >
+                      {client.email}
+                    </Typography>
+                  </Box>
+
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Chip startDecorator={<PhoneIcon />} />
+                    <Typography
+                      sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                    >
+                      {client.phone_number}
+                    </Typography>
+                  </Box>
+
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Chip startDecorator={<NoteIcon />} />
+                    <Typography
+                      sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                    >
+                      {client.notes}
+                    </Typography>
+                  </Box>
+
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Chip startDecorator={<LabelIcon />} />
+                    <Typography
+                      sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                    >
+                      {client.tag}
+                    </Typography>
+                  </Box>
+
+                  <Divider />
+
+                  <Box sx={{ display: "flex", flexDirection: "row", gap: 2 }}>
+                    <Chip startDecorator={<ConstructionIcon />} />
+                    {projects.map((project, index) => (
+                      <Box
+                        key={index}
+                        sx={{
+                          display: "flex",
+                          flexDirection: "row",
+                          alignItems: "center",
+                          gap: 1,
+                        }}
+                      >
+                        <Typography
+                          sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                        >
+                          {project.project_name}
+                          {index < projects.length - 1 && ","}
+                        </Typography>
+                      </Box>
+                    ))}
+                  </Box>
                 </Box>
-              ))}
-            </Box>
+              </CardContent>
+              <CardActions sx={{ justifyContent: "space-between" }}>
+                <Button
+                  startDecorator={<EditIcon />}
+                  variant="outlined"
+                  onClick={handleEdit}
+                >
+                  Edit
+                </Button>
+                <Button
+                  startDecorator={<DeleteIcon />}
+                  color="danger"
+                  variant="outlined"
+                  onClick={handleDelete}
+                >
+                  Delete
+                </Button>
+              </CardActions>
+            </Card>
+            <Button
+              variant="outlined"
+              startDecorator={<HomeIcon />}
+              onClick={() => navigate("/clients")}
+            >
+              Back to Clients
+            </Button>
           </Box>
-        </CardContent>
-        <CardActions sx={{ justifyContent: "space-between" }}>
-          <Button
-            startDecorator={<EditIcon />}
-            variant="outlined"
-            onClick={handleEdit}
-          >
-            Edit
-          </Button>
-          <Button
-            startDecorator={<DeleteIcon />}
-            color="danger"
-            variant="outlined"
-            onClick={handleDelete}
-          >
-            Delete
-          </Button>
-        </CardActions>
-      </Card>
-      <Button
-        variant="outlined"
-        startDecorator={<HomeIcon />}
-        onClick={() => navigate("/clients")}
-      >
-        Back to Clients
-      </Button>
-    </Box>
+        </Box>
+      </Box>
+    </CssVarsProvider>
   );
 };
 
