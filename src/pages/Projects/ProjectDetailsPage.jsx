@@ -4,25 +4,17 @@ import { supabaseClient } from "../../supabase-client";
 import { useParams } from "react-router-dom";
 import Box from "@mui/joy/Box";
 import Chip from "@mui/joy/Chip";
-import Card from "@mui/joy/Card";
-import CardOverflow from "@mui/joy/CardOverflow";
 import Sheet from "@mui/joy/Sheet";
 import Typography from "@mui/joy/Typography";
 import Button from "@mui/joy/Button";
 import Snackbar from "@mui/joy/Snackbar";
-import AspectRatio from "@mui/joy/AspectRatio";
 import Divider from "@mui/joy/Divider";
-import Avatar from "@mui/joy/Avatar";
 import Tooltip from "@mui/joy/Tooltip";
-import Badge from "@mui/joy/Badge";
 import Modal from "@mui/joy/Modal"
 import { ModalDialog } from "@mui/joy";
 import IconButton from '@mui/joy/IconButton';
 
 import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
-import ForwardToInboxRoundedIcon from "@mui/icons-material/ForwardToInboxRounded";
-import FolderIcon from "@mui/icons-material/Folder";
-import ReplyRoundedIcon from "@mui/icons-material/ReplyRounded";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import ProjectTasks from "../../components/project/ProjectTasks";
@@ -34,7 +26,6 @@ import Breadcrumbs from "@mui/joy/Breadcrumbs";
 import Link from "@mui/joy/Link";
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
-import DownloadRoundedIcon from "@mui/icons-material/DownloadRounded";
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 
 export default function ProjectDetailsPage() {
@@ -527,7 +518,7 @@ export default function ProjectDetailsPage() {
 
               <Typography textAlign="left" level="body-sm" mt={2} mb={2}>
                 <Typography level="title-md" textColor="text.primary" mb={1}>
-                  Project Description:
+                  Project Notes:
                 </Typography>
                 <br></br>
                 {project.project_description}
@@ -537,9 +528,9 @@ export default function ProjectDetailsPage() {
             <Box
               sx={{
                 mt: {
-                  xs: 1, // On extra small and small screens
-                  sm: 2, // On small screens
-                  lg: 6, // On large screens and above
+                  xs: 1,
+                  sm: 2,
+                  lg: 6,
                 },
               }}
             />
