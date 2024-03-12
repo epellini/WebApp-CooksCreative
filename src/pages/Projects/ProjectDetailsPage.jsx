@@ -266,9 +266,25 @@ export default function ProjectDetailsPage() {
                   {project.project_name}
                 </Typography>
                 <Chip
-                  size="lg"
+                  size="lg" // Default to large size
                   variant="soft"
                   color={getStatusColor(status.name)}
+                  sx={{
+                    fontSize: {
+                      xs: '0.875rem',
+                      md: '1rem'
+                    },
+                    height: {
+                      xs: '32px',
+                      md: '40px'
+                    },
+                    '.MuiChip-label': {
+                      padding: {
+                        xs: '0 10px',
+                        md: '0 12px'
+                      }
+                    }
+                  }}
                 >
                   {status.name}
                 </Chip>
@@ -454,7 +470,7 @@ export default function ProjectDetailsPage() {
                     display="inline"
                     style={{ fontSize: "smaller" }}
                   >
-                    (Client ID: {project.client_id})
+                    (ID: {project.client_id})
                   </Typography>
                 </Typography>
                 <Box
