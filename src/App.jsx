@@ -19,7 +19,7 @@ import ClientDetailsPage from "./pages/Clients/ClientDetailsPage.jsx";
 import ClientForm from "./components/client/ClientForm.jsx";
 import ForgotPassword from './pages/Auth/ForgotPassword.jsx';
 import TasksPage from './pages/Tasks/TasksPage.jsx';
-import TaskForm from './components/tasks/TaskFormAdd.jsx';
+import TaskForm from './components/tasks/TaskForm.jsx';
 import AdminPanel from './pages/AdminPanel/AdminPanel.jsx'
 
 function App() {
@@ -57,6 +57,7 @@ function App() {
              <Route path="/tasks">
               <Route index element={<TasksPage/>}/>
               <Route path="new" element={<TaskForm/>}/>
+              <Route path="edit/:taskid" element={<TaskForm/>}/>
              </Route>
 
             {/* ADMIN ROUTES */}

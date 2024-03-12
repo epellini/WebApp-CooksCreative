@@ -12,7 +12,7 @@ import {
 } from "@mui/joy";
 import { Skeleton } from "@mui/joy";
 import { supabaseClient } from "../../supabase-client";
-import TaskFormAdd from "../tasks/TaskFormAdd";
+import TaskForm from "../tasks/TaskForm";
 import ProjectTaskForm from "./ProjectTaskForm";
 
 const ProjectTasks = ({ projectid }) => {

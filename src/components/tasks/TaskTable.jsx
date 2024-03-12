@@ -29,7 +29,10 @@ import {
   Tab,
   tabClasses,
   Table,
+  
 } from "@mui/joy";
+import EditNoteIcon from "@mui/icons-material/EditNote";
+import { useNavigate } from "react-router-dom";
 import Checkbox, { checkboxClasses } from "@mui/joy/Checkbox";
 import Dropdown from "@mui/joy/Dropdown";
 import MenuButton from "@mui/joy/MenuButton";
@@ -41,10 +44,10 @@ import { supabaseClient } from "../../supabase-client"; // Import the supabase c
 import Add from "@mui/icons-material/Add";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
-import ArchiveIcon from '@mui/icons-material/Archive';
+import ArchiveIcon from "@mui/icons-material/Archive";
 
 //task form
-import TaskForm from "./TaskFormAdd";
+import TaskForm from "./TaskForm";
 
 export default function TaskTable({ isModalOpen, toggleModal }) {
   const [open, setOpen] = React.useState(false);
@@ -57,6 +60,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   let [days, setDays] = useState(30);
 
+  const navigate = useNavigate();
   const createHandleClose = (index, value) => () => {
     if (typeof index === "number") {
       setSelectedIndex(index);
@@ -75,11 +79,11 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
     const { data, error } = await supabaseClient.from("tasks").select(`
       *,
       projects(*),
-      priority:task_priority (name)
+      priority:task_priority (name),
+      users(*)
     `);
 
     // if no tasks the display text saying no tasks
-
 
     if (error) {
       console.error("Error fetching tasks:", error);
@@ -89,6 +93,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
         priority_name: task.priority ? task.priority.name : "Unknown",
       }));
       setTasks(tasksWithPriorityName);
+      setUsers(tasksWithPriorityName.map((task) => task.users));
       setProjects(tasksWithPriorityName.map((task) => task.projects));
     }
   }
@@ -101,7 +106,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
       .from("tasks")
       .update({
         is_archived: true,
-        date_archived: new Date().toISOString()
+        date_archived: new Date().toISOString(),
       })
       .match({ task_id: task_id });
     if (error) {
@@ -148,7 +153,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
 
   const getPriorityColor = (priorityName) => {
     switch (
-    priorityName?.toLowerCase() // Safe navigation in case of undefined
+      priorityName?.toLowerCase() // Safe navigation in case of undefined
     ) {
       case "high":
         return "danger";
@@ -207,14 +212,6 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
         {/* Add New Task */}
 
         <React.Fragment>
-          <Button
-            variant="outlined"
-            color="neutral"
-            startDecorator={<Add />}
-            onClick={() => setOpen(true)}
-          >
-            Complete Task Button Example
-          </Button>
           <Modal
             className="formWindow"
             open={isModalOpen}
@@ -245,6 +242,9 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
             </ModalDialog>
           </Modal>
         </React.Fragment>
+        
+
+        
 
         <Tabs
           aria-label="Pipeline"
@@ -306,8 +306,17 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
               <thead>
                 <tr>
                   <th style={{ width: 120, padding: "12px 6px" }}>Task Name</th>
-                  <th style={{ width: 60, padding: "12px 6px", textAlign: "center" }}>Priority</th>
+                  <th
+                    style={{
+                      width: 60,
+                      padding: "12px 6px",
+                      textAlign: "center",
+                    }}
+                  >
+                    Priority
+                  </th>
                   <th style={{ width: 60, padding: "12px 6px" }}>Created</th>
+                  <th style={{ width: 40, padding: "12px 6px" }}></th>
                   <th style={{ width: 25, padding: "12px 6px" }}></th>
                 </tr>
               </thead>
@@ -347,7 +356,9 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                       </td>
                       <td style={{ textAlign: "center" }}>
                         <Chip
-                          onClick={() => console.log(`Task Clicked: ${task.task_id}`)}
+                          onClick={() =>
+                            console.log(`Task Clicked: ${task.task_id}`)
+                          }
                           style={{ cursor: "pointer" }}
                           variant="soft"
                           size="sm"
@@ -356,10 +367,27 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                           {task.priority_name}
                         </Chip>
                       </td>
+
                       <td style={{ textAlign: "left" }}>
                         {task.date_created
-                          ? new Date(task.date_created).toISOString().split("T")[0]
+                          ? new Date(task.date_created)
+                              .toISOString()
+                              .split("T")[0]
                           : "N/A"}
+                      </td>
+
+                      <td style={{ textAlign: "left" }}>
+                      <Button
+                          size="sm"
+                          variant="soft"
+                          color="neutral"
+                          startDecorator={<EditNoteIcon />}
+                          onClick={() =>
+                            navigate(`/tasks/edit/${task.task_id}`)
+                          }
+                        >
+                          Complete
+                        </Button>
                       </td>
                       <td style={{ textAlign: "center" }}>
                         <IconButton
@@ -453,17 +481,21 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                       </td>
 
                       <td style={{ textAlign: "left" }}>
-                        {task.completed_by ? task.completed_by : "N/A"}
+                        {task.is_completed ? (task.users?.first_name ?? "N/A") : "N/A"}
                       </td>
                       <td style={{ textAlign: "left" }}>
                         {task.date_created
-                          ? new Date(task.date_created).toISOString().split("T")[0]
+                          ? new Date(task.date_created)
+                              .toISOString()
+                              .split("T")[0]
                           : "N/A"}
                       </td>
 
                       <td style={{ textAlign: "left" }}>
                         {task.date_completed
-                          ? new Date(task.date_completed).toISOString().split("T")[0]
+                          ? new Date(task.date_completed)
+                              .toISOString()
+                              .split("T")[0]
                           : "N/A"}
                       </td>
                     </tr>
@@ -478,7 +510,6 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                   </tr>
                 )}
               </tbody>
-
             </Table>
           </TabPanel>
 
@@ -553,13 +584,17 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                       </td>
                       <td style={{ textAlign: "left" }}>
                         {task.date_created
-                          ? new Date(task.date_created).toISOString().split("T")[0]
+                          ? new Date(task.date_created)
+                              .toISOString()
+                              .split("T")[0]
                           : "N/A"}
                       </td>
 
                       <td style={{ textAlign: "left" }}>
                         {task.date_completed
-                          ? new Date(task.date_completed).toISOString().split("T")[0]
+                          ? new Date(task.date_completed)
+                              .toISOString()
+                              .split("T")[0]
                           : "N/A"}
                       </td>
                     </tr>
@@ -574,7 +609,6 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                   </tr>
                 )}
               </tbody>
-
             </Table>
           </TabPanel>
         </Tabs>
@@ -690,11 +724,19 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                 borderRadius: "5px",
               }}
             >
-            {/* TABLE HEAD BEGINS HERE */}
-            <thead>
+              {/* TABLE HEAD BEGINS HERE */}
+              <thead>
                 <tr>
                   <th style={{ width: 120, padding: "12px 6px" }}>Task Name</th>
-                  <th style={{ width: 60, padding: "12px 6px", textAlign: "center" }}>Priority</th>
+                  <th
+                    style={{
+                      width: 60,
+                      padding: "12px 6px",
+                      textAlign: "center",
+                    }}
+                  >
+                    Priority
+                  </th>
                   <th style={{ width: 60, padding: "12px 6px" }}>Created</th>
                   <th style={{ width: 40, padding: "12px 6px" }}></th>
                 </tr>
@@ -735,7 +777,9 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                       </td>
                       <td style={{ textAlign: "center" }}>
                         <Chip
-                          onClick={() => console.log(`Task Clicked: ${task.task_id}`)}
+                          onClick={() =>
+                            console.log(`Task Clicked: ${task.task_id}`)
+                          }
                           style={{ cursor: "pointer" }}
                           variant="soft"
                           size="sm"
@@ -746,8 +790,13 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                       </td>
                       <td style={{ textAlign: "left" }}>
                         {task.date_created
-                          ? new Date(task.date_created).toISOString().split("T")[0]
+                          ? new Date(task.date_created)
+                              .toISOString()
+                              .split("T")[0]
                           : "N/A"}
+                      </td>
+                      <td style={{ textAlign: "center" }}>
+
                       </td>
                       <td style={{ textAlign: "center" }}>
                         <IconButton
