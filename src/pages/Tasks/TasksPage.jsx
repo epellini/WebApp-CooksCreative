@@ -13,11 +13,15 @@ import { Css } from "@mui/icons-material";
 import React, { useState, useEffect } from "react";
 import TaskTable from "../../components/tasks/TaskTable";
 import Confetti from "../../components/tasks/confetti.jsx";
+import AddIcon from '@mui/icons-material/Add';
 
 
 const TasksPage = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const toggleModal = () => setIsModalOpen(!isModalOpen);
+
   return (
-<CssVarsProvider disableTransitionOnChange>
+    <CssVarsProvider disableTransitionOnChange>
       <CssBaseline />
       <Box sx={{ display: "flex", minHeight: "100dvh" }}>
         <Box
@@ -47,12 +51,7 @@ const TasksPage = () => {
               separator={<ChevronRightRoundedIcon fontSize="sm" />}
               sx={{ pl: 0 }}
             >
-              <Link
-                underline="none"
-                color="neutral"
-                href="/"
-                aria-label="Home"
-              >
+              <Link underline="none" color="neutral" href="/" aria-label="Home">
                 <HomeRoundedIcon />
               </Link>
               <Typography color="primary" fontWeight={500} fontSize={12}>
@@ -75,17 +74,16 @@ const TasksPage = () => {
               Tasks
             </Typography>
             <Button
-              // onClick={() => navigate('/projects/new')}
+              onClick={toggleModal} // Toggle modal on click
               color="primary"
-              startDecorator={<DownloadRoundedIcon />}
+              startDecorator={<AddIcon />}
               size="sm"
             >
               New Task
             </Button>
           </Box>
 
-
-          <TaskTable />
+          <TaskTable isModalOpen={isModalOpen} toggleModal={toggleModal}  />
 
           <Confetti />
         </Box>

@@ -45,11 +45,12 @@ import { useEffect, useState } from "react";
 import { supabaseClient } from "../../supabase-client"; // Import the supabase client
 // ICONS:
 import Add from "@mui/icons-material/Add";
+import AddIcon from '@mui/icons-material/Add';
 
 //task form
 import TaskForm from "./TaskFormAdd";
 
-export default function TaskTable() {
+export default function TaskTable({ isModalOpen, toggleModal }) {
   const [open, setOpen] = React.useState(false);
   const [tasks, setTasks] = useState([]);
   const [users, setUsers] = useState([]);
@@ -57,7 +58,7 @@ export default function TaskTable() {
   const [clients, setClients] = useState([]);
   const options = ["The Godfather", "Pulp Fiction"];
   const [index, setIndex] = React.useState(0);
-  const [selectedIndex, setSelectedIndex] =useState(0);
+  const [selectedIndex, setSelectedIndex] = useState(0);
   let [days, setDays] = useState(30);
 
   const createHandleClose = (index, value) => () => {
@@ -120,9 +121,8 @@ export default function TaskTable() {
   });
 
   const onHandleSubmit = () => {
-    setOpen(false);
-    //reload the tasks
-    getTasks();
+    toggleModal(); // Close the modal after submission
+    getTasks(); // Reload tasks
   };
 
   return (
@@ -177,34 +177,24 @@ export default function TaskTable() {
             startDecorator={<Add />}
             onClick={() => setOpen(true)}
           >
-            New Task
+            Complete Task Button Example
           </Button>
           <Modal
             className="formWindow"
-            open={open}
-            onClose={() => setOpen(false)}
+            open={isModalOpen}
+            onClose={toggleModal} // Use the passed function to close the modal
           >
             <ModalDialog>
               <TaskForm
-                open={open}
-                setOpen={setOpen}
+                open={isModalOpen}
+                setOpen={toggleModal}
                 onHandleSubmit={onHandleSubmit}
               />
             </ModalDialog>
           </Modal>
         </React.Fragment>
 
-        {/* Complete Task*/}
-
         <React.Fragment>
-          <Button
-            variant="outlined"
-            color="neutral"
-            startDecorator={<Add />}
-            onClick={() => setOpen(true)}
-          >
-            New Task
-          </Button>
           <Modal
             className="formWindow"
             open={open}
