@@ -98,10 +98,11 @@ export default function ProjectTable() {
         setClients(data.map((project) => project.clients));
         setStatus(data.map((project) => project.status));
         setCategory(data.map((project) => project.category));
-        console.log(clients);
-        console.log("categories" + categories);
-        console.log();
-        setLoading(false); // Set loading to false when data is fetched
+
+        const activeStatus = data.map((project) => project.status).find(status => status.name === "Active");
+        setSelectedStatus(activeStatus)
+ 
+        setLoading(false);
       }
     }
     getProjects();
@@ -253,7 +254,7 @@ export default function ProjectTable() {
             value={selectedStatus}
             onChange={(event, newValue) => {
               setSelectedStatus(newValue);
-              setSelectedProject(newValue ? `${newValue.name}` : null); // Update selectedProject
+              setSelectedProject(newValue ? `${newValue.name}` : null);
               console.log("Selected status:", newValue);
             }}
             renderInput={(params) => <Input {...params} />}
