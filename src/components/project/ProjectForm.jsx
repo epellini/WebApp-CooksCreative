@@ -209,7 +209,7 @@ const ProjectForm = () => {
             <Box sx={{ mb: 1 }}>
               <Typography level="title-md">Project Information</Typography>
               <Typography level="body-sm">
-                Add a title, description, and other details to your project.
+                Add a title, notes, and other details to your project.
               </Typography>
             </Box>
             <Divider />
@@ -298,7 +298,7 @@ const ProjectForm = () => {
                     />
                   </Box>
 
-                  <FormLabel>Project Description</FormLabel>
+                  <FormLabel>Project Notes</FormLabel>
                   <FormControl
                     sx={{
                       display: { sm: "flex-column", md: "flex-row" },

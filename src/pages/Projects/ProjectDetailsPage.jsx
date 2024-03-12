@@ -4,22 +4,17 @@ import { supabaseClient } from "../../supabase-client";
 import { useParams } from "react-router-dom";
 import Box from "@mui/joy/Box";
 import Chip from "@mui/joy/Chip";
-import Card from "@mui/joy/Card";
-import CardOverflow from "@mui/joy/CardOverflow";
 import Sheet from "@mui/joy/Sheet";
 import Typography from "@mui/joy/Typography";
 import Button from "@mui/joy/Button";
 import Snackbar from "@mui/joy/Snackbar";
-import AspectRatio from "@mui/joy/AspectRatio";
 import Divider from "@mui/joy/Divider";
-import Avatar from "@mui/joy/Avatar";
 import Tooltip from "@mui/joy/Tooltip";
-import Badge from "@mui/joy/Badge";
+import Modal from "@mui/joy/Modal"
+import { ModalDialog } from "@mui/joy";
+import IconButton from '@mui/joy/IconButton';
 
 import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
-import ForwardToInboxRoundedIcon from "@mui/icons-material/ForwardToInboxRounded";
-import FolderIcon from "@mui/icons-material/Folder";
-import ReplyRoundedIcon from "@mui/icons-material/ReplyRounded";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import ProjectTasks from "../../components/project/ProjectTasks";
@@ -31,10 +26,11 @@ import Breadcrumbs from "@mui/joy/Breadcrumbs";
 import Link from "@mui/joy/Link";
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
-import DownloadRoundedIcon from "@mui/icons-material/DownloadRounded";
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 
 export default function ProjectDetailsPage() {
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
   const [project, setProject] = useState({
     project_name: "",
     client_id: null,
@@ -261,9 +257,25 @@ export default function ProjectDetailsPage() {
                   {project.project_name}
                 </Typography>
                 <Chip
-                  size="lg"
+                  size="lg" // Default to large size
                   variant="soft"
                   color={getStatusColor(status.name)}
+                  sx={{
+                    fontSize: {
+                      xs: '0.875rem',
+                      md: '1rem'
+                    },
+                    height: {
+                      xs: '32px',
+                      md: '40px'
+                    },
+                    '.MuiChip-label': {
+                      padding: {
+                        xs: '0 10px',
+                        md: '0 12px'
+                      }
+                    }
+                  }}
                 >
                   {status.name}
                 </Chip>
@@ -277,27 +289,55 @@ export default function ProjectDetailsPage() {
                   gap: 1.5,
                 }}
               >
-                <Button
-                  size="sm"
-                  variant="soft"
-                  color="neutral"
-                  startDecorator={<EditNoteIcon />}
-                  onClick={() =>
-                    navigate(`/projects/edit/${project.project_id}`)
-                  }
-                >
-                  Edit Project
-                </Button>
+                {/* For small screens */}
+                <Box sx={{ display: { xs: 'block', md: 'none' } }}>
+                  <IconButton
+                    size="sm"
+                    color="neutral"
+                    variant="soft"
+                    onClick={() => navigate(`/projects/edit/${project.project_id}`)}
+                  >
+                    <EditNoteIcon />
+                  </IconButton>
+                </Box>
 
-                <Button
-                  size="sm"
-                  variant="soft"
-                  color="primary"
-                  startDecorator={<AddPhotoAlternateIcon />} // Import this icon from @mui/icons-material
-                  onClick={() => imagesRef.current.triggerFileInputClick()}
-                >
-                  Add Image
-                </Button>
+                {/* For larger screens */}
+                <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+                  <Button
+                    size="sm"
+                    variant="soft"
+                    color="neutral"
+                    startDecorator={<EditNoteIcon />}
+                    onClick={() => navigate(`/projects/edit/${project.project_id}`)}
+                  >
+                    Update Project
+                  </Button>
+                </Box>
+
+                {/* For small screens */}
+                <Box sx={{ display: { xs: 'block', md: 'none' } }}>
+                  <IconButton
+                    size="sm"
+                    color="primary"
+                    variant="soft"
+                    onClick={() => imagesRef.current.triggerFileInputClick()}
+                  >
+                    <AddPhotoAlternateIcon />
+                  </IconButton>
+                </Box>
+
+                {/* For larger screens*/}
+                <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+                  <Button
+                    size="sm"
+                    variant="soft"
+                    color="primary"
+                    startDecorator={<AddPhotoAlternateIcon />}
+                    onClick={() => imagesRef.current.triggerFileInputClick()}
+                  >
+                    Add Image
+                  </Button>
+                </Box>
 
                 <Snackbar
                   color="success"
@@ -319,16 +359,62 @@ export default function ProjectDetailsPage() {
                   Your project has been edited.
                 </Snackbar>
 
-                {/* Need to add a Modal View to ask for confirmation before deleting a project */}
-                <Button
-                  size="sm"
-                  variant="soft"
-                  color="danger"
-                  startDecorator={<DeleteRoundedIcon />}
-                  onClick={() => deleteProject(project.project_id)}
+                {/* For small screens */}
+                <Box sx={{ display: { xs: 'block', md: 'none' } }}>
+                  <IconButton
+                    size="sm"
+                    color="danger"
+                    variant="soft"
+                    onClick={() => setIsDeleteModalOpen(true)}
+                  >
+                    <DeleteRoundedIcon />
+                  </IconButton>
+                </Box>
+
+                {/* For larger screens: */}
+                <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+                  <Button
+                    size="sm"
+                    variant="soft"
+                    color="danger"
+                    startDecorator={<DeleteRoundedIcon />}
+                    onClick={() => setIsDeleteModalOpen(true)}
+                  >
+                    Delete
+                  </Button>
+                </Box>
+                <Modal
+                  aria-labelledby="delete-confirmation-dialog-title"
+                  aria-describedby="delete-confirmation-dialog-description"
+                  open={isDeleteModalOpen}
+                  onClose={() => setIsDeleteModalOpen(false)} // Close the modal when clicking away or pressing escape
                 >
-                  Delete
-                </Button>
+                  <ModalDialog
+                    id="delete-confirmation-dialog"
+                    aria-labelledby="delete-confirmation-dialog-title"
+                    aria-describedby="delete-confirmation-dialog-description"
+                    role="dialog"
+                    sx={{ p: 2 }}
+                  >
+                    <Typography level="h2" id="delete-confirmation-dialog-title" mb={2}>
+                      Confirm Deletion
+                    </Typography>
+                    <Typography id="delete-confirmation-dialog-description" mb={3}>
+                      Are you sure you want to delete this project?{' '}
+                      <br />
+                      This action cannot be undone.
+                    </Typography>
+
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+                      <Button variant="outlined" color="neutral" onClick={() => setIsDeleteModalOpen(false)}>
+                        Cancel
+                      </Button>
+                      <Button variant="solid" color="danger" onClick={() => { deleteProject(project.project_id); setIsDeleteModalOpen(false); }}>
+                        Delete
+                      </Button>
+                    </Box>
+                  </ModalDialog>
+                </Modal>
                 <Snackbar
                   color="danger"
                   open={open[2]}
@@ -375,7 +461,7 @@ export default function ProjectDetailsPage() {
                     display="inline"
                     style={{ fontSize: "smaller" }}
                   >
-                    (Client ID: {project.client_id})
+                    (ID: {project.client_id})
                   </Typography>
                 </Typography>
                 <Box
@@ -432,7 +518,7 @@ export default function ProjectDetailsPage() {
 
               <Typography textAlign="left" level="body-sm" mt={2} mb={2}>
                 <Typography level="title-md" textColor="text.primary" mb={1}>
-                  Project Description:
+                  Project Notes:
                 </Typography>
                 <br></br>
                 {project.project_description}
@@ -442,9 +528,9 @@ export default function ProjectDetailsPage() {
             <Box
               sx={{
                 mt: {
-                  xs: 1, // On extra small and small screens
-                  sm: 2, // On small screens
-                  lg: 6, // On large screens and above
+                  xs: 1,
+                  sm: 2,
+                  lg: 6,
                 },
               }}
             />
