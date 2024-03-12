@@ -17,13 +17,6 @@ import {
   Typography,
   Tabs,
   TabList,
-  List,
-  ListItem,
-  Breadcrumbs,
-  Link,
-  Card,
-  CardActions,
-  CardOverflow,
   Modal,
   ModalDialog,
   DialogTitle,
@@ -47,6 +40,8 @@ import { supabaseClient } from "../../supabase-client"; // Import the supabase c
 // ICONS:
 import Add from "@mui/icons-material/Add";
 import AddIcon from "@mui/icons-material/Add";
+import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
+import ArchiveIcon from '@mui/icons-material/Archive';
 
 //task form
 import TaskForm from "./TaskFormAdd";
@@ -83,12 +78,15 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
       priority:task_priority (name)
     `);
 
+    // if no tasks the display text saying no tasks
+
+
     if (error) {
       console.error("Error fetching tasks:", error);
     } else {
       const tasksWithPriorityName = data.map((task) => ({
         ...task,
-        priority_name: task.priority ? task.priority.name : "Unknown", // Correctly assigning 'priority_name'
+        priority_name: task.priority ? task.priority.name : "Unknown",
       }));
       setTasks(tasksWithPriorityName);
       setProjects(tasksWithPriorityName.map((task) => task.projects));
@@ -97,6 +95,22 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
   useEffect(() => {
     getTasks();
   }, []);
+
+  async function archiveTask(task_id) {
+    const { data, error } = await supabaseClient
+      .from("tasks")
+      .update({
+        is_archived: true,
+        date_archived: new Date().toISOString()
+      })
+      .match({ task_id: task_id });
+    if (error) {
+      console.error("Error updating Task status:", error);
+    } else {
+      console.log("Task archived successfully", data);
+    }
+    getTasks();
+  }
 
   const completedTasks = tasks.filter((task) => {
     const dayLength = days * 24 * 60 * 60 * 1000; // 30 days in milliseconds
@@ -116,7 +130,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
   });
 
   const activeTasks = tasks.filter((task) => {
-    if (task.is_completed == false) {
+    if (task.is_completed == false && task.is_archived == false) {
       return task;
     }
   });
@@ -132,22 +146,9 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
     getTasks(); // Reload tasks
   };
 
-  // const getPriorityColor = (priorityName) => {
-  //   switch (priorityName.toLowerCase()) {
-  //     case "high":
-  //       return "error"; // MUI's equivalent for danger/red
-  //     case "medium":
-  //       return "warning"; // MUI's warning color
-  //     case "low":
-  //       return "success"; // MUI's success color
-  //     default:
-  //       return "default"; // MUI's default color
-  //   }
-  // };
-
   const getPriorityColor = (priorityName) => {
     switch (
-      priorityName?.toLowerCase() // Safe navigation in case of undefined
+    priorityName?.toLowerCase() // Safe navigation in case of undefined
     ) {
       case "high":
         return "danger";
@@ -274,7 +275,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
             </Tab>
 
             <Tab indicatorInset>
-              Archived Tasks{" "}
+              Recently Deleted Tasks{" "}
               <Chip
                 size="sm"
                 variant="soft"
@@ -307,68 +308,80 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                   <th style={{ width: 120, padding: "12px 6px" }}>Task Name</th>
                   <th style={{ width: 60, padding: "12px 6px", textAlign: "center" }}>Priority</th>
                   <th style={{ width: 60, padding: "12px 6px" }}>Created</th>
+                  <th style={{ width: 25, padding: "12px 6px" }}></th>
                 </tr>
               </thead>
 
               <tbody>
-                {Object.values(activeTasks).map((task) => (
-                  <tr key={task.task_id}>
-                    <td
-                      onClick={() => console.log("Task Clicked")}
-                      style={{ cursor: "pointer", textAlign: "left" }}
-                    >
-                      <Typography
-                        variant="subtitle1"
-                        component="div"
-                        style={{ color: "#212121", textAlign: "left" }}
+                {activeTasks.length > 0 ? (
+                  Object.values(activeTasks).map((task) => (
+                    <tr key={task.task_id}>
+                      <td
+                        onClick={() => console.log("Task Clicked")}
+                        style={{ cursor: "pointer", textAlign: "left" }}
                       >
-                        {task.task_name}
+                        <Typography
+                          variant="subtitle1"
+                          component="div"
+                          style={{ color: "#212121", textAlign: "left" }}
+                        >
+                          {task.task_name}
+                        </Typography>
+                        {task.projects ? (
+                          <Typography
+                            variant="body2"
+                            component="div"
+                            style={{ color: "#757575", textAlign: "left" }}
+                          >
+                            {task.projects.project_name}
+                          </Typography>
+                        ) : (
+                          <Typography
+                            variant="body2"
+                            component="div"
+                            style={{ color: "#757575", textAlign: "left" }}
+                          >
+                            No Project
+                          </Typography>
+                        )}
+                      </td>
+                      <td style={{ textAlign: "center" }}>
+                        <Chip
+                          onClick={() => console.log(`Task Clicked: ${task.task_id}`)}
+                          style={{ cursor: "pointer" }}
+                          variant="soft"
+                          size="sm"
+                          color={getPriorityColor(task.priority_name)}
+                        >
+                          {task.priority_name}
+                        </Chip>
+                      </td>
+                      <td style={{ textAlign: "left" }}>
+                        {task.date_created
+                          ? new Date(task.date_created).toISOString().split("T")[0]
+                          : "N/A"}
+                      </td>
+                      <td style={{ textAlign: "center" }}>
+                        <IconButton
+                          size="sm"
+                          variant="soft"
+                          color="danger"
+                          onClick={() => archiveTask(task.task_id)}
+                        >
+                          <DeleteRoundedIcon />
+                        </IconButton>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="4" style={{ textAlign: "center" }}>
+                      <Typography variant="h1" component="h1">
+                        No Active Tasks
                       </Typography>
-                      {task.projects ? (
-                        <Typography
-                          variant="body2"
-                          component="div"
-                          style={{ color: "#757575", textAlign: "left" }}
-                        >
-                          {task.projects.project_name}
-                        </Typography>
-                      ) : (
-                        <Typography
-                          variant="body2"
-                          component="div"
-                          style={{ color: "#757575", textAlign: "left" }}
-                        >
-                          No Project
-                        </Typography>
-                      )}
-                    </td>
-
-                    <td style={{ textAlign: "center" }}>
-                      <Chip
-                        onClick={() =>
-                          console.log(`Task Clicked: ${task.task_id}`)
-                        } // Adjust this as necessary for your use case
-                        style={{ cursor: "pointer" }}
-                        variant="soft"
-                        size="sm"
-                        color={getPriorityColor(task.priority_name)}
-                      >
-                        {task.priority_name}
-                      </Chip>
-                    </td>
-
-                    <td style={{ textAlign: "left" }}>
-                      {task.date_created
-                        ? new Intl.DateTimeFormat("en-US", {
-                            weekday: "short",
-                            year: "numeric",
-                            month: "short",
-                            day: "numeric",
-                          }).format(new Date(task.date_created))
-                        : "N/A"}
                     </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </Table>
           </TabPanel>
@@ -421,44 +434,51 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
               </thead>
 
               <tbody>
-                {Object.values(completedTasks).map((task, days) => (
-                  <tr key={task.task_id}>
-                    <td
-                      onClick={() => console.log("Task Clicked")}
-                      style={{ textAlign: "left", cursor: "pointer" }}
-                    >
-                      {`${task.task_name}`}
-                    </td>
+                {completedTasks.length > 0 ? (
+                  Object.values(completedTasks).map((task, days) => (
+                    <tr key={task.task_id}>
+                      <td
+                        onClick={() => console.log("Task Clicked")}
+                        style={{ textAlign: "left", cursor: "pointer" }}
+                      >
+                        {`${task.task_name}`}
+                      </td>
 
-                    <td style={{ textAlign: "left" }}>
-                      {task.projects ? (
-                        <>{task.projects.project_name}</>
-                      ) : (
-                        <>No Project</>
-                      )}
-                    </td>
+                      <td style={{ textAlign: "left" }}>
+                        {task.projects ? (
+                          <>{task.projects.project_name}</>
+                        ) : (
+                          <>No Project</>
+                        )}
+                      </td>
 
-                    <td style={{ textAlign: "left" }}>
-                      {task.completed_by ? task.completed_by : "N/A"}
-                    </td>
-                    <td style={{ textAlign: "left" }}>
-                      {task.date_created
-                        ? new Date(task.date_created)
-                            .toISOString()
-                            .split("T")[0]
-                        : "N/A"}
-                    </td>
+                      <td style={{ textAlign: "left" }}>
+                        {task.completed_by ? task.completed_by : "N/A"}
+                      </td>
+                      <td style={{ textAlign: "left" }}>
+                        {task.date_created
+                          ? new Date(task.date_created).toISOString().split("T")[0]
+                          : "N/A"}
+                      </td>
 
-                    <td style={{ textAlign: "left" }}>
-                      {task.date_created
-                        ? new Date(task.date_completed)
-                            .toISOString()
-                            .split("T")[0]
-                        : "N/A"}
+                      <td style={{ textAlign: "left" }}>
+                        {task.date_completed
+                          ? new Date(task.date_completed).toISOString().split("T")[0]
+                          : "N/A"}
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="5" style={{ textAlign: "center" }}>
+                      <Typography variant="h1" component="h1">
+                        No Completed Tasks
+                      </Typography>
                     </td>
                   </tr>
-                ))}
+                )}
               </tbody>
+
             </Table>
           </TabPanel>
 
@@ -510,44 +530,51 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
               </thead>
 
               <tbody>
-                {Object.values(archivedTasks).map((task, days) => (
-                  <tr key={task.task_id}>
-                    <td
-                      onClick={() => console.log("Task Clicked")}
-                      style={{ textAlign: "left", cursor: "pointer" }}
-                    >
-                      {`${task.task_name}`}
-                    </td>
+                {archivedTasks.length > 0 ? (
+                  Object.values(archivedTasks).map((task, days) => (
+                    <tr key={task.task_id}>
+                      <td
+                        onClick={() => console.log("Task Clicked")}
+                        style={{ textAlign: "left", cursor: "pointer" }}
+                      >
+                        {`${task.task_name}`}
+                      </td>
 
-                    <td style={{ textAlign: "left" }}>
-                      {task.projects ? (
-                        <>{task.projects.project_name}</>
-                      ) : (
-                        <>No Project</>
-                      )}
-                    </td>
+                      <td style={{ textAlign: "left" }}>
+                        {task.projects ? (
+                          <>{task.projects.project_name}</>
+                        ) : (
+                          <>No Project</>
+                        )}
+                      </td>
 
-                    <td style={{ textAlign: "left" }}>
-                      {task.completed_by ? task.completed_by : "N/A"}
-                    </td>
-                    <td style={{ textAlign: "left" }}>
-                      {task.date_created
-                        ? new Date(task.date_created)
-                            .toISOString()
-                            .split("T")[0]
-                        : "N/A"}
-                    </td>
+                      <td style={{ textAlign: "left" }}>
+                        {task.completed_by ? task.completed_by : "N/A"}
+                      </td>
+                      <td style={{ textAlign: "left" }}>
+                        {task.date_created
+                          ? new Date(task.date_created).toISOString().split("T")[0]
+                          : "N/A"}
+                      </td>
 
-                    <td style={{ textAlign: "left" }}>
-                      {task.date_created
-                        ? new Date(task.date_completed)
-                            .toISOString()
-                            .split("T")[0]
-                        : "N/A"}
+                      <td style={{ textAlign: "left" }}>
+                        {task.date_completed
+                          ? new Date(task.date_completed).toISOString().split("T")[0]
+                          : "N/A"}
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="5" style={{ textAlign: "center" }}>
+                      <Typography variant="h1" component="h1">
+                        No Recently Deleted Tasks
+                      </Typography>
                     </td>
                   </tr>
-                ))}
+                )}
               </tbody>
+
             </Table>
           </TabPanel>
         </Tabs>
@@ -663,45 +690,86 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                 borderRadius: "5px",
               }}
             >
-              {/* TABLE HEAD BEGINS HERE */}
-              <thead>
+            {/* TABLE HEAD BEGINS HERE */}
+            <thead>
                 <tr>
                   <th style={{ width: 120, padding: "12px 6px" }}>Task Name</th>
-                  <th style={{ width: 60, padding: "12px 6px" }}>Project</th>
+                  <th style={{ width: 60, padding: "12px 6px", textAlign: "center" }}>Priority</th>
                   <th style={{ width: 60, padding: "12px 6px" }}>Created</th>
+                  <th style={{ width: 40, padding: "12px 6px" }}></th>
                 </tr>
               </thead>
 
               <tbody>
-                {Object.values(activeTasks).map((task) => (
-                  <tr key={task.task_id}>
-                    <td
-                      onClick={() => console.log("Task Clicked")}
-                      style={{ textAlign: "left", cursor: "pointer" }}
-                    >
-                      {`${task.task_name}`}
-                    </td>
-
-                    <td style={{ textAlign: "left" }}>
-                      {task.projects ? (
-                        <>{task.projects.project_name}</>
-                      ) : (
-                        <>No Project</>
-                      )}
-                    </td>
-
-                    <td style={{ textAlign: "left" }}>
-                      {task.date_created
-                        ? new Intl.DateTimeFormat("en-US", {
-                            weekday: "short",
-                            year: "numeric",
-                            month: "short",
-                            day: "numeric",
-                          }).format(new Date(task.date_created))
-                        : "N/A"}
+                {activeTasks.length > 0 ? (
+                  Object.values(activeTasks).map((task) => (
+                    <tr key={task.task_id}>
+                      <td
+                        onClick={() => console.log("Task Clicked")}
+                        style={{ cursor: "pointer", textAlign: "left" }}
+                      >
+                        <Typography
+                          variant="subtitle1"
+                          component="div"
+                          style={{ color: "#212121", textAlign: "left" }}
+                        >
+                          {task.task_name}
+                        </Typography>
+                        {task.projects ? (
+                          <Typography
+                            variant="body2"
+                            component="div"
+                            style={{ color: "#757575", textAlign: "left" }}
+                          >
+                            {task.projects.project_name}
+                          </Typography>
+                        ) : (
+                          <Typography
+                            variant="body2"
+                            component="div"
+                            style={{ color: "#757575", textAlign: "left" }}
+                          >
+                            No Project
+                          </Typography>
+                        )}
+                      </td>
+                      <td style={{ textAlign: "center" }}>
+                        <Chip
+                          onClick={() => console.log(`Task Clicked: ${task.task_id}`)}
+                          style={{ cursor: "pointer" }}
+                          variant="soft"
+                          size="sm"
+                          color={getPriorityColor(task.priority_name)}
+                        >
+                          {task.priority_name}
+                        </Chip>
+                      </td>
+                      <td style={{ textAlign: "left" }}>
+                        {task.date_created
+                          ? new Date(task.date_created).toISOString().split("T")[0]
+                          : "N/A"}
+                      </td>
+                      <td style={{ textAlign: "center" }}>
+                        <IconButton
+                          size="sm"
+                          variant="soft"
+                          color="danger"
+                          onClick={() => archiveTask(task.task_id)}
+                        >
+                          <DeleteRoundedIcon />
+                        </IconButton>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="4" style={{ textAlign: "center" }}>
+                      <Typography variant="h1" component="h1">
+                        No Active Tasks
+                      </Typography>
                     </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </Table>
           </TabPanel>
