@@ -153,7 +153,12 @@ const ClientDetailsPage = () => {
                   gap: 2,
                 }}
               >
-                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                  }}
+                >
                   <Typography
                     level="h2"
                     textColor="text.primary"
@@ -180,7 +185,7 @@ const ClientDetailsPage = () => {
                     startDecorator={<EditIcon />}
                     onClick={handleEdit}
                   >
-                    Edit CLient
+                    Edit Client
                   </Button>
 
                   <Snackbar
@@ -238,7 +243,7 @@ const ClientDetailsPage = () => {
                 sx={{
                   py: 2,
                   display: "flex",
-                  flexDirection: { xs: "column", md: "row" },
+                  flexDirection: { xs: "column", md: "row", },
                   alignItems: "start",
                 }}
               >
@@ -278,16 +283,101 @@ const ClientDetailsPage = () => {
                       component="span"
                       sx={{ mr: 1, display: "inline-block" }}
                     >
-                      Address: {client.street}, {client.province}, {client.postal_code}
+                      Address:{" "}
+                      <a
+                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                          `${client.street}, ${client.city}, ${client.province} ${client.postal_code}`
+                        )}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        underline="hover"
+                        sx={{ color: "inherit", textDecoration: "none" }} // Optionally set the color to match the surrounding text
+                      >
+                        {client.street}, {client.city}, {client.province},{" "}
+                        {client.postal_code}
+                      </a>
+                    </Typography>
+
+                    <Typography
+                      mt={1}
+                      level="title-md"
+                      textColor="text.primary"
+                      component="span"
+                      sx={{ mr: 1, display: "inline-block" }}
+                    >
+                      Email:{" "}
+                      <a
+                        href={`mailto:${client.email}`}
+                        style={{ textDecoration: "none" }}
+                      >
+                        {" "}
+                        {client.email}{" "}
+                      </a>
+                    </Typography>
+                    <Typography
+                      mt={1}
+                      level="title-md"
+                      textColor="text.primary"
+                      component="span"
+                      sx={{ mr: 1, display: "inline-block" }}
+                    >
+                      Phone: 
+                      <a
+                          href={`tel:${client.phone_number}`}
+                          style={{ textDecoration: "none" }}
+                        >{client.phone_number}</a>
+                    </Typography>
+                    <Typography
+                      mt={1}
+                      level="title-md"
+                      textColor="text.primary"
+                      component="span"
+                      sx={{ mr: 1, display: "inline-block" }}
+                    >
+                      Notes: {client.notes}
+                    </Typography>
+                    <Typography
+                      mt={1}
+                      level="title-md"
+                      textColor="text.primary"
+                      component="span"
+                      sx={{ mr: 1, display: "inline-block" }}
+                    >
+                      Tag: {client.tag}
+                    </Typography>
+                    <Typography
+                      sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                    >
+                      Projects:{" "}
+                      {projects.map((project, index) => (
+                        <Typography
+                          sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                        >
+                          {project.project_name}
+                          {index < projects.length - 1 && ","}
+                        </Typography>
+                      ))}
                     </Typography>
                   </Box>
                 </Box>
               </Box>
             </Sheet>
-            <Typography variant="h3" gutterBottom>
+          </Box>
+        </Box>
+      </Box>
+    </CssVarsProvider>
+  );
+};
+
+export default ClientDetailsPage;
+
+{
+  /* <Typography variant="h3" gutterBottom>
               {client.first_name} {client.last_name}'s Details
-            </Typography>
-            <Card elevation={4} sx={{ p: 2, mb: 2 }}>
+            </Typography> */
+}
+{
+  /* <Card elevation={4} sx={{ p: 2, mb: 2 }}>
               <CardContent>
                 <Typography variant="h6">Contact Information</Typography>
                 <Box
@@ -396,8 +486,10 @@ const ClientDetailsPage = () => {
                     ))}
                   </Box>
                 </Box>
-              </CardContent>
-              <CardActions sx={{ justifyContent: "space-between" }}>
+              </CardContent> */
+}
+{
+  /* <CardActions sx={{ justifyContent: "space-between" }}>
                 <Button
                   startDecorator={<EditIcon />}
                   variant="outlined"
@@ -414,19 +506,14 @@ const ClientDetailsPage = () => {
                   Delete
                 </Button>
               </CardActions>
-            </Card>
-            <Button
+            </Card> */
+}
+{
+  /* <Button
               variant="outlined"
               startDecorator={<HomeIcon />}
               onClick={() => navigate("/clients")}
             >
               Back to Clients
-            </Button>
-          </Box>
-        </Box>
-      </Box>
-    </CssVarsProvider>
-  );
-};
-
-export default ClientDetailsPage;
+            </Button> */
+}
