@@ -49,28 +49,20 @@ export default function DashboardTasks() {
   async function GetTasks() {
     const { data, error } = await supabaseClient.from("tasks").select(`
     *,
-    projects(*),
+    projects(*)
   `);
     // Hey Thomas, do we need to add this here too? Broke this view when I added priorities to the tasks table
   // priority:task_priority (name) 
   
   // Get all the projects from the database
     if (error) {
-      console.error(error);
+      console.error('Error Fetching Tasks' + error);
       return;
     } else {
-      setTasks(data); // Set the projects to the state
+      setTasks(data); // Set the tasks to the state
       setProjects(data.map((task) => task.projects));
     }
   }
-
-  const completedTasks = tasks.filter((task) => {
-    // Check if the task is completed and its creation date is within the last 30 days
-    if (task.is_completed) {
-      return true; // Keep the task in the filtered array
-    }
-    return false; // Exclude the task from the filtered array
-  });
 
   useEffect(() => {
     GetTasks();
@@ -107,7 +99,7 @@ export default function DashboardTasks() {
           </thead>
 
           <tbody>
-            {tasks.slice(0, 5).map((task) => (
+            {tasks.sort((a,b) => new Date(b.date_created) - new Date(a.date_created)).slice(0,5).map((task) => (
               <tr>
                 <td>{task.task_name}</td>
                 <td>{task.projects.project_name}</td>
