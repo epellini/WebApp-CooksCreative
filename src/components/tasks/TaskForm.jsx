@@ -35,7 +35,7 @@ import FileUpload from "../FileUpload";
 import { useNavigate, useParams } from "react-router-dom";
 import { supabaseClient } from "../../supabase-client";
 
-const TaskFormComplete = ({open, setOpen, onHandleSubmit}) => {
+const TaskForm = ({ open, setOpen, onHandleSubmit }) => {
   const [task, setTask] = useState({
     task_name: "",
     project_id: null,
@@ -49,8 +49,9 @@ const TaskFormComplete = ({open, setOpen, onHandleSubmit}) => {
   const navigate = useNavigate();
   const supabase = supabaseClient;
   const [projects, setProjects] = useState([]);
-  const [tasks, setTasks] = useState([]);   
-const [users, setUsers] = useState([]);
+  const [tasks, setTasks] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [priority, setPriority] = useState([]);
 
   useEffect(() => {
     async function fetchData() {
@@ -62,21 +63,27 @@ const [users, setUsers] = useState([]);
           .eq("task_id", taskid || "")
           .single();
 
+        console.log("taskData", taskData);
+
         const { data: projectsData, error: projectsError } = await supabase
           .from("projects")
           .select("*")
           .order("project_id", { ascending: true });
 
-          const { data: usersData, error: usersError } = await supabase
-            .from("users")
-            .select("*")
-            .order("user_id", { ascending: true });
+        const { data: usersData, error: usersError } = await supabase
+          .from("users")
+          .select("*")
+          .order("user_id", { ascending: true });
 
+        const { data: priorityData, error: priorityError } = await supabase
+          .from("priority")
+          .select("*")
+          .order("priority_id", { ascending: true });
 
         if (tasksError) {
           console.error("Error fetching tasks:", tasksError);
         } else {
-          setTasks(taskData || {});
+          setTask(taskData || {});
         }
 
         if (projectsError) {
@@ -85,11 +92,15 @@ const [users, setUsers] = useState([]);
           setProjects(projectsData || []);
         }
         if (usersError) {
-            console.error("Error fetching users:", usersError);
-            }
-            else {
-            setUsers(usersData || []);
-            }
+          console.error("Error fetching users:", usersError);
+        } else {
+          setUsers(usersData || []);
+        }
+        if (priorityError) {
+          console.error("Error fetching priority:", priorityError);
+        } else {
+          setPriority(priorityData || []);
+        }
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -99,11 +110,13 @@ const [users, setUsers] = useState([]);
 
     fetchData();
   }, [taskid]);
+
   const handleChange = (e, value, name) => {
     // Check if e is null or undefined
     console.log("value", value);
     console.log("e", e);
     console.log("name", name);
+    console.log("task", task);
 
     if (!e) {
       return;
@@ -132,27 +145,33 @@ const [users, setUsers] = useState([]);
       try {
         let result = null;
         if (taskid) {
+          task.is_completed = true;
           result = await supabase
             .from("tasks")
             .update(task)
             .eq("task_id", taskid);
+
+          navigate("/tasks");
+          return;
         } else {
+          // Set is_completed value from the state
+          const isCompletedValue = task.is_completed; // Get the value from the state
+          const newTask = { ...task, is_completed: isCompletedValue }; // Update the task object with the is_completed value
           const { data, error } = await supabase
             .from("tasks")
-            .insert([task]);
+            .insert([newTask]); // Insert the updated task object
           result = { data, error };
         }
         if (result.error) {
           console.error("Error adding task:", result.error);
         } else {
-            // navigate("/tasks");
-            onHandleSubmit();
+          // navigate("/tasks");
+          onHandleSubmit();
           console.log("Task added successfully");
         }
       } catch (error) {
         console.error("Error adding task:", error);
       }
-
     }
   };
 
@@ -169,7 +188,7 @@ const [users, setUsers] = useState([]);
         >
           <Box sx={{ px: { xs: 2, md: 6 } }}>
             <Typography level="h2" component="h1" sx={{ mt: 1, mb: 2 }}>
-              {taskid ? "Update Task" : "Add Task"}
+              {taskid ? "Complete Task" : "Add Task"}
             </Typography>
           </Box>
         </Box>
@@ -202,6 +221,7 @@ const [users, setUsers] = useState([]);
                   <FormControl sx={{ flexGrow: 1 }}>
                     <FormLabel>Task Name</FormLabel>
                     <Input
+                      disabled={taskid ? true : false} // Set directly to true or false based on the condition
                       size="sm"
                       type="text"
                       id="task_name"
@@ -213,44 +233,83 @@ const [users, setUsers] = useState([]);
                   </FormControl>
                 </Stack>
                 <FormControl sx={{ flexGrow: 1 }}>
-                    <FormLabel>Project Name</FormLabel>
-                    <Autocomplete
-                      id="project_id"
-                      name="project_id"
-                      options={projects}
-                      getOptionLabel={(option) =>
-                        option.project_name +
-                        " " +
-                        "(ID: " +
-                        option.project_id +
-                        ")"
-                      }
-                      value={
-                        projects.find(
-                          (project) => project.project_id === task.project_id
-                        ) || null
-                      }
-                      onChange={(e, value) =>
-                        handleChange(
-                          e,
-                          value ? value.project_id : null,
-                          "project_id"
-                        )
-                      }
-                      renderInput={(params) => (
-                        <Input
-                          {...params}
-                          size="sm"
-                          id="project_id"
-                          name="project_id"
-                          required
-                        />
-                      )}
-                    />
-                  </FormControl>
-                  <FormControl sx={{ flexGrow: 1 }}>
-                    <FormLabel>Completed</FormLabel>
-                    <Select
+                  <FormLabel>Project Name</FormLabel>
+                  <Autocomplete
+                    disabled={taskid ? true : false}
+                    id="project_id"
+                    name="project_id"
+                    options={projects}
+                    getOptionLabel={(option) =>
+                      option.project_name +
+                      " " +
+                      "(ID: " +
+                      option.project_id +
+                      ")"
+                    }
+                    value={
+                      projects.find(
+                        (project) => project.project_id === task.project_id
+                      ) || null
+                    }
+                    onChange={(e, value) =>
+                      handleChange(
+                        e,
+                        value ? value.project_id : null,
+                        "project_id"
+                      )
+                    }
+                    renderInput={(params) => (
+                      <Input
+                        {...params}
+                        size="sm"
+                        id="project_id"
+                        name="project_id"
+                        required
+                      />
+                    )}
+                  />
+                </FormControl>
+
+                {!taskid && (
+                  <Stack spacing={1}>
+                    <FormControl sx={{ flexGrow: 1 }}>
+                      <FormLabel>Task Priority</FormLabel>
+                      <Autocomplete
+                        id="task_priority"
+                        name="task_priority"
+                        options={priority}
+                        getOptionLabel={(option) => option.name + " "}
+                        value={
+                          priority.find(
+                            (priority) =>
+                              priority.priority_id === task.task_priority
+                          ) || null
+                        }
+                        onChange={(e, value) =>
+                          handleChange(
+                            e,
+                            value ? value.priority_id : null,
+                            "task_priority"
+                          )
+                        }
+                        renderInput={(params) => (
+                          <Input
+                            {...params}
+                            size="sm"
+                            id="task_priority"
+                            name="task_priority"
+                            required
+                          />
+                        )}
+                      />
+                    </FormControl>
+                  </Stack>
+                )}
+                {!taskid && (
+                  <Stack spacing={1}>
+                    <FormControl sx={{ flexGrow: 1 }}>
+                      <FormLabel>Completed</FormLabel>
+                      <Select
                         placeholder="Select Status"
                         id="is_completed"
                         name="is_completed" // Add the name attribute
@@ -259,74 +318,67 @@ const [users, setUsers] = useState([]);
                           handleChange(e, value, "is_completed")
                         } // Pass the name along with the value
                         required
-                        >
+                      >
                         <Option value={true}>Yes</Option>
                         <Option value={false}>No</Option>
-                    </Select>
+                      </Select>
                     </FormControl>
-                    
-                    
-
-                <Stack spacing={1}>
-                  {/* <Box>
-                    <FormLabel htmlFor="time_stamp">Start Date</FormLabel>
-                    <Input
-                      id="time_stamp"
-                      name="time_stamp"
-                      type="date"
-                      value={task.time_stamp}
-                      onChange={handleChange}
-                      required
-                    />
-                  </Box> */}
-
-                  {/* <FormLabel>Task Notes</FormLabel>
-                  <FormControl
-                    sx={{
-                      display: { sm: "flex-column", md: "flex-row" },
-                      gap: 2,
-                    }}
-                  >
-                    <Textarea
-                      size="sm"
-                      minRows={4}
-                      sx={{ flexGrow: 1 }}
-                      id="completion_notes"
-                      name="completion_notes"
-                      value={task.completion_notes}
-                      onChange={handleChange}
-                      required
-                    />
-                  </FormControl> */}
-                </Stack>
-
-                {/* <Stack direction="row" spacing={2}>
+                  </Stack>
+                )}
+                {taskid && (
                   <FormControl sx={{ flexGrow: 1 }}>
-                    <FormLabel>User</FormLabel>
-                    <Select
-                      placeholder="Select User"
-                      id="status_id"
-                      name="status_id" // Add the name attribute
-                      value={project.status_id}
+                    <FormLabel>Completed By</FormLabel>
+                    <Autocomplete
+                      id="user_id"
+                      name="user_id"
+                      options={users}
+                      getOptionLabel={(option) => option.first_name + " "}
+                      value={
+                        users.find((user) => user.user_id === task.user_id) ||
+                        null
+                      }
                       onChange={(e, value) =>
-                        handleChange(e, value, "status_id")
-                      } // Pass the name along with the value
-                      required
-                    >
-                      {status.map((statusOption) => (
-                        <Option
-                          key={statusOption.status_id}
-                          value={statusOption.status_id}
-                          selected={
-                            statusOption.status_id === project.status_id
-                          } // Set selected attribute
-                        >
-                          {statusOption.name}
-                        </Option>
-                      ))}
-                    </Select>
+                        handleChange(
+                          e,
+                          value ? value.user_id : null, // Pass the user ID directly to handleChange
+                          "user_id"
+                        )
+                      }
+                      renderInput={(params) => (
+                        <Input
+                          {...params}
+                          size="sm"
+                          id="user_id"
+                          name="user_id"
+                          required
+                        />
+                      )}
+                    />
                   </FormControl>
-                </Stack> */}
+                )}
+
+                {taskid && (
+                  <Stack spacing={1}>
+                    <FormLabel>Completion Notes</FormLabel>
+                    <FormControl
+                      sx={{
+                        display: { sm: "flex-column", md: "flex-row" },
+                        gap: 2,
+                      }}
+                    >
+                      <Textarea
+                        size="sm"
+                        minRows={4}
+                        sx={{ flexGrow: 1 }}
+                        id="completion_notes"
+                        name="completion_notes"
+                        value={task.completion_notes}
+                        onChange={handleChange}
+                        required
+                      />
+                    </FormControl>
+                  </Stack>
+                )}
               </Stack>
             </Stack>
             <Stack
@@ -340,6 +392,7 @@ const [users, setUsers] = useState([]);
                   <FormControl sx={{ flexGrow: 1 }}>
                     <FormLabel>Task Name</FormLabel>
                     <Input
+                      disabled={taskid ? true : false} // Set directly to true or false based on the condition
                       size="sm"
                       type="text"
                       id="task_name"
@@ -351,54 +404,7 @@ const [users, setUsers] = useState([]);
                   </FormControl>
                 </Stack>
               </Stack>
-              <div>
-                {/* <Stack direction="row" spacing={2}>
-                  <FormControl sx={{ flexGrow: 1 }}>
-                    <FormLabel>User</FormLabel>
-                    <Select
-                      placeholder="Select User"
-                      id="status_id"
-                      name="status_id" // Add the name attribute
-                      value={project.status_id}
-                      onChange={(e, value) =>
-                        handleChange(e, value, "status_id")
-                      } // Pass the name along with the value
-                      required
-                    >
-                      {status.map((statusOption) => (
-                        <Option
-                          key={statusOption.status_id}
-                          value={statusOption.status_id}
-                          selected={
-                            statusOption.status_id === project.status_id
-                          } // Set selected attribute
-                        >
-                          {statusOption.name}
-                        </Option>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Stack> */}
-              </div>
-
-              {/* <FormLabel>Task Notes</FormLabel>
-              <FormControl
-                sx={{
-                  display: { sm: "flex-column", md: "flex-row" },
-                  gap: 2,
-                }}
-              >
-                <Textarea
-                  size="sm"
-                  minRows={4}
-                  sx={{ flexGrow: 1 }}
-                  id="completion_notes"
-                  name="completion_notes"
-                  value={task.completion_notes}
-                  onChange={handleChange}
-                  required
-                />
-              </FormControl> */}
+              <div></div>
             </Stack>
             <CardOverflow
               sx={{ borderTop: "1px solid", borderColor: "divider" }}
@@ -413,7 +419,7 @@ const [users, setUsers] = useState([]);
                   Cancel
                 </Button>
                 <Button size="sm" variant="solid" type="submit">
-                  {taskid ? "Update Task" : "Add Task"}
+                  {taskid ? "Complete Task" : "Add Task"}
                 </Button>
               </CardActions>
             </CardOverflow>
@@ -424,4 +430,4 @@ const [users, setUsers] = useState([]);
   );
 };
 
-export default TaskFormComplete;
+export default TaskForm;
