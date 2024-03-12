@@ -149,16 +149,16 @@ export default function ProjectTable() {
     }
   }
 
-  const getStatusColor = (statusName) => {
-    switch (statusName.toLowerCase()) {
-      case "completed":
-        return "warning";
-      case "active":
-        return "success";
-      case "cancelled":
-        return "danger";
-    }
-  };
+  // const getStatusColor = (statusName) => {
+  //   switch (statusName.toLowerCase()) {
+  //     case "completed":
+  //       return "warning";
+  //     case "active":
+  //       return "success";
+  //     case "cancelled":
+  //       return "danger";
+  //   }
+  // };
 
   return (
     <React.Fragment>
@@ -592,7 +592,7 @@ export default function ProjectTable() {
                       alignItems="center"
                       variant="outlined"
                       label={project.status.name}
-                      color={getStatusColor(project.status.name)}
+                      // color={getStatusColor(project.status.name)}
                     />
                   </td>
                   <td>

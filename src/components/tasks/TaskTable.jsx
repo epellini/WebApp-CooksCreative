@@ -31,6 +31,7 @@ import {
   DialogActions,
   Sheet,
   Chip,
+  Badge,
   TabPanel,
   Tab,
   tabClasses,
@@ -45,7 +46,7 @@ import { useEffect, useState } from "react";
 import { supabaseClient } from "../../supabase-client"; // Import the supabase client
 // ICONS:
 import Add from "@mui/icons-material/Add";
-import AddIcon from '@mui/icons-material/Add';
+import AddIcon from "@mui/icons-material/Add";
 
 //task form
 import TaskForm from "./TaskFormAdd";
@@ -74,17 +75,23 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
     newMembers[index] = event.target.checked;
     setMembers(newMembers);
   };
+
   async function getTasks() {
     const { data, error } = await supabaseClient.from("tasks").select(`
-  *,
-  projects(*)
-`);
+      *,
+      projects(*),
+      priority:task_priority (name)
+    `);
 
     if (error) {
       console.error("Error fetching tasks:", error);
     } else {
-      setTasks(data);
-      setProjects(data.map((task) => task.projects)); //get the projects for the specified task
+      const tasksWithPriorityName = data.map((task) => ({
+        ...task,
+        priority_name: task.priority ? task.priority.name : "Unknown", // Correctly assigning 'priority_name'
+      }));
+      setTasks(tasksWithPriorityName);
+      setProjects(tasksWithPriorityName.map((task) => task.projects));
     }
   }
   useEffect(() => {
@@ -123,6 +130,34 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
   const onHandleSubmit = () => {
     toggleModal(); // Close the modal after submission
     getTasks(); // Reload tasks
+  };
+
+  // const getPriorityColor = (priorityName) => {
+  //   switch (priorityName.toLowerCase()) {
+  //     case "high":
+  //       return "error"; // MUI's equivalent for danger/red
+  //     case "medium":
+  //       return "warning"; // MUI's warning color
+  //     case "low":
+  //       return "success"; // MUI's success color
+  //     default:
+  //       return "default"; // MUI's default color
+  //   }
+  // };
+
+  const getPriorityColor = (priorityName) => {
+    switch (
+      priorityName?.toLowerCase() // Safe navigation in case of undefined
+    ) {
+      case "high":
+        return "danger";
+      case "medium":
+        return "warning";
+      case "low":
+        return "success";
+      default:
+        return "default";
+    }
   };
 
   return (
@@ -270,6 +305,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
               <thead>
                 <tr>
                   <th style={{ width: 120, padding: "12px 6px" }}>Task Name</th>
+                  <th style={{ width: 60, padding: "12px 6px", textAlign: "center" }}>Priority</th>
                   <th style={{ width: 60, padding: "12px 6px" }}>Created</th>
                 </tr>
               </thead>
@@ -279,10 +315,48 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                   <tr key={task.task_id}>
                     <td
                       onClick={() => console.log("Task Clicked")}
-                      style={{ textAlign: "left", cursor: "pointer" }}
+                      style={{ cursor: "pointer", textAlign: "left" }}
                     >
-                      {`${task.task_name}`}
+                      <Typography
+                        variant="subtitle1"
+                        component="div"
+                        style={{ color: "#212121", textAlign: "left" }}
+                      >
+                        {task.task_name}
+                      </Typography>
+                      {task.projects ? (
+                        <Typography
+                          variant="body2"
+                          component="div"
+                          style={{ color: "#757575", textAlign: "left" }}
+                        >
+                          {task.projects.project_name}
+                        </Typography>
+                      ) : (
+                        <Typography
+                          variant="body2"
+                          component="div"
+                          style={{ color: "#757575", textAlign: "left" }}
+                        >
+                          No Project
+                        </Typography>
+                      )}
                     </td>
+
+                    <td style={{ textAlign: "center" }}>
+                      <Chip
+                        onClick={() =>
+                          console.log(`Task Clicked: ${task.task_id}`)
+                        } // Adjust this as necessary for your use case
+                        style={{ cursor: "pointer" }}
+                        variant="soft"
+                        size="sm"
+                        color={getPriorityColor(task.priority_name)}
+                      >
+                        {task.priority_name}
+                      </Chip>
+                    </td>
+
                     <td style={{ textAlign: "left" }}>
                       {task.date_created
                         ? new Intl.DateTimeFormat("en-US", {
@@ -593,6 +667,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
               <thead>
                 <tr>
                   <th style={{ width: 120, padding: "12px 6px" }}>Task Name</th>
+                  <th style={{ width: 60, padding: "12px 6px" }}>Project</th>
                   <th style={{ width: 60, padding: "12px 6px" }}>Created</th>
                 </tr>
               </thead>
@@ -606,6 +681,15 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                     >
                       {`${task.task_name}`}
                     </td>
+
+                    <td style={{ textAlign: "left" }}>
+                      {task.projects ? (
+                        <>{task.projects.project_name}</>
+                      ) : (
+                        <>No Project</>
+                      )}
+                    </td>
+
                     <td style={{ textAlign: "left" }}>
                       {task.date_created
                         ? new Intl.DateTimeFormat("en-US", {

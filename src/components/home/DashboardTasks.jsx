@@ -41,7 +41,6 @@ import { useEffect, useState } from "react";
 import { supabaseClient } from "../../supabase-client"; // Import the supabase client
 
 
-//task form
 
 export default function DashboardTasks() {
   const [tasks, setTasks] = useState([]); // State to hold the projects
@@ -50,9 +49,12 @@ export default function DashboardTasks() {
   async function GetTasks() {
     const { data, error } = await supabaseClient.from("tasks").select(`
     *,
-    projects(*)
-
-  `); // Get all the projects from the database
+    projects(*),
+  `);
+    // Hey Thomas, do we need to add this here too? Broke this view when I added priorities to the tasks table
+  // priority:task_priority (name) 
+  
+  // Get all the projects from the database
     if (error) {
       console.error(error);
       return;
