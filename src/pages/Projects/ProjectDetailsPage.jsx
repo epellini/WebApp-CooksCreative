@@ -32,6 +32,7 @@ import Link from "@mui/joy/Link";
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 import DownloadRoundedIcon from "@mui/icons-material/DownloadRounded";
+import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 
 export default function ProjectDetailsPage() {
   const [project, setProject] = useState({
@@ -71,6 +72,7 @@ export default function ProjectDetailsPage() {
   const navigate = useNavigate();
   const supabase = supabaseClient;
   const { id } = useParams();
+  const imagesRef = React.useRef(null);
 
   const getStatusColor = (statusName) => {
     if (!statusName) return "default"; // Handle undefined or empty string
@@ -277,7 +279,7 @@ export default function ProjectDetailsPage() {
               >
                 <Button
                   size="sm"
-                  variant="plain"
+                  variant="soft"
                   color="neutral"
                   startDecorator={<EditNoteIcon />}
                   onClick={() =>
@@ -286,6 +288,17 @@ export default function ProjectDetailsPage() {
                 >
                   Edit Project
                 </Button>
+
+                <Button
+                  size="sm"
+                  variant="soft"
+                  color="primary"
+                  startDecorator={<AddPhotoAlternateIcon />} // Import this icon from @mui/icons-material
+                  onClick={() => imagesRef.current.triggerFileInputClick()}
+                >
+                  Add Image
+                </Button>
+
                 <Snackbar
                   color="success"
                   open={open[1]}
@@ -305,9 +318,11 @@ export default function ProjectDetailsPage() {
                 >
                   Your project has been edited.
                 </Snackbar>
+
+                {/* Need to add a Modal View to ask for confirmation before deleting a project */}
                 <Button
                   size="sm"
-                  variant="plain"
+                  variant="soft"
                   color="danger"
                   startDecorator={<DeleteRoundedIcon />}
                   onClick={() => deleteProject(project.project_id)}
@@ -436,8 +451,7 @@ export default function ProjectDetailsPage() {
 
             <ProjectTasks projectid={id} />
 
-            <Images projectid={id} />
-            
+            <Images projectid={id} ref={imagesRef} />
           </Sheet>
         </Box>
       </Box>

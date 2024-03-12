@@ -35,7 +35,7 @@ import FileUpload from "../FileUpload";
 import { useNavigate, useParams } from "react-router-dom";
 import { supabaseClient } from "../../supabase-client";
 
-const TaskFormAdd = ({open, setOpen, onHandleSubmit}) => {
+const TaskFormAdd = ({ open, setOpen, onHandleSubmit }) => {
   const [task, setTask] = useState({
     task_name: "",
     project_id: null,
@@ -49,8 +49,9 @@ const TaskFormAdd = ({open, setOpen, onHandleSubmit}) => {
   const navigate = useNavigate();
   const supabase = supabaseClient;
   const [projects, setProjects] = useState([]);
-  const [tasks, setTasks] = useState([]);   
-const [users, setUsers] = useState([]);
+  const [tasks, setTasks] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [priority, setPriority] = useState([]);
 
   useEffect(() => {
     async function fetchData() {
@@ -67,11 +68,15 @@ const [users, setUsers] = useState([]);
           .select("*")
           .order("project_id", { ascending: true });
 
-          const { data: usersData, error: usersError } = await supabase
-            .from("users")
-            .select("*")
-            .order("user_id", { ascending: true });
+        const { data: usersData, error: usersError } = await supabase
+          .from("users")
+          .select("*")
+          .order("user_id", { ascending: true });
 
+        const { data: priorityData, error: priorityError } = await supabase
+          .from("priority")
+          .select("*")
+          .order("priority_id", { ascending: true });
 
         if (tasksError) {
           console.error("Error fetching tasks:", tasksError);
@@ -85,11 +90,15 @@ const [users, setUsers] = useState([]);
           setProjects(projectsData || []);
         }
         if (usersError) {
-            console.error("Error fetching users:", usersError);
-            }
-            else {
-            setUsers(usersData || []);
-            }
+          console.error("Error fetching users:", usersError);
+        } else {
+          setUsers(usersData || []);
+        }
+        if (priorityError) {
+          console.error("Error fetching priority:", priorityError);
+        } else {
+          setPriority(priorityData || []);
+        }
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -99,11 +108,13 @@ const [users, setUsers] = useState([]);
 
     fetchData();
   }, [taskid]);
+
   const handleChange = (e, value, name) => {
     // Check if e is null or undefined
     console.log("value", value);
     console.log("e", e);
     console.log("name", name);
+    console.log("task", task);
 
     if (!e) {
       return;
@@ -137,22 +148,19 @@ const [users, setUsers] = useState([]);
             .update(task)
             .eq("task_id", taskid);
         } else {
-          const { data, error } = await supabase
-            .from("tasks")
-            .insert([task]);
+          const { data, error } = await supabase.from("tasks").insert([task]);
           result = { data, error };
         }
         if (result.error) {
           console.error("Error adding task:", result.error);
         } else {
-            // navigate("/tasks");
-            onHandleSubmit();
+          // navigate("/tasks");
+          onHandleSubmit();
           console.log("Task added successfully");
         }
       } catch (error) {
         console.error("Error adding task:", error);
       }
-
     }
   };
 
@@ -213,59 +221,93 @@ const [users, setUsers] = useState([]);
                   </FormControl>
                 </Stack>
                 <FormControl sx={{ flexGrow: 1 }}>
-                    <FormLabel>Project Name</FormLabel>
-                    <Autocomplete
-                      id="project_id"
-                      name="project_id"
-                      options={projects}
-                      getOptionLabel={(option) =>
-                        option.project_name +
-                        " " +
-                        "(ID: " +
-                        option.project_id +
-                        ")"
-                      }
-                      value={
-                        projects.find(
-                          (project) => project.project_id === task.project_id
-                        ) || null
-                      }
-                      onChange={(e, value) =>
-                        handleChange(
-                          e,
-                          value ? value.project_id : null,
-                          "project_id"
-                        )
-                      }
-                      renderInput={(params) => (
-                        <Input
-                          {...params}
-                          size="sm"
-                          id="project_id"
-                          name="project_id"
-                          required
-                        />
-                      )}
-                    />
-                  </FormControl>
-                  <FormControl sx={{ flexGrow: 1 }}>
-                    <FormLabel>Completed</FormLabel>
-                    <Select
-                        placeholder="Select Status"
-                        id="is_completed"
-                        name="is_completed" // Add the name attribute
-                        value={task.is_completed}
-                        onChange={(e, value) =>
-                          handleChange(e, value, "is_completed")
-                        } // Pass the name along with the value
+                  <FormLabel>Project Name</FormLabel>
+                  <Autocomplete
+                    id="project_id"
+                    name="project_id"
+                    options={projects}
+                    getOptionLabel={(option) =>
+                      option.project_name +
+                      " " +
+                      "(ID: " +
+                      option.project_id +
+                      ")"
+                    }
+                    value={
+                      projects.find(
+                        (project) => project.project_id === task.project_id
+                      ) || null
+                    }
+                    onChange={(e, value) =>
+                      handleChange(
+                        e,
+                        value ? value.project_id : null,
+                        "project_id"
+                      )
+                    }
+                    renderInput={(params) => (
+                      <Input
+                        {...params}
+                        size="sm"
+                        id="project_id"
+                        name="project_id"
                         required
-                        >
-                        <Option value={true}>Yes</Option>
-                        <Option value={false}>No</Option>
-                    </Select>
-                    </FormControl>
-                    
-                    
+                      />
+                    )}
+                  />
+                </FormControl>
+
+                <FormControl sx={{ flexGrow: 1 }}>
+                  <FormLabel>Task Priority</FormLabel>
+                  <Autocomplete
+                    id="task_priority"
+                    name="task_priority"
+                    options={priority}
+                    getOptionLabel={(option) =>
+                      option.name +
+                      " "
+                    }
+                    value={
+                      priority.find(
+                        (priority) => priority.priority_id === task.task_priority
+                      ) || null
+                    }
+                    onChange={(e, value) =>
+                      handleChange(
+                        e,
+                        value ? value.priority_id : null,
+                        "task_priority"
+                      )
+                    }
+                    renderInput={(params) => (
+                      <Input
+                        {...params}
+                        size="sm"
+                        id="task_priority"
+                        name="task_priority"
+                        required
+                      />
+                    )}
+                  />
+                </FormControl>
+
+
+                <FormControl sx={{ flexGrow: 1 }}>
+                  <FormLabel>Completed</FormLabel>
+                  <Select
+                    placeholder="Select Status"
+                    id="is_completed"
+                    name="is_completed" // Add the name attribute
+                    value={task.is_completed}
+                    onChange={(e, value) =>
+                      handleChange(e, value, "is_completed")
+                    } // Pass the name along with the value
+                    required
+                  >
+                    <Option value={true}>Yes</Option>
+                    <Option value={false}>No</Option>
+                  </Select>
+                </FormControl>
 
                 <Stack spacing={1}>
                   {/* <Box>
@@ -351,10 +393,7 @@ const [users, setUsers] = useState([]);
                   </FormControl>
                 </Stack>
               </Stack>
-              <div>
-              </div>
-
-
+              <div></div>
             </Stack>
             <CardOverflow
               sx={{ borderTop: "1px solid", borderColor: "divider" }}

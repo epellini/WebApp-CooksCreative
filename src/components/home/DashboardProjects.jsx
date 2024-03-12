@@ -99,16 +99,18 @@ export default function DashboardProjects() {
               <th>Client Name</th>
               <th>Status</th>
               <th>Category</th>
+              <th>Start Date</th>
             </tr>
           </thead>
 
           <tbody>
-            {projects.slice(0, 5).map((project) => (
+            {projects.sort((a,b) => new Date(b.start_date) - new Date(a.start_date)).slice(0, 5).map((project) => (
               <tr>
                 <td>{project.project_name}</td>
                 <td>{project.clients.first_name}</td>
                 <td>{project.status.name}</td>
                 <td>{project.category.name}</td>
+                <td>{project.start_date}</td>
               </tr>
             ))}
           </tbody>

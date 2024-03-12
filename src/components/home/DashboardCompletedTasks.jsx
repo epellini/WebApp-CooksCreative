@@ -105,7 +105,7 @@ export default function DashboardCompletedTasks() {
           </thead>
 
           <tbody>
-            {completedTasks.slice(0, 5).map((task) => (
+            {completedTasks.sort((a,b) => new Date(b.date_completed) - new Date(a.date_completed)).slice(0, 5).map((task) => (
               <tr>
                 <td>{task.task_name}</td>
                 <td style={{ textAlign: 'left' }}>

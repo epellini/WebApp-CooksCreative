@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, forwardRef, useImperativeHandle } from "react";
 import { CardContent, CardMedia, FormGroup } from "@mui/material";
 import { FormControl } from "@mui/material";
 import Button from "@mui/joy/Button";
@@ -13,13 +13,13 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Snackbar from "@mui/joy/Snackbar";
 import Grid from "@mui/material/Grid";
 
-const Images = (projectid) => {
+
+const Images = (projectid, ref) => {
   const [images, setImages] = useState([]);
   const [project, setProject] = useState({ project_id: projectid.projectid });
   const [imageUrl, setImageUrl] = useState("");
   const [imageUrls, setImageUrls] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
-  const [refresh, setRefresh] = useState(false);
 
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
@@ -65,51 +65,57 @@ const Images = (projectid) => {
     }
   };
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        // Fetch image URLs
-        const { data: imageData, error: imageError } = await supabaseClient
-          .from("images")
-          .select("image_urls")
-          .eq("project_id", project.project_id);
-
-        console.log("imageData: ", imageData);
-
-        if (imageError) {
-          console.error("Error fetching images", imageError);
-          return;
-        }
-
-        // Fetch public URLs for all images
-        if (imageData && imageData.length > 0) {
-          const pathToImages = imageData.map((image) => image.image_urls);
-
-          const imageUrlsPromises = pathToImages.map(async (pathToImage) => {
-            const { data: publicUrlData, error: publicUrlError } =
-              await supabaseClient.storage
-                .from("images")
-                .getPublicUrl(pathToImage);
-
-            if (publicUrlError) {
-              console.error(publicUrlError);
-              return null;
-            }
-
-            return publicUrlData.publicUrl;
-          });
-
-          const fetchedImageUrls = await Promise.all(imageUrlsPromises);
-          setImageUrls(fetchedImageUrls);
-          console.log(fetchedImageUrls);
-        }
-      } catch (error) {
-        console.error(error);
-      }
+  // Add this to expose the file input click functionality to parent components
+  useImperativeHandle(ref, () => ({
+    triggerFileInputClick: () => {
+      document.getElementById('upload-image-input').click();
     }
+  }));
 
-    fetchData();
-  }, [refresh]); // Trigger useEffect when refresh state changes
+  const getImages = async () => {
+    try {
+      const { data: imageData, error: imageError } = await supabaseClient
+        .from("images")
+        .select("image_urls")
+        .eq("project_id", project.project_id);
+
+      console.log("imageData: ", imageData);
+
+      if (imageError) {
+        console.error("Error fetching images:", imageError);
+        return;
+      }
+
+      // Fetch public URLs for all images
+      if (imageData && imageData.length > 0) {
+        const pathToImages = imageData.map((image) => image.image_urls);
+
+        const imageUrlsPromises = pathToImages.map(async (pathToImage) => {
+          const { data: publicUrlData, error: publicUrlError } =
+            await supabaseClient.storage
+              .from("images")
+              .getPublicUrl(pathToImage);
+
+          if (publicUrlError) {
+            console.error(publicUrlError);
+            return null;
+          }
+
+          return publicUrlData.publicUrl;
+        });
+
+        const fetchedImageUrls = await Promise.all(imageUrlsPromises);
+        setImageUrls(fetchedImageUrls);
+        console.log(fetchedImageUrls);
+      }
+    } catch (imageError) {
+      console.log(imageError);
+    }
+  };
+
+  useEffect(() => {
+    getImages();
+  }, [imageUrl]);
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
@@ -132,10 +138,10 @@ const Images = (projectid) => {
     const imagePath = urlParts.slice(imagePathIndex).join('/');
     console.log("Image Path: ", imagePath);
 
-    const {error: dbError} = await supabaseClient
-    .from('images')
-    .delete()
-    .match({image_urls: imagePath});
+    const { error: dbError } = await supabaseClient
+      .from('images')
+      .delete()
+      .match({ image_urls: imagePath });
 
     if (dbError) {
       console.error('Error deleting image URL from the database:', dbError);
@@ -144,11 +150,12 @@ const Images = (projectid) => {
       return;
     }
 
+
     // Step 2: Delete the image from storage
-    const {error: storageError} = await supabaseClient
-    .storage
-    .from('images')
-    .remove([imagePath]);
+    const { error: storageError } = await supabaseClient
+      .storage
+      .from('images')
+      .remove([imagePath]);
 
     if (storageError) {
       console.error('Error deleting image file from storage:', storageError);
@@ -160,7 +167,6 @@ const Images = (projectid) => {
     setSnackbarMessage("Image deleted successfully!");
     setOpenSnackbar(true);
 
-    setRefresh(prev => !prev); // Trigger useEffect to fetch updated image URLs
   };
 
 
@@ -176,14 +182,15 @@ const Images = (projectid) => {
         project_id: project.project_id,
       });
       setImageUrls([...imageUrls, path]);
-      setSelectedFile(null); 
-      setImageUrl(""); 
-      setRefresh(!refresh);
+      setSelectedFile(null);
+      setImageUrl("");
       setSnackbarMessage("Image Uploaded Successfully!");
       setOpenSnackbar(true);
     } else {
       console.error("Error uploading image", error);
     }
+
+    await getImages();
   };
 
   return (
@@ -191,7 +198,7 @@ const Images = (projectid) => {
       <Snackbar
         open={openSnackbar}
         onClose={() => setOpenSnackbar(false)}
-        autoHideDuration={5000} 
+        autoHideDuration={5000}
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       >
         {snackbarMessage}
@@ -298,4 +305,4 @@ const Images = (projectid) => {
   );
 };
 
-export default Images;
+export default forwardRef(Images);

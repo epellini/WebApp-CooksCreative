@@ -136,7 +136,7 @@ export default function ProjectTable() {
     handlePageChange,
     handlePrevious,
     handleNext,
-  } = usePagination(filteredProjects, 10);
+  } = usePagination(filteredProjects, 15);
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
@@ -149,16 +149,16 @@ export default function ProjectTable() {
     }
   }
 
-  const getStatusColor = (statusName) => {
-    switch (statusName.toLowerCase()) {
-      case "completed":
-        return "warning";
-      case "active":
-        return "success";
-      case "cancelled":
-        return "danger";
-    }
-  };
+  // const getStatusColor = (statusName) => {
+  //   switch (statusName.toLowerCase()) {
+  //     case "completed":
+  //       return "warning";
+  //     case "active":
+  //       return "success";
+  //     case "cancelled":
+  //       return "danger";
+  //   }
+  // };
 
   return (
     <React.Fragment>
@@ -301,21 +301,11 @@ export default function ProjectTable() {
               </th>
               <th style={{ width: 100, padding: "12px 6px" }}>Client Name</th>
               <th
-                style={{ width: 140, padding: "12px 6px", textAlign: "center" }}
+                style={{ width: 100, padding: "12px 6px", textAlign: "center" }}
               >
                 Status
               </th>
-              <th
 
-                style={{ width: 100, padding: "12px 6px", textAlign: "left" }}
-              >
-                Start Date
-              </th>
-              <th
-                style={{ width: 140, padding: "12px 6px", textAlign: "left" }}
-              >
-                End Date
-              </th>
               <th
                 style={{ width: 140, padding: "12px 6px", textAlign: "left" }}
               >
@@ -323,8 +313,17 @@ export default function ProjectTable() {
               </th>
 
               <th
-                style={{ width: 140, padding: "12px 6px", textAlign: "left" }}
-              ></th>
+                style={{ width: 100, padding: "12px 6px", textAlign: "left" }}
+              >
+                Start Date
+              </th>
+              <th
+                style={{ width: 100, padding: "12px 6px", textAlign: "left" }}
+              >
+                End Date
+              </th>
+          
+              
             </tr>
           </thead>
 
@@ -427,9 +426,9 @@ export default function ProjectTable() {
                         }
                         color={
                           project.status.name == "Completed"
-                            ? "success"
+                            ? "neutral"
                             : project.status.name == "Active"
-                              ? "neutral"
+                              ? "success"
                               : project.status.name == "Cancelled"
                                 ? "danger"
                                 : "default" // Use default color for "N/A" or other statuses
@@ -437,6 +436,20 @@ export default function ProjectTable() {
                       >
                         {project.status.name}
                       </Chip>
+                    </td>
+
+                    <td style={{ textAlign: "left" }}>
+                      {project ? (
+                        <Typography
+                          onClick={() =>
+                            navigate(`/projects/${project.project_id}`)
+                          }
+                          style={{ cursor: "pointer" }}
+                          level="body-xs"
+                        >{`${project.category.name}`}</Typography>
+                      ) : (
+                        <Typography level="body-xs">N/A</Typography>
+                      )}
                     </td>
 
                     <td style={{ textAlign: "left" }}>
@@ -465,29 +478,7 @@ export default function ProjectTable() {
                         <Typography level="body-xs">N/A</Typography>
                       )}
                     </td>
-                    <td style={{ textAlign: "left" }}>
-                      {project ? (
-                        <Typography
-                          onClick={() =>
-                            navigate(`/projects/${project.project_id}`)
-                          }
-                          style={{ cursor: "pointer" }}
-                          level="body-xs"
-                        >{`${project.category.name}`}</Typography>
-                      ) : (
-                        <Typography level="body-xs">N/A</Typography>
-                      )}
-                    </td>
-                    <td>
-                      <Box
-                        sx={{ display: "flex", gap: 2, alignItems: "center" }}
-                      >
-                        {/* <Link level="body-xs" component="button" >
-                        Download
-                      </Link> */}
-                        <RowMenu projectId={project.project_id} />
-                      </Box>
-                    </td>
+                   
                   </tr>
                 );
               })}
@@ -601,7 +592,7 @@ export default function ProjectTable() {
                       alignItems="center"
                       variant="outlined"
                       label={project.status.name}
-                      color={getStatusColor(project.status.name)}
+                      // color={getStatusColor(project.status.name)}
                     />
                   </td>
                   <td>
