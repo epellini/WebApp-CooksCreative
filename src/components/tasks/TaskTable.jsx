@@ -420,6 +420,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                                       }}
                                     >
                                       <Checkbox
+                                      sx={{ padding: 0.5 }}
                                         checked={subtask.is_completed}
                                         onChange={() =>
                                           handleSubtaskToggle(
@@ -430,7 +431,6 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                                         }
                                       />
                                       <Typography
-                                        variant="body2"
                                         sx={{
                                           flexGrow: 1,
                                           textDecoration: subtask.is_completed
