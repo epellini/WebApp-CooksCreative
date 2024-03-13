@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 
 import AspectRatio from "@mui/joy/AspectRatio";
+import confetti from "https://esm.run/canvas-confetti@1";
 import Box from "@mui/joy/Box";
 import Button from "@mui/joy/Button";
 import Divider from "@mui/joy/Divider";
@@ -27,7 +28,6 @@ import InsertDriveFileRoundedIcon from "@mui/icons-material/InsertDriveFileRound
 import EditRoundedIcon from "@mui/icons-material/EditRounded";
 
 import Autocomplete from "@mui/joy/Autocomplete";
-
 import DropZone from "../DropZone";
 import FileUpload from "../FileUpload";
 
@@ -146,6 +146,7 @@ const TaskForm = ({ open, setOpen, onHandleSubmit }) => {
         let result = null;
         if (taskid) {
           task.is_completed = true;
+          playConfetti();
           result = await supabase
             .from("tasks")
             .update(task)
@@ -167,6 +168,7 @@ const TaskForm = ({ open, setOpen, onHandleSubmit }) => {
         } else {
           // navigate("/tasks");
           onHandleSubmit();
+
           console.log("Task added successfully");
         }
       } catch (error) {
@@ -174,6 +176,13 @@ const TaskForm = ({ open, setOpen, onHandleSubmit }) => {
       }
     }
   };
+
+  function playConfetti() {
+    confetti({
+      particleCount: 200,
+      spread: 180,
+    });
+  }
 
   return (
     <form onSubmit={handleSubmit}>

@@ -8,6 +8,7 @@
 
 body {
   text-align: center;
+  background: linear-gradient(#fff, #ecf9ff) fixed;
 }
 
 /* In your index.css or a relevant CSS file */
