@@ -88,7 +88,8 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
       *,
       projects(*),
       priority:task_priority (name),
-      users(*)
+      users(*),
+      subtasks(*)
     `);
 
     // if no tasks the display text saying no tasks
@@ -99,6 +100,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
       const tasksWithPriorityName = data.map((task) => ({
         ...task,
         priority_name: task.priority ? task.priority.name : "Unknown",
+        subtasks: task.subtasks ? task.subtasks : [],
       }));
       setTasks(tasksWithPriorityName);
       setUsers(tasksWithPriorityName.map((task) => task.users));
@@ -173,6 +175,21 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
         return "default";
     }
   };
+
+  async function handleSubtaskToggle(taskId, subtaskId, isCompleted) {
+    const { data, error } = await supabaseClient
+      .from("subtasks")
+      .update({ is_completed: isCompleted })
+      .match({ subtask_id: subtaskId });
+
+    if (error) {
+      console.error("Error updating subtask:", error);
+    } else {
+      console.log("Subtask updated successfully", data);
+      // Refresh your tasks list to reflect the changes
+      getTasks();
+    }
+  }
 
   return (
     <React.Fragment>
@@ -385,10 +402,50 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                                 </Typography>
                               )}
                             </AccordionSummary>
-                            <AccordionDetails variant="soft">
-                              Lorem ipsum dolor sit amet, consectetur adipiscing
-                              elit, sed do eiusmod tempor incididunt ut labore
-                              et dolore magna aliqua.
+                            <AccordionDetails
+                              variant="soft"
+                              sx={{ padding: 0 }}
+                            >
+                              <Box sx={{ listStyleType: "none", padding: 0 }}>
+                                {task.subtasks && task.subtasks.length > 0 ? (
+                                  task.subtasks.map((subtask) => (
+                                    <Box
+                                      key={subtask.subtask_id}
+                                      sx={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        textDecoration: subtask.is_completed
+                                          ? "line-through"
+                                          : "none",
+                                      }}
+                                    >
+                                      <Checkbox
+                                        checked={subtask.is_completed}
+                                        onChange={() =>
+                                          handleSubtaskToggle(
+                                            task.task_id,
+                                            subtask.subtask_id,
+                                            !subtask.is_completed
+                                          )
+                                        }
+                                      />
+                                      <Typography
+                                        variant="body2"
+                                        sx={{
+                                          flexGrow: 1,
+                                          textDecoration: subtask.is_completed
+                                            ? "line-through"
+                                            : "none",
+                                        }}
+                                      >
+                                        {subtask.subtask_name}
+                                      </Typography>
+                                    </Box>
+                                  ))
+                                ) : (
+                                  <Typography>No Subtasks</Typography>
+                                )}
+                              </Box>
                             </AccordionDetails>
                           </Accordion>
                         </AccordionGroup>
