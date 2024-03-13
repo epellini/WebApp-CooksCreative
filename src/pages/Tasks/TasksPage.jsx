@@ -85,7 +85,6 @@ const TasksPage = () => {
 
           <TaskTable isModalOpen={isModalOpen} toggleModal={toggleModal}  />
 
-          <Confetti />
         </Box>
       </Box>
     </CssVarsProvider>

@@ -191,7 +191,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
           minHeight: 0,
         }}
       >
-        <Dropdown>
+        {/* <Dropdown>
           <MenuButton>Select Number of Days</MenuButton>
           <Menu>
             <MenuItem
@@ -207,7 +207,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
               60
             </MenuItem>
           </Menu>
-        </Dropdown>
+        </Dropdown> */}
 
         {/* Add New Task */}
 
@@ -637,7 +637,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
           minHeight: 0,
         }}
       >
-        <Dropdown>
+        {/* <Dropdown >
           <MenuButton>Select Number of Days</MenuButton>
           <Menu>
             <MenuItem
@@ -653,7 +653,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
               60
             </MenuItem>
           </Menu>
-        </Dropdown>
+        </Dropdown> */}
 
         <React.Fragment>
           <Button
