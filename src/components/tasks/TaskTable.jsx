@@ -29,7 +29,6 @@ import {
   Tab,
   tabClasses,
   Table,
-  
 } from "@mui/joy";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import { useNavigate } from "react-router-dom";
@@ -45,6 +44,15 @@ import Add from "@mui/icons-material/Add";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
 import ArchiveIcon from "@mui/icons-material/Archive";
+
+import AccordionGroup from "@mui/joy/AccordionGroup";
+import Accordion from "@mui/joy/Accordion";
+import AccordionDetails, {
+  accordionDetailsClasses,
+} from "@mui/joy/AccordionDetails";
+import AccordionSummary, {
+  accordionSummaryClasses,
+} from "@mui/joy/AccordionSummary";
 
 //task form
 import TaskForm from "./TaskForm";
@@ -242,9 +250,6 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
             </ModalDialog>
           </Modal>
         </React.Fragment>
-        
-
-        
 
         <Tabs
           aria-label="Pipeline"
@@ -329,30 +334,64 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                         onClick={() => console.log("Task Clicked")}
                         style={{ cursor: "pointer", textAlign: "left" }}
                       >
-                        <Typography
-                          variant="subtitle1"
-                          component="div"
-                          style={{ color: "#212121", textAlign: "left" }}
+                        <AccordionGroup
+                          variant="outlined"
+                          transition="0.2s"
+                          sx={{
+                            maxWidth: 400,
+                            borderRadius: "lg",
+                            [`& .${accordionSummaryClasses.button}:hover`]: {
+                              bgcolor: "transparent",
+                            },
+                            [`& .${accordionDetailsClasses.content}`]: {
+                              boxShadow: (theme) =>
+                                `inset 0 1px ${theme.vars.palette.divider}`,
+                              [`&.${accordionDetailsClasses.expanded}`]: {
+                                paddingBlock: "0.75rem",
+                              },
+                            },
+                          }}
                         >
-                          {task.task_name}
-                        </Typography>
-                        {task.projects ? (
-                          <Typography
-                            variant="body2"
-                            component="div"
-                            style={{ color: "#757575", textAlign: "left" }}
-                          >
-                            {task.projects.project_name}
-                          </Typography>
-                        ) : (
-                          <Typography
-                            variant="body2"
-                            component="div"
-                            style={{ color: "#757575", textAlign: "left" }}
-                          >
-                            No Project
-                          </Typography>
-                        )}
+                          <Accordion>
+                            <AccordionSummary>
+                              <Typography
+                                variant="subtitle1"
+                                component="div"
+                                style={{ color: "#212121", textAlign: "left" }}
+                              >
+                                {task.task_name}
+                              </Typography>
+                              {task.projects ? (
+                                <Typography
+                                  variant="body2"
+                                  component="div"
+                                  style={{
+                                    color: "#757575",
+                                    textAlign: "left",
+                                  }}
+                                >
+                                  {task.projects.project_name}
+                                </Typography>
+                              ) : (
+                                <Typography
+                                  variant="body2"
+                                  component="div"
+                                  style={{
+                                    color: "#757575",
+                                    textAlign: "left",
+                                  }}
+                                >
+                                  No Project
+                                </Typography>
+                              )}
+                            </AccordionSummary>
+                            <AccordionDetails variant="soft">
+                              Lorem ipsum dolor sit amet, consectetur adipiscing
+                              elit, sed do eiusmod tempor incididunt ut labore
+                              et dolore magna aliqua.
+                            </AccordionDetails>
+                          </Accordion>
+                        </AccordionGroup>
                       </td>
                       <td style={{ textAlign: "center" }}>
                         <Chip
@@ -377,7 +416,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                       </td>
 
                       <td style={{ textAlign: "left" }}>
-                      <Button
+                        <Button
                           size="sm"
                           variant="soft"
                           color="neutral"
@@ -481,7 +520,9 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                       </td>
 
                       <td style={{ textAlign: "left" }}>
-                        {task.is_completed ? (task.users?.first_name ?? "N/A") : "N/A"}
+                        {task.is_completed
+                          ? task.users?.first_name ?? "N/A"
+                          : "N/A"}
                       </td>
                       <td style={{ textAlign: "left" }}>
                         {task.date_created
@@ -795,9 +836,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                               .split("T")[0]
                           : "N/A"}
                       </td>
-                      <td style={{ textAlign: "center" }}>
-
-                      </td>
+                      <td style={{ textAlign: "center" }}></td>
                       <td style={{ textAlign: "center" }}>
                         <IconButton
                           size="sm"
