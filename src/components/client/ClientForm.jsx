@@ -57,6 +57,7 @@ const ClientForm = () => {
             street: data.street,
             city: data.city,
             province: data.province,
+            postal_code: data.postal_code,
             notes: data.notes,
             tag: data.tag,
           });
@@ -87,6 +88,7 @@ const ClientForm = () => {
       street: client.street,
       city: client.city,
       province: client.province,
+      postal_code: client.postal_code,
       notes: client.notes,
       tag: client.tag,
       ...(clientId ? { client_id: clientId } : {}),

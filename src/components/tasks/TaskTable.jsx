@@ -17,13 +17,6 @@ import {
   Typography,
   Tabs,
   TabList,
-  List,
-  ListItem,
-  Breadcrumbs,
-  Link,
-  Card,
-  CardActions,
-  CardOverflow,
   Modal,
   ModalDialog,
   DialogTitle,
@@ -37,6 +30,8 @@ import {
   tabClasses,
   Table,
 } from "@mui/joy";
+import EditNoteIcon from "@mui/icons-material/EditNote";
+import { useNavigate } from "react-router-dom";
 import Checkbox, { checkboxClasses } from "@mui/joy/Checkbox";
 import Dropdown from "@mui/joy/Dropdown";
 import MenuButton from "@mui/joy/MenuButton";
@@ -47,9 +42,20 @@ import { supabaseClient } from "../../supabase-client"; // Import the supabase c
 // ICONS:
 import Add from "@mui/icons-material/Add";
 import AddIcon from "@mui/icons-material/Add";
+import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
+import ArchiveIcon from "@mui/icons-material/Archive";
+
+import AccordionGroup from "@mui/joy/AccordionGroup";
+import Accordion from "@mui/joy/Accordion";
+import AccordionDetails, {
+  accordionDetailsClasses,
+} from "@mui/joy/AccordionDetails";
+import AccordionSummary, {
+  accordionSummaryClasses,
+} from "@mui/joy/AccordionSummary";
 
 //task form
-import TaskForm from "./TaskFormAdd";
+import TaskForm from "./TaskForm";
 
 export default function TaskTable({ isModalOpen, toggleModal }) {
   const [open, setOpen] = React.useState(false);
@@ -62,6 +68,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   let [days, setDays] = useState(30);
 
+  const navigate = useNavigate();
   const createHandleClose = (index, value) => () => {
     if (typeof index === "number") {
       setSelectedIndex(index);
@@ -80,23 +87,45 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
     const { data, error } = await supabaseClient.from("tasks").select(`
       *,
       projects(*),
-      priority:task_priority (name)
+      priority:task_priority (name),
+      users(*),
+      subtasks(*)
     `);
+
+    // if no tasks the display text saying no tasks
 
     if (error) {
       console.error("Error fetching tasks:", error);
     } else {
       const tasksWithPriorityName = data.map((task) => ({
         ...task,
-        priority_name: task.priority ? task.priority.name : "Unknown", // Correctly assigning 'priority_name'
+        priority_name: task.priority ? task.priority.name : "Unknown",
+        subtasks: task.subtasks ? task.subtasks : [],
       }));
       setTasks(tasksWithPriorityName);
+      setUsers(tasksWithPriorityName.map((task) => task.users));
       setProjects(tasksWithPriorityName.map((task) => task.projects));
     }
   }
   useEffect(() => {
     getTasks();
   }, []);
+
+  async function archiveTask(task_id) {
+    const { data, error } = await supabaseClient
+      .from("tasks")
+      .update({
+        is_archived: true,
+        date_archived: new Date().toISOString(),
+      })
+      .match({ task_id: task_id });
+    if (error) {
+      console.error("Error updating Task status:", error);
+    } else {
+      console.log("Task archived successfully", data);
+    }
+    getTasks();
+  }
 
   const completedTasks = tasks.filter((task) => {
     const dayLength = days * 24 * 60 * 60 * 1000; // 30 days in milliseconds
@@ -116,7 +145,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
   });
 
   const activeTasks = tasks.filter((task) => {
-    if (task.is_completed == false) {
+    if (task.is_completed == false && task.is_archived == false) {
       return task;
     }
   });
@@ -132,19 +161,6 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
     getTasks(); // Reload tasks
   };
 
-  // const getPriorityColor = (priorityName) => {
-  //   switch (priorityName.toLowerCase()) {
-  //     case "high":
-  //       return "error"; // MUI's equivalent for danger/red
-  //     case "medium":
-  //       return "warning"; // MUI's warning color
-  //     case "low":
-  //       return "success"; // MUI's success color
-  //     default:
-  //       return "default"; // MUI's default color
-  //   }
-  // };
-
   const getPriorityColor = (priorityName) => {
     switch (
       priorityName?.toLowerCase() // Safe navigation in case of undefined
@@ -159,6 +175,21 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
         return "default";
     }
   };
+
+  async function handleSubtaskToggle(taskId, subtaskId, isCompleted) {
+    const { data, error } = await supabaseClient
+      .from("subtasks")
+      .update({ is_completed: isCompleted })
+      .match({ subtask_id: subtaskId });
+
+    if (error) {
+      console.error("Error updating subtask:", error);
+    } else {
+      console.log("Subtask updated successfully", data);
+      // Refresh your tasks list to reflect the changes
+      getTasks();
+    }
+  }
 
   return (
     <React.Fragment>
@@ -185,7 +216,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
           minHeight: 0,
         }}
       >
-        <Dropdown>
+        {/* <Dropdown>
           <MenuButton>Select Number of Days</MenuButton>
           <Menu>
             <MenuItem
@@ -201,19 +232,11 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
               60
             </MenuItem>
           </Menu>
-        </Dropdown>
+        </Dropdown> */}
 
         {/* Add New Task */}
 
         <React.Fragment>
-          <Button
-            variant="outlined"
-            color="neutral"
-            startDecorator={<Add />}
-            onClick={() => setOpen(true)}
-          >
-            Complete Task Button Example
-          </Button>
           <Modal
             className="formWindow"
             open={isModalOpen}
@@ -274,7 +297,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
             </Tab>
 
             <Tab indicatorInset>
-              Archived Tasks{" "}
+              Recently Deleted Tasks{" "}
               <Chip
                 size="sm"
                 variant="soft"
@@ -305,70 +328,184 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
               <thead>
                 <tr>
                   <th style={{ width: 120, padding: "12px 6px" }}>Task Name</th>
-                  <th style={{ width: 60, padding: "12px 6px", textAlign: "center" }}>Priority</th>
+                  <th
+                    style={{
+                      width: 60,
+                      padding: "12px 6px",
+                      textAlign: "center",
+                    }}
+                  >
+                    Priority
+                  </th>
                   <th style={{ width: 60, padding: "12px 6px" }}>Created</th>
+                  <th style={{ width: 40, padding: "12px 6px" }}></th>
+                  <th style={{ width: 25, padding: "12px 6px" }}></th>
                 </tr>
               </thead>
 
               <tbody>
-                {Object.values(activeTasks).map((task) => (
-                  <tr key={task.task_id}>
-                    <td
-                      onClick={() => console.log("Task Clicked")}
-                      style={{ cursor: "pointer", textAlign: "left" }}
-                    >
-                      <Typography
-                        variant="subtitle1"
-                        component="div"
-                        style={{ color: "#212121", textAlign: "left" }}
+                {activeTasks.length > 0 ? (
+                  Object.values(activeTasks).map((task) => (
+                    <tr key={task.task_id}>
+                      <td
+                        onClick={() => console.log("Task Clicked")}
+                        style={{ cursor: "pointer", textAlign: "left" }}
                       >
-                        {task.task_name}
+                        <AccordionGroup
+                          variant="outlined"
+                          transition="0.2s"
+                          sx={{
+                            maxWidth: 400,
+                            borderRadius: "lg",
+                            [`& .${accordionSummaryClasses.button}:hover`]: {
+                              bgcolor: "transparent",
+                            },
+                            [`& .${accordionDetailsClasses.content}`]: {
+                              boxShadow: (theme) =>
+                                `inset 0 1px ${theme.vars.palette.divider}`,
+                              [`&.${accordionDetailsClasses.expanded}`]: {
+                                paddingBlock: "0.75rem",
+                              },
+                            },
+                          }}
+                        >
+                          <Accordion>
+                            <AccordionSummary>
+                              <Typography
+                                variant="subtitle1"
+                                component="div"
+                                style={{ color: "#212121", textAlign: "left" }}
+                              >
+                                {task.task_name}
+                              </Typography>
+                              {task.projects ? (
+                                <Typography
+                                  variant="body2"
+                                  component="div"
+                                  style={{
+                                    color: "#757575",
+                                    textAlign: "left",
+                                  }}
+                                >
+                                  {task.projects.project_name}
+                                </Typography>
+                              ) : (
+                                <Typography
+                                  variant="body2"
+                                  component="div"
+                                  style={{
+                                    color: "#757575",
+                                    textAlign: "left",
+                                  }}
+                                >
+                                  No Project
+                                </Typography>
+                              )}
+                            </AccordionSummary>
+                            <AccordionDetails
+                              variant="soft"
+                              sx={{ padding: 0 }}
+                            >
+                              <Box sx={{ listStyleType: "none", padding: 0 }}>
+                                {task.subtasks && task.subtasks.length > 0 ? (
+                                  task.subtasks.map((subtask) => (
+                                    <Box
+                                      key={subtask.subtask_id}
+                                      sx={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        textDecoration: subtask.is_completed
+                                          ? "line-through"
+                                          : "none",
+                                      }}
+                                    >
+                                      <Checkbox
+                                      sx={{ padding: 0.5 }}
+                                        checked={subtask.is_completed}
+                                        onChange={() =>
+                                          handleSubtaskToggle(
+                                            task.task_id,
+                                            subtask.subtask_id,
+                                            !subtask.is_completed
+                                          )
+                                        }
+                                      />
+                                      <Typography
+                                        sx={{
+                                          flexGrow: 1,
+                                          textDecoration: subtask.is_completed
+                                            ? "line-through"
+                                            : "none",
+                                        }}
+                                      >
+                                        {subtask.subtask_name}
+                                      </Typography>
+                                    </Box>
+                                  ))
+                                ) : (
+                                  <Typography>No Subtasks</Typography>
+                                )}
+                              </Box>
+                            </AccordionDetails>
+                          </Accordion>
+                        </AccordionGroup>
+                      </td>
+                      <td style={{ textAlign: "center" }}>
+                        <Chip
+                          onClick={() =>
+                            console.log(`Task Clicked: ${task.task_id}`)
+                          }
+                          style={{ cursor: "pointer" }}
+                          variant="soft"
+                          size="sm"
+                          color={getPriorityColor(task.priority_name)}
+                        >
+                          {task.priority_name}
+                        </Chip>
+                      </td>
+
+                      <td style={{ textAlign: "left" }}>
+                        {task.date_created
+                          ? new Date(task.date_created)
+                              .toISOString()
+                              .split("T")[0]
+                          : "N/A"}
+                      </td>
+
+                      <td style={{ textAlign: "left" }}>
+                        <Button
+                          size="sm"
+                          variant="soft"
+                          color="neutral"
+                          startDecorator={<EditNoteIcon />}
+                          onClick={() =>
+                            navigate(`/tasks/edit/${task.task_id}`)
+                          }
+                        >
+                          Complete
+                        </Button>
+                      </td>
+                      <td style={{ textAlign: "center" }}>
+                        <IconButton
+                          size="sm"
+                          variant="soft"
+                          color="danger"
+                          onClick={() => archiveTask(task.task_id)}
+                        >
+                          <DeleteRoundedIcon />
+                        </IconButton>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="4" style={{ textAlign: "center" }}>
+                      <Typography variant="h1" component="h1">
+                        No Active Tasks
                       </Typography>
-                      {task.projects ? (
-                        <Typography
-                          variant="body2"
-                          component="div"
-                          style={{ color: "#757575", textAlign: "left" }}
-                        >
-                          {task.projects.project_name}
-                        </Typography>
-                      ) : (
-                        <Typography
-                          variant="body2"
-                          component="div"
-                          style={{ color: "#757575", textAlign: "left" }}
-                        >
-                          No Project
-                        </Typography>
-                      )}
-                    </td>
-
-                    <td style={{ textAlign: "center" }}>
-                      <Chip
-                        onClick={() =>
-                          console.log(`Task Clicked: ${task.task_id}`)
-                        } // Adjust this as necessary for your use case
-                        style={{ cursor: "pointer" }}
-                        variant="soft"
-                        size="sm"
-                        color={getPriorityColor(task.priority_name)}
-                      >
-                        {task.priority_name}
-                      </Chip>
-                    </td>
-
-                    <td style={{ textAlign: "left" }}>
-                      {task.date_created
-                        ? new Intl.DateTimeFormat("en-US", {
-                            weekday: "short",
-                            year: "numeric",
-                            month: "short",
-                            day: "numeric",
-                          }).format(new Date(task.date_created))
-                        : "N/A"}
                     </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </Table>
           </TabPanel>
@@ -421,43 +558,55 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
               </thead>
 
               <tbody>
-                {Object.values(completedTasks).map((task, days) => (
-                  <tr key={task.task_id}>
-                    <td
-                      onClick={() => console.log("Task Clicked")}
-                      style={{ textAlign: "left", cursor: "pointer" }}
-                    >
-                      {`${task.task_name}`}
-                    </td>
+                {completedTasks.length > 0 ? (
+                  Object.values(completedTasks).map((task, days) => (
+                    <tr key={task.task_id}>
+                      <td
+                        onClick={() => console.log("Task Clicked")}
+                        style={{ textAlign: "left", cursor: "pointer" }}
+                      >
+                        {`${task.task_name}`}
+                      </td>
 
-                    <td style={{ textAlign: "left" }}>
-                      {task.projects ? (
-                        <>{task.projects.project_name}</>
-                      ) : (
-                        <>No Project</>
-                      )}
-                    </td>
+                      <td style={{ textAlign: "left" }}>
+                        {task.projects ? (
+                          <>{task.projects.project_name}</>
+                        ) : (
+                          <>No Project</>
+                        )}
+                      </td>
 
-                    <td style={{ textAlign: "left" }}>
-                      {task.completed_by ? task.completed_by : "N/A"}
-                    </td>
-                    <td style={{ textAlign: "left" }}>
-                      {task.date_created
-                        ? new Date(task.date_created)
-                            .toISOString()
-                            .split("T")[0]
-                        : "N/A"}
-                    </td>
+                      <td style={{ textAlign: "left" }}>
+                        {task.is_completed
+                          ? task.users?.first_name ?? "N/A"
+                          : "N/A"}
+                      </td>
+                      <td style={{ textAlign: "left" }}>
+                        {task.date_created
+                          ? new Date(task.date_created)
+                              .toISOString()
+                              .split("T")[0]
+                          : "N/A"}
+                      </td>
 
-                    <td style={{ textAlign: "left" }}>
-                      {task.date_created
-                        ? new Date(task.date_completed)
-                            .toISOString()
-                            .split("T")[0]
-                        : "N/A"}
+                      <td style={{ textAlign: "left" }}>
+                        {task.date_completed
+                          ? new Date(task.date_completed)
+                              .toISOString()
+                              .split("T")[0]
+                          : "N/A"}
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="5" style={{ textAlign: "center" }}>
+                      <Typography variant="h1" component="h1">
+                        No Completed Tasks
+                      </Typography>
                     </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </Table>
           </TabPanel>
@@ -510,43 +659,53 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
               </thead>
 
               <tbody>
-                {Object.values(archivedTasks).map((task, days) => (
-                  <tr key={task.task_id}>
-                    <td
-                      onClick={() => console.log("Task Clicked")}
-                      style={{ textAlign: "left", cursor: "pointer" }}
-                    >
-                      {`${task.task_name}`}
-                    </td>
+                {archivedTasks.length > 0 ? (
+                  Object.values(archivedTasks).map((task, days) => (
+                    <tr key={task.task_id}>
+                      <td
+                        onClick={() => console.log("Task Clicked")}
+                        style={{ textAlign: "left", cursor: "pointer" }}
+                      >
+                        {`${task.task_name}`}
+                      </td>
 
-                    <td style={{ textAlign: "left" }}>
-                      {task.projects ? (
-                        <>{task.projects.project_name}</>
-                      ) : (
-                        <>No Project</>
-                      )}
-                    </td>
+                      <td style={{ textAlign: "left" }}>
+                        {task.projects ? (
+                          <>{task.projects.project_name}</>
+                        ) : (
+                          <>No Project</>
+                        )}
+                      </td>
 
-                    <td style={{ textAlign: "left" }}>
-                      {task.completed_by ? task.completed_by : "N/A"}
-                    </td>
-                    <td style={{ textAlign: "left" }}>
-                      {task.date_created
-                        ? new Date(task.date_created)
-                            .toISOString()
-                            .split("T")[0]
-                        : "N/A"}
-                    </td>
+                      <td style={{ textAlign: "left" }}>
+                        {task.completed_by ? task.completed_by : "N/A"}
+                      </td>
+                      <td style={{ textAlign: "left" }}>
+                        {task.date_created
+                          ? new Date(task.date_created)
+                              .toISOString()
+                              .split("T")[0]
+                          : "N/A"}
+                      </td>
 
-                    <td style={{ textAlign: "left" }}>
-                      {task.date_created
-                        ? new Date(task.date_completed)
-                            .toISOString()
-                            .split("T")[0]
-                        : "N/A"}
+                      <td style={{ textAlign: "left" }}>
+                        {task.date_completed
+                          ? new Date(task.date_completed)
+                              .toISOString()
+                              .split("T")[0]
+                          : "N/A"}
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="5" style={{ textAlign: "center" }}>
+                      <Typography variant="h1" component="h1">
+                        No Recently Deleted Tasks
+                      </Typography>
                     </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </Table>
           </TabPanel>
@@ -576,7 +735,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
           minHeight: 0,
         }}
       >
-        <Dropdown>
+        {/* <Dropdown >
           <MenuButton>Select Number of Days</MenuButton>
           <Menu>
             <MenuItem
@@ -592,7 +751,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
               60
             </MenuItem>
           </Menu>
-        </Dropdown>
+        </Dropdown> */}
 
         <React.Fragment>
           <Button
@@ -667,41 +826,95 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
               <thead>
                 <tr>
                   <th style={{ width: 120, padding: "12px 6px" }}>Task Name</th>
-                  <th style={{ width: 60, padding: "12px 6px" }}>Project</th>
+                  <th
+                    style={{
+                      width: 60,
+                      padding: "12px 6px",
+                      textAlign: "center",
+                    }}
+                  >
+                    Priority
+                  </th>
                   <th style={{ width: 60, padding: "12px 6px" }}>Created</th>
+                  <th style={{ width: 40, padding: "12px 6px" }}></th>
                 </tr>
               </thead>
 
               <tbody>
-                {Object.values(activeTasks).map((task) => (
-                  <tr key={task.task_id}>
-                    <td
-                      onClick={() => console.log("Task Clicked")}
-                      style={{ textAlign: "left", cursor: "pointer" }}
-                    >
-                      {`${task.task_name}`}
-                    </td>
-
-                    <td style={{ textAlign: "left" }}>
-                      {task.projects ? (
-                        <>{task.projects.project_name}</>
-                      ) : (
-                        <>No Project</>
-                      )}
-                    </td>
-
-                    <td style={{ textAlign: "left" }}>
-                      {task.date_created
-                        ? new Intl.DateTimeFormat("en-US", {
-                            weekday: "short",
-                            year: "numeric",
-                            month: "short",
-                            day: "numeric",
-                          }).format(new Date(task.date_created))
-                        : "N/A"}
+                {activeTasks.length > 0 ? (
+                  Object.values(activeTasks).map((task) => (
+                    <tr key={task.task_id}>
+                      <td
+                        onClick={() => console.log("Task Clicked")}
+                        style={{ cursor: "pointer", textAlign: "left" }}
+                      >
+                        <Typography
+                          variant="subtitle1"
+                          component="div"
+                          style={{ color: "#212121", textAlign: "left" }}
+                        >
+                          {task.task_name}
+                        </Typography>
+                        {task.projects ? (
+                          <Typography
+                            variant="body2"
+                            component="div"
+                            style={{ color: "#757575", textAlign: "left" }}
+                          >
+                            {task.projects.project_name}
+                          </Typography>
+                        ) : (
+                          <Typography
+                            variant="body2"
+                            component="div"
+                            style={{ color: "#757575", textAlign: "left" }}
+                          >
+                            No Project
+                          </Typography>
+                        )}
+                      </td>
+                      <td style={{ textAlign: "center" }}>
+                        <Chip
+                          onClick={() =>
+                            console.log(`Task Clicked: ${task.task_id}`)
+                          }
+                          style={{ cursor: "pointer" }}
+                          variant="soft"
+                          size="sm"
+                          color={getPriorityColor(task.priority_name)}
+                        >
+                          {task.priority_name}
+                        </Chip>
+                      </td>
+                      <td style={{ textAlign: "left" }}>
+                        {task.date_created
+                          ? new Date(task.date_created)
+                              .toISOString()
+                              .split("T")[0]
+                          : "N/A"}
+                      </td>
+                      <td style={{ textAlign: "center" }}></td>
+                      <td style={{ textAlign: "center" }}>
+                        <IconButton
+                          size="sm"
+                          variant="soft"
+                          color="danger"
+                          onClick={() => archiveTask(task.task_id)}
+                        >
+                          <DeleteRoundedIcon />
+                        </IconButton>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="4" style={{ textAlign: "center" }}>
+                      <Typography variant="h1" component="h1">
+                        No Active Tasks
+                      </Typography>
                     </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </Table>
           </TabPanel>
