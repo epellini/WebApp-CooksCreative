@@ -36,6 +36,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { supabaseClient } from "../../supabase-client";
 
 const TaskForm = ({ open, setOpen, onHandleSubmit }) => {
+  const [subtasks, setSubtasks] = useState([{ id: Date.now(), name: "" }]);
+
   const [task, setTask] = useState({
     task_name: "",
     project_id: null,
@@ -184,6 +186,27 @@ const TaskForm = ({ open, setOpen, onHandleSubmit }) => {
     });
   }
 
+  const handleSubtaskChange = (id, newName) => {
+    setSubtasks((currentSubtasks) =>
+      currentSubtasks.map((subtask) =>
+        subtask.id === id ? { ...subtask, name: newName } : subtask
+      )
+    );
+  };
+
+  const addSubtask = () => {
+    setSubtasks((currentSubtasks) => [
+      ...currentSubtasks,
+      { id: Date.now(), name: "" },
+    ]);
+  };
+
+  const removeSubtask = (id) => {
+    setSubtasks((currentSubtasks) =>
+      currentSubtasks.filter((subtask) => subtask.id !== id)
+    );
+  };
+
   return (
     <form onSubmit={handleSubmit}>
       <Box sx={{ flex: 1, width: "100%" }}>
@@ -191,13 +214,12 @@ const TaskForm = ({ open, setOpen, onHandleSubmit }) => {
           sx={{
             position: "sticky",
             top: { sm: -100, md: -110 },
-            bgcolor: "background.body",
             zIndex: 9995,
           }}
         >
           <Box sx={{ px: { xs: 2, md: 6 } }}>
-            <Typography level="h2" component="h1" sx={{ mt: 1, mb: 2 }}>
-              {taskid ? "Complete Task" : "Add Task"}
+            <Typography level="h3" component="h3" sx={{ mt: 2, mb: 0 }}>
+              {taskid ? "Complete Task" : "New Task"}
             </Typography>
           </Box>
         </Box>
@@ -212,21 +234,14 @@ const TaskForm = ({ open, setOpen, onHandleSubmit }) => {
           }}
         >
           <Card>
-            <Box sx={{ mb: 1 }}>
-              <Typography level="title-md">Task Information</Typography>
-              <Typography level="body-sm">
-                Add a title, description, and other details to your Task.
-              </Typography>
-            </Box>
-            <Divider />
             <Stack
               direction="row"
               spacing={3}
-              sx={{ display: { xs: "none", md: "flex" }, my: 1 }}
+              sx={{ display: { xs: "none", md: "flex" }, my: 0 }}
             >
               <Stack direction="column" spacing={1}></Stack>
-              <Stack spacing={2} sx={{ flexGrow: 2 }}>
-                <Stack direction="row" spacing={2}>
+              <Stack spacing={2} sx={{ flexGrow: 1 }}>
+                <Stack direction="row" spacing={1}>
                   <FormControl sx={{ flexGrow: 1 }}>
                     <FormLabel>Task Name</FormLabel>
                     <Input
@@ -317,6 +332,39 @@ const TaskForm = ({ open, setOpen, onHandleSubmit }) => {
                 {!taskid && (
                   <Stack spacing={1}>
                     <FormControl sx={{ flexGrow: 1 }}>
+                      {subtasks.map((subtask, index) => (
+                        <Stack
+                          key={subtask.id}
+                          direction="row"
+                          spacing={1}
+                          alignItems="center"
+                        >
+                          <Input
+                            size="sm"
+                            type="text"
+                            placeholder={`Subtask #${index + 1}`}
+                            value={subtask.name}
+                            onChange={(e) =>
+                              handleSubtaskChange(subtask.id, e.target.value)
+                            }
+                          />
+                          <IconButton
+                            size="sm"
+                            onClick={() => removeSubtask(subtask.id)}
+                          >
+                            <EditRoundedIcon />
+                          </IconButton>
+                        </Stack>
+                      ))}
+                      <Button size="sm" onClick={addSubtask}>
+                        Add Subtask
+                      </Button>
+                    </FormControl>
+                  </Stack>
+                )}
+                {!taskid && (
+                  <Stack spacing={1}>
+                    <FormControl sx={{ flexGrow: 1 }}>
                       <FormLabel>Completed</FormLabel>
                       <Select
                         placeholder="Select Status"
@@ -401,13 +449,13 @@ const TaskForm = ({ open, setOpen, onHandleSubmit }) => {
                   <FormControl sx={{ flexGrow: 1 }}>
                     <FormLabel>Task Name</FormLabel>
                     <Input
-                      disabled={taskid ? true : false} // Set directly to true or false based on the condition
+                      disabled={taskid ? true : false}
                       size="sm"
                       type="text"
                       id="task_name"
                       name="task_name"
                       value={task.task_name}
-                      onChange={handleChange} // Pass the event object directly
+                      onChange={handleChange}
                       required
                     />
                   </FormControl>
@@ -428,7 +476,7 @@ const TaskForm = ({ open, setOpen, onHandleSubmit }) => {
                   Cancel
                 </Button>
                 <Button size="sm" variant="solid" type="submit">
-                  {taskid ? "Complete Task" : "Add Task"}
+                  {taskid ? "Complete Task" : "New Task"}
                 </Button>
               </CardActions>
             </CardOverflow>
