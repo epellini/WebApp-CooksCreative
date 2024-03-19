@@ -149,19 +149,47 @@ export default function ProjectDetailsPage() {
     getProject();
   }, []); // Fetch projects when the component mounts
 
+
   async function deleteProject(project_id) {
-    const { error } = await supabase
+    // Fetches the image URLs
+    let { data: images, error: fetchError } = await supabase
+      .from('images')
+      .select('image_urls')
+      .eq('project_id', project_id);
+
+    if (fetchError) {
+      console.error("Error fetching images:", fetchError);
+      return;
+    }
+
+    // Deletes the project
+    const { error: deleteError } = await supabase
       .from("projects")
       .delete()
       .match({ project_id });
-    if (error) {
-      console.error("Error deleting project:", error);
+
+    if (deleteError) {
+      console.error("Error deleting project:", deleteError);
+      return;
     } else {
       console.log("Project deleted successfully");
-      // navigate back to the projects page
       navigate("/projects");
     }
+
+    if (images.length > 0) {
+      const imagePaths = images.map(image => image.image_urls);
+      const { error: storageError } = await supabase.storage
+        .from('images')
+        .remove(imagePaths);
+
+      if (storageError) {
+        console.error("Error deleting images from storage:", storageError);
+      } else {
+        console.log("Images deleted from storage.");
+      }
+    }
   }
+
 
   const [open, setOpen] = React.useState([false, false, false]);
 

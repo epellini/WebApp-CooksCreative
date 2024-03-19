@@ -1,18 +1,14 @@
 import React, { useEffect, useState, forwardRef, useImperativeHandle } from "react";
 import { CardContent, CardMedia, FormGroup } from "@mui/material";
-import { FormControl } from "@mui/material";
 import Button from "@mui/joy/Button";
 import { v4 as uuidv4 } from "uuid";
 import { supabaseClient } from "../../supabase-client";
-import { Stack } from "@mui/material";
 import { Box } from "@mui/material";
-import SvgIcon from "@mui/joy/SvgIcon";
 import { Typography, styled } from "@mui/joy";
 import Card from "@mui/joy/Card";
 import CircularProgress from "@mui/material/CircularProgress";
 import Snackbar from "@mui/joy/Snackbar";
 import Grid from "@mui/material/Grid";
-
 
 const Images = (projectid, ref) => {
   const [images, setImages] = useState([]);
@@ -132,7 +128,6 @@ const Images = (projectid, ref) => {
   };
 
   const deleteImage = async (imageUrl) => {
-
     const urlParts = imageUrl.split('/');
     const imagePathIndex = urlParts.findIndex(part => part === 'images') + 1;
     const imagePath = urlParts.slice(imagePathIndex).join('/');
@@ -143,6 +138,7 @@ const Images = (projectid, ref) => {
       .delete()
       .match({ image_urls: imagePath });
 
+
     if (dbError) {
       console.error('Error deleting image URL from the database:', dbError);
       setSnackbarMessage("Failed to delete image URL from the database.");
@@ -150,8 +146,6 @@ const Images = (projectid, ref) => {
       return;
     }
 
-
-    // Step 2: Delete the image from storage
     const { error: storageError } = await supabaseClient
       .storage
       .from('images')
@@ -163,10 +157,10 @@ const Images = (projectid, ref) => {
       setOpenSnackbar(true);
       return;
     }
-
+    
     setSnackbarMessage("Image deleted successfully!");
     setOpenSnackbar(true);
-
+     await getImages();
   };
 
 
