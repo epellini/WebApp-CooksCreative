@@ -13,6 +13,8 @@ import Login from "./pages/Auth/Login";
 import Register from "./pages/Auth/Register";
 import CreateUserPage from "./pages/Auth/CreateUserPage.jsx";
 import ConfirmationPage from "./pages/Auth/ConfirmationPage.jsx";
+import PasswordPage from "./pages/Auth/PasswordPage.jsx";
+
 // Protected Route:
 import Protected from './components/Protected';
 import ClientDetailsPage from "./pages/Clients/ClientDetailsPage.jsx";
@@ -66,6 +68,7 @@ function App() {
 
           </Route> {/* END OF PROTECTED ROUTE */}
             <Route path="/confirm-signup" element={<ConfirmationPage/>} />
+            <Route path="/set-password" element={<PasswordPage/>} />
             <Route path="/create-user" element={<CreateUserPage/>} />
             <Route path="/forgot-password" element={<ForgotPassword/>} />
           {/* NOT FOUND ROUTE */}
