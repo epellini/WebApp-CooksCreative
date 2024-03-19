@@ -36,7 +36,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { supabaseClient } from "../../supabase-client";
 
 const TaskForm = ({ open, setOpen, onHandleSubmit }) => {
-  const [subtasks, setSubtasks] = useState([{ id: Date.now(), name: "" }]);
+  const [subtasks, setSubtasks] = useState([]);
+  const [subtask, setSubTask] = useState({});
 
   const [task, setTask] = useState({
     task_name: "",
@@ -113,12 +114,34 @@ const TaskForm = ({ open, setOpen, onHandleSubmit }) => {
     fetchData();
   }, [taskid]);
 
+  const handleSubTaskChange = (e, value, name) =>{
+    subtasks.map((subtask) => {
+      console.log("subtasks: ", subtask);
+
+      if(value !== null && value !== undefined){
+        setSubTask((prevState) => ({
+          ...prevState,
+          [name]: value, // Use the name parameter to dynamically set the state key
+        }));
+      }else if (e.target) {
+        // Handle input change
+        const { name, value } = e.target;
+        setSubTask((prevState) => ({
+          ...prevState,
+          [name]: value,
+        }));
+      }
+    }
+
+    )}
+
   const handleChange = (e, value, name) => {
     // Check if e is null or undefined
     console.log("value", value);
     console.log("e", e);
     console.log("name", name);
     console.log("task", task);
+
 
     if (!e) {
       return;
@@ -154,8 +177,8 @@ const TaskForm = ({ open, setOpen, onHandleSubmit }) => {
             .update(task)
             .eq("task_id", taskid);
 
-          navigate("/tasks");
-          return;
+          // navigate("/tasks");
+          // return;
         } else {
           // Set is_completed value from the state
           const isCompletedValue = task.is_completed; // Get the value from the state
@@ -164,11 +187,29 @@ const TaskForm = ({ open, setOpen, onHandleSubmit }) => {
             .from("tasks")
             .insert([newTask]); // Insert the updated task object
           result = { data, error };
+
+          subtasks.map((subtask)=> {
+            console.log("subtasks: " + subtask.subtask_name);
+          })
+
+          if(subtasks.length > 0){
+              const {subtaskData, subtaskError} = await supabase
+              .from("subtasks")
+              .insert(subtasks);//insert subtasks
+            result = {subtaskData, subtaskError};
+
+            console.log("subtask data: " + subtaskData);
+          }else{
+            console.log("no subtasks");
+          }
+
         }
         if (result.error) {
           console.error("Error adding task:", result.error);
         } else {
+
           // navigate("/tasks");
+          
           onHandleSubmit();
 
           console.log("Task added successfully");
@@ -186,24 +227,24 @@ const TaskForm = ({ open, setOpen, onHandleSubmit }) => {
     });
   }
 
-  const handleSubtaskChange = (id, newName) => {
-    setSubtasks((currentSubtasks) =>
-      currentSubtasks.map((subtask) =>
-        subtask.id === id ? { ...subtask, name: newName } : subtask
-      )
-    );
-  };
+  // const handleSubtaskChange = (id, newName) => {
+  //   setSubtasks((currentSubtasks) =>
+  //     currentSubtasks.map((subtask) =>
+  //       subtask.subtask_id === id ? { ...subtask, name: newName } : subtask
+  //     )
+  //   );
+  // };
 
   const addSubtask = () => {
     setSubtasks((currentSubtasks) => [
       ...currentSubtasks,
-      { id: Date.now(), name: "" },
+      { subtask_id: Date.now(), subtask_name: "" },
     ]);
   };
 
   const removeSubtask = (id) => {
     setSubtasks((currentSubtasks) =>
-      currentSubtasks.filter((subtask) => subtask.id !== id)
+      currentSubtasks.filter((subtask) => subtask.subtask_id !== id)
     );
   };
 
@@ -334,7 +375,7 @@ const TaskForm = ({ open, setOpen, onHandleSubmit }) => {
                     <FormControl sx={{ flexGrow: 1 }}>
                       {subtasks.map((subtask, index) => (
                         <Stack
-                          key={subtask.id}
+                          key={subtask.subtask_id}
                           direction="row"
                           spacing={1}
                           alignItems="center"
@@ -343,14 +384,16 @@ const TaskForm = ({ open, setOpen, onHandleSubmit }) => {
                             size="sm"
                             type="text"
                             placeholder={`Subtask #${index + 1}`}
-                            value={subtask.name}
-                            onChange={(e) =>
-                              handleSubtaskChange(subtask.id, e.target.value)
+                            id="subtask_name"
+                            name="subtask_name"
+                            value={subtask.subtask_name}
+                            onChange={(e, value) =>
+                              handleSubTaskChange(e, value, "subtask_name")
                             }
                           />
                           <IconButton
                             size="sm"
-                            onClick={() => removeSubtask(subtask.id)}
+                            onClick={() => removeSubtask(subtask.subtask_id)}
                           >
                             <EditRoundedIcon />
                           </IconButton>
