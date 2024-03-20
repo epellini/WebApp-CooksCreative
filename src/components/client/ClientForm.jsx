@@ -18,7 +18,9 @@ import CardActions from "@mui/joy/CardActions";
 
 import { supabaseClient } from "../../supabase-client";
 
+// ClientForm component for adding or editing client information
 const ClientForm = () => {
+  // State for holding and updating client information
   const [client, setClient] = useState({
     first_name: "",
     last_name: "",
@@ -31,12 +33,15 @@ const ClientForm = () => {
     notes: "",
     tag: "",
   });
-  const { clientId } = useParams();
+
+  const { clientId } = useParams(); // Extracting clientId from URL parameters
   console.log("clientId: ", clientId);
 
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // Hook to navigate programmatically
 
-  const supabase = supabaseClient;
+  const supabase = supabaseClient; // Reference to the Supabase client
+
+  // Effect hook to fetch client data if clientId is present (edit mode)
   useEffect(() => {
     if (clientId) {
       const fetchClient = async () => {
@@ -116,7 +121,8 @@ const ClientForm = () => {
       );
     }
   };
-  // The form for adding or editing client details.
+  
+  // Render form for adding or editing client details
   return (
     <form onSubmit={handleSubmit}>
       <Box sx={{ flex: 1, width: "100%" }}>

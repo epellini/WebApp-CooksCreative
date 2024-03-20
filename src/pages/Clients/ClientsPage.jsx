@@ -97,7 +97,7 @@ const ClientsPage = () => {
               Add Client
             </Button>
           </Box>
-          <ClientTable clients={clients} />
+           <ClientTable clients={clients} /> {/*Exporting the client table component */}
         </Box>
       </Box>
     </CssVarsProvider>

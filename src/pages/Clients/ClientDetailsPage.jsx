@@ -32,12 +32,14 @@ import RoomIcon from "@mui/icons-material/Room";
 import CssBaseline from "@mui/joy/CssBaseline";
 import { CssVarsProvider } from "@mui/joy/styles";
 const ClientDetailsPage = () => {
-  const { id } = useParams();
+  const { id } = useParams(); // Get client ID from URL
   const navigate = useNavigate();
-  const [client, setClient] = useState({});
-  const [loading, setLoading] = useState(true);
-  const [projects, setProjects] = useState([]);
+  const [client, setClient] = useState({}); // State to store client details
+  const [loading, setLoading] = useState(true); // State to handle loading state
+  const [projects, setProjects] = useState([]); // State to store related projects
+
   useEffect(() => {
+    // Function to fetch client and projects data from the database
     const fetchData = async () => {
       try {
         const { data: clientData, error: clientError } = await supabaseClient
@@ -55,16 +57,19 @@ const ClientDetailsPage = () => {
       } catch (error) {
         console.error("Error fetching data:", error.message);
       } finally {
-        setLoading(false);
+        setLoading(false); // Set loading to false once data is fetched
       }
     };
 
     fetchData();
   }, [id]);
+
+  // Navigate to edit client page
   const handleEdit = () => {
     navigate(`/clients/edit/${id}`);
   };
 
+  // Function to delete a client
   const handleDelete = async () => {
     try {
       const { error } = await supabaseClient
@@ -79,7 +84,7 @@ const ClientDetailsPage = () => {
   };
 
   if (loading) {
-    return <Typography>Loading...</Typography>;
+    return <Typography>Loading...</Typography>; // Show loading message while data is being fetched
   }
 
   return (
@@ -105,6 +110,7 @@ const ClientDetailsPage = () => {
             gap: 1,
           }}
         >
+          {/* Breadcrumbs for navigation */}
           <Breadcrumbs
             size="sm"
             aria-label="breadcrumbs"

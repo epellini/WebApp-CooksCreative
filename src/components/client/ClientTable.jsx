@@ -42,16 +42,18 @@ import HomeIcon from "@mui/icons-material/Home";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabaseClient } from "../../supabase-client"; // Import the supabase client
-import { usePagination } from "../../hooks/usePagination";
-import { convertToCSV, downloadCSV } from "../../utils/CsvUtils";
+import { usePagination } from "../../hooks/usePagination"; // Custom hook for handling pagination
+import { convertToCSV, downloadCSV } from "../../utils/CsvUtils"; // Utilities for converting data to CSV and downloading it
 import FmdGoodIcon from "@mui/icons-material/FmdGood";
-import RoomIcon from '@mui/icons-material/Room'; 
+import RoomIcon from "@mui/icons-material/Room";
 import ClientForm from "./ClientForm";
 
 function RowMenu({ clientId }) {
+  // Component for each row's menu, allowing navigation to edit or detail view
   const navigate = useNavigate();
 
   return (
+    // Dropdown menu for each client row
     <Dropdown>
       <MenuButton
         slots={{ root: IconButton }}
@@ -74,9 +76,9 @@ function RowMenu({ clientId }) {
 }
 
 export default function ClientTable() {
-  const [clients, setClients] = useState([]);
+  const [clients, setClients] = useState([]); // State for all clients data
   //const [projects, setProjects] = useState([]);
-  const [selected, setSelected] = useState([]);
+  const [selected, setSelected] = useState([]); // State for selected rows (for export)
   const [status, setStatus] = useState([]);
   const [open, setOpen] = React.useState(false);
   const [loading, setLoading] = useState(true);
@@ -86,6 +88,7 @@ export default function ClientTable() {
 
   const [selectedClient, setSelectedClient] = useState(null);
   useEffect(() => {
+     // Fetch clients from the database on component mount
     async function getClients() {
       setLoading(true); // Begin loading state
 
@@ -176,6 +179,7 @@ export default function ClientTable() {
   //   window.location.href = `mailto:${emailAddress}`;
   // }
 
+  // Logic to export selected clients to CSV
   const handleExportSelected = () => {
     // Filter the clients to only those selected
     const selectedClientsData = clients.filter((client) =>
@@ -189,6 +193,7 @@ export default function ClientTable() {
     downloadCSV(csvData, "SelectedClients.csv");
   };
 
+  // Render the UI components like search bar, table, pagination, etc.
   return (
     <React.Fragment>
       <Sheet
@@ -461,7 +466,6 @@ export default function ClientTable() {
         </Table>
       </Sheet>
 
-
       {/* Mobile View */}
 
       <Sheet
@@ -517,7 +521,7 @@ export default function ClientTable() {
                 />
               </th>
               <th style={{ width: 25, padding: "12px 6px" }}>Name</th>
-          
+
               <th style={{ width: 50, padding: "12px 6px", textAlign: "left" }}>
                 Contact
               </th>
@@ -587,39 +591,33 @@ export default function ClientTable() {
                         {`${client.first_name} ${client.last_name}`}
                       </Typography>
 
-
                       <Box
-  display="flex"
-  flexDirection="column"
-  alignItems="flex-start"
-  gap={0.5}
->
-  <Link
-    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-      `${client.street}, ${client.city}, ${client.province} ${client.postal_code}`
-    )}`}
-    target="_blank"
-    rel="noopener noreferrer"
-    underline="hover"
-    sx={{
-      display: "flex",
-      flexDirection: "row", // Adjust if you want the icon next to text or standalone
-      alignItems: "center", // Center align the icon with the text if you decide to add text
-      gap: 0.5,
-    }}
-  >
-    <RoomIcon /> {/* This displays the icon */}
-    Directions
-    {/* Optionally, add Typography with text here if you want both an icon and text */}
-  </Link>
-</Box>
-
-
-
-
-
-                      </td>
-                      <td>
+                        display="flex"
+                        flexDirection="column"
+                        alignItems="flex-start"
+                        gap={0.5}
+                      >
+                        <Link
+                          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                            `${client.street}, ${client.city}, ${client.province} ${client.postal_code}`
+                          )}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          underline="hover"
+                          sx={{
+                            display: "flex",
+                            flexDirection: "row", // Adjust if you want the icon next to text or standalone
+                            alignItems: "center", // Center align the icon with the text if you decide to add text
+                            gap: 0.5,
+                          }}
+                        >
+                          <RoomIcon /> {/* This displays the icon */}
+                          Directions
+                          {/* Optionally, add Typography with text here if you want both an icon and text */}
+                        </Link>
+                      </Box>
+                    </td>
+                    <td>
                       <Box
                         display="flex"
                         flexDirection="column"
@@ -648,8 +646,6 @@ export default function ClientTable() {
                       </Box>
                     </td>
 
-                 
-
                     {/* <td>
                       <Box sx={{ display: "flex", gap: 2, alignItems: "left" }}>
                         <Link
@@ -669,10 +665,6 @@ export default function ClientTable() {
           </tbody>
         </Table>
       </Sheet>
-
-
-
-
 
       {/* Import to CSV button. Shows up when at least one client is selected  */}
       {selected.length > 0 && (
