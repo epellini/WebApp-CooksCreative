@@ -63,7 +63,6 @@ function App() {
              </Route>
 
             {/* ADMIN ROUTES */}
-            <Route path='/admin' element={<AdminPanel/>} ></Route>
 
 
           </Route> {/* END OF PROTECTED ROUTE */}
