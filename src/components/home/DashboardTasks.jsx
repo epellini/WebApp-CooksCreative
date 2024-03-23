@@ -88,7 +88,7 @@ export default function DashboardTasks() {
           minHeight: 0,
         }}
       >
-        <h1>Tasks</h1>
+        <h2>Recently Added Tasks</h2>
         <Table sx={{'& tr > *:not(:first-child)': { textAlign: 'left' } }}>
           <thead>
             <tr>
