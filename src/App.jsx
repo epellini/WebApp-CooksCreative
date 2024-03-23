@@ -46,7 +46,12 @@ function App() {
               <Route path="edit/:projectid" element={<ProjectForm />} />
             </Route>
             {isAdmin && (
-              <Route path="/clients" element={<ClientsPage />} />
+              <Route path="/clients">
+                <Route index element={<ClientsPage />} />
+                <Route path=":id" element={<ClientDetailsPage />} />
+                <Route path="new" element={<ClientForm />} />
+                <Route path="edit/:clientId" element={<ClientForm />} />
+              </Route>
             )}
             <Route path="/tasks">
               <Route index element={<TasksPage />} />
