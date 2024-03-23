@@ -63,6 +63,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
   const [users, setUsers] = useState([]);
   const [subTasks, setSubTasks] = useState([]);
   const [subTask, setSubTask] = useState("");
+  // const [completedSubTasks, setCompletedSubTasks] = useState([]);
   const [projects, setProjects] = useState([]);
   const [clients, setClients] = useState([]);
   const options = ["The Godfather", "Pulp Fiction"];
@@ -144,16 +145,6 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
     return false; // Exclude the task from the filtered array
   });
 
-  const completedSubTasks = subTasks.filter((subtask) => {
-    subTasks.map((subtask) => {
-      console.log("subtask name: " + subtask.subtask_name);
-    })
-    if(subtask.is_completed){
-      return true;
-    }
-    return false;
-  });
-
   const activeTasks = tasks.filter((task) => {
     if (task.is_completed == false && task.is_archived == false) {
       return task;
@@ -173,7 +164,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
 
   const getPriorityColor = (priorityName) => {
     switch (
-    priorityName?.toLowerCase() // Safe navigation in case of undefined
+      priorityName?.toLowerCase() // Safe navigation in case of undefined
     ) {
       case "high":
         return "danger";
@@ -226,7 +217,6 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
     }
   }
 
-
   return (
     <React.Fragment>
       <Sheet
@@ -253,7 +243,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
         }}
       >
         {/* Add New Task */}
-
+{/* 
         <React.Fragment>
           <Modal
             className="formWindow"
@@ -291,7 +281,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
               />
             </ModalDialog>
           </Modal>
-        </React.Fragment>
+        </React.Fragment> */}
 
         <Tabs
           aria-label="Pipeline"
@@ -376,7 +366,14 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                         onClick={() => console.log("Task Clicked")}
                         style={{ cursor: "pointer", textAlign: "left" }}
                       >
-                        <Typography>{completedSubTasks.length} / {task.subtasks.length} Subtasks</Typography>
+                        <Typography>
+                          {
+                            task.subtasks.filter(
+                              (subtask) => subtask.is_completed
+                            ).length
+                          }{" "}
+                          / {task.subtasks.length} Subtasks
+                        </Typography>
                         <AccordionGroup
                           transition="0.2s"
                           sx={{
@@ -427,7 +424,10 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                                 </Typography>
                               )}
                             </AccordionSummary>
-                            <AccordionDetails variant="soft" sx={{ padding: 0 }}>
+                            <AccordionDetails
+                              variant="soft"
+                              sx={{ padding: 0 }}
+                            >
                               <Box sx={{ listStyleType: "none", padding: 0 }}>
                                 {task.subtasks && task.subtasks.length > 0 ? (
                                   task.subtasks.map((subtask) => (
@@ -488,7 +488,11 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                               <Button
                                 variant="contained"
                                 onClick={() => {
-                                  addSubTask(subTask[task.task_id], task.task_id, false);
+                                  addSubTask(
+                                    subTask[task.task_id],
+                                    task.task_id,
+                                    false
+                                  );
                                   setSubTask((prevState) => ({
                                     ...prevState,
                                     [task.task_id]: "", // Reset the corresponding task_id key to an empty string
@@ -499,7 +503,6 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                                 Add Subtask
                               </Button>
                             </AccordionDetails>
-
                           </Accordion>
                         </AccordionGroup>
                       </td>
@@ -520,8 +523,8 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                       <td style={{ textAlign: "left" }}>
                         {task.date_created
                           ? new Date(task.date_created)
-                            .toISOString()
-                            .split("T")[0]
+                              .toISOString()
+                              .split("T")[0]
                           : "N/A"}
                       </td>
 
@@ -614,6 +617,14 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                         onClick={() => console.log("Task Clicked")}
                         style={{ cursor: "pointer", textAlign: "left" }}
                       >
+                        <Typography>
+                          {
+                            task.subtasks.filter(
+                              (subtask) => subtask.is_completed
+                            ).length
+                          }{" "}
+                          / {task.subtasks.length} Subtasks
+                        </Typography>
                         <AccordionGroup
                           transition="0.2s"
                           sx={{
@@ -702,13 +713,10 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                                       >
                                         {subtask.subtask_name}
                                       </Typography>
-
                                     </Box>
-
                                   ))
                                 ) : (
                                   <Typography>No Subtasks</Typography>
-
                                 )}
                               </Box>
                             </AccordionDetails>
@@ -724,16 +732,16 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                       <td style={{ textAlign: "left" }}>
                         {task.date_created
                           ? new Date(task.date_created)
-                            .toISOString()
-                            .split("T")[0]
+                              .toISOString()
+                              .split("T")[0]
                           : "N/A"}
                       </td>
 
                       <td style={{ textAlign: "left" }}>
                         {task.date_completed
                           ? new Date(task.date_completed)
-                            .toISOString()
-                            .split("T")[0]
+                              .toISOString()
+                              .split("T")[0]
                           : "N/A"}
                       </td>
                     </tr>
@@ -819,16 +827,16 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                       <td style={{ textAlign: "left" }}>
                         {task.date_created
                           ? new Date(task.date_created)
-                            .toISOString()
-                            .split("T")[0]
+                              .toISOString()
+                              .split("T")[0]
                           : "N/A"}
                       </td>
 
                       <td style={{ textAlign: "left" }}>
                         {task.date_completed
                           ? new Date(task.date_completed)
-                            .toISOString()
-                            .split("T")[0]
+                              .toISOString()
+                              .split("T")[0]
                           : "N/A"}
                       </td>
                     </tr>
@@ -1185,10 +1193,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                               </Typography>
                             )}
                           </AccordionSummary>
-                          <AccordionDetails
-                            variant="soft"
-                            sx={{ padding: 0 }}
-                          >
+                          <AccordionDetails variant="soft" sx={{ padding: 0 }}>
                             <Box sx={{ listStyleType: "none", padding: 0 }}>
                               {task.subtasks && task.subtasks.length > 0 ? (
                                 task.subtasks.map((subtask) => (

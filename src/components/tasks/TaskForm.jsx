@@ -19,6 +19,7 @@ import Link from "@mui/joy/Link";
 import Card from "@mui/joy/Card";
 import CardActions from "@mui/joy/CardActions";
 import CardOverflow from "@mui/joy/CardOverflow";
+import Snackbar from '@mui/joy/Snackbar';
 
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 import EmailRoundedIcon from "@mui/icons-material/EmailRounded";
@@ -38,6 +39,7 @@ import { supabaseClient } from "../../supabase-client";
 const TaskForm = ({ open, setOpen, onHandleSubmit }) => {
   const [subtasks, setSubtasks] = useState([]);
   const [subtask, setSubTask] = useState({});
+  
 
   const [task, setTask] = useState({
     task_name: "",
@@ -66,7 +68,7 @@ const TaskForm = ({ open, setOpen, onHandleSubmit }) => {
           .eq("task_id", taskid || "")
           .single();
 
-        console.log("taskData", taskData);
+        // console.log("taskData", taskData);
 
         const { data: projectsData, error: projectsError } = await supabase
           .from("projects")
@@ -114,33 +116,33 @@ const TaskForm = ({ open, setOpen, onHandleSubmit }) => {
     fetchData();
   }, [taskid]);
 
-  const handleSubTaskChange = (e, value, name) =>{
-    subtasks.map((subtask) => {
-      console.log("subtasks: ", subtask);
+  // const handleSubTaskChange = (e, value, name) =>{
+  //   subtasks.map((subtask) => {
+  //     console.log("subtasks: ", subtask);
 
-      if(value !== null && value !== undefined){
-        setSubTask((prevState) => ({
-          ...prevState,
-          [name]: value, // Use the name parameter to dynamically set the state key
-        }));
-      }else if (e.target) {
-        // Handle input change
-        const { name, value } = e.target;
-        setSubTask((prevState) => ({
-          ...prevState,
-          [name]: value,
-        }));
-      }
-    }
+  //     if(value !== null && value !== undefined){
+  //       setSubTask((prevState) => ({
+  //         ...prevState,
+  //         [name]: value, // Use the name parameter to dynamically set the state key
+  //       }));
+  //     }else if (e.target) {
+  //       // Handle input change
+  //       const { name, value } = e.target;
+  //       setSubTask((prevState) => ({
+  //         ...prevState,
+  //         [name]: value,
+  //       }));
+  //     }
+  //   }
 
-    )}
+  //   )}
 
   const handleChange = (e, value, name) => {
     // Check if e is null or undefined
-    console.log("value", value);
-    console.log("e", e);
-    console.log("name", name);
-    console.log("task", task);
+    // console.log("value", value);
+    // console.log("e", e);
+    // console.log("name", name);
+    // console.log("task", task);
 
 
     if (!e) {
@@ -165,7 +167,7 @@ const TaskForm = ({ open, setOpen, onHandleSubmit }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("task", task.task_name);
+    // console.log("task", task.task_name);
     if (task.task_name.trim() !== "") {
       try {
         let result = null;
@@ -188,34 +190,36 @@ const TaskForm = ({ open, setOpen, onHandleSubmit }) => {
             .insert([newTask]); // Insert the updated task object
           result = { data, error };
 
-          subtasks.map((subtask)=> {
-            console.log("subtasks: " + subtask.subtask_name);
-          })
+          // subtasks.map((subtask)=> {
+          //   console.log("subtasks: " + subtask.subtask_name);
+          // })
 
-          if(subtasks.length > 0){
-              const {subtaskData, subtaskError} = await supabase
-              .from("subtasks")
-              .insert(subtasks);//insert subtasks
-            result = {subtaskData, subtaskError};
+          // if(subtasks.length > 0){
+          //     const {subtaskData, subtaskError} = await supabase
+          //     .from("subtasks")
+          //     .insert(subtasks);//insert subtasks
+          //   result = {subtaskData, subtaskError};
 
-            console.log("subtask data: " + subtaskData);
-          }else{
-            console.log("no subtasks");
-          }
+          //   console.log("subtask data: " + subtaskData);
+          // }else{
+          //   console.log("no subtasks");
+          // }
 
         }
         if (result.error) {
           console.error("Error adding task:", result.error);
         } else {
 
-          // navigate("/tasks");
+          navigate("/tasks");
           
-          onHandleSubmit();
+          // onHandleSubmit();
 
-          console.log("Task added successfully");
+
+
         }
       } catch (error) {
-        console.error("Error adding task:", error);
+        // console.error("Error adding task:", error);
+
       }
     }
   };
@@ -235,18 +239,18 @@ const TaskForm = ({ open, setOpen, onHandleSubmit }) => {
   //   );
   // };
 
-  const addSubtask = () => {
-    setSubtasks((currentSubtasks) => [
-      ...currentSubtasks,
-      { subtask_id: Date.now(), subtask_name: "" },
-    ]);
-  };
+  // const addSubtask = () => {
+  //   setSubtasks((currentSubtasks) => [
+  //     ...currentSubtasks,
+  //     { subtask_id: Date.now(), subtask_name: "" },
+  //   ]);
+  // };
 
-  const removeSubtask = (id) => {
-    setSubtasks((currentSubtasks) =>
-      currentSubtasks.filter((subtask) => subtask.subtask_id !== id)
-    );
-  };
+  // const removeSubtask = (id) => {
+  //   setSubtasks((currentSubtasks) =>
+  //     currentSubtasks.filter((subtask) => subtask.subtask_id !== id)
+  //   );
+  // };
 
   return (
     <form onSubmit={handleSubmit}>
@@ -370,7 +374,7 @@ const TaskForm = ({ open, setOpen, onHandleSubmit }) => {
                     </FormControl>
                   </Stack>
                 )}
-                {!taskid && (
+                {/* {!taskid && (
                   <Stack spacing={1}>
                     <FormControl sx={{ flexGrow: 1 }}>
                       {subtasks.map((subtask, index) => (
@@ -404,7 +408,7 @@ const TaskForm = ({ open, setOpen, onHandleSubmit }) => {
                       </Button>
                     </FormControl>
                   </Stack>
-                )}
+                )} */}
                 {!taskid && (
                   <Stack spacing={1}>
                     <FormControl sx={{ flexGrow: 1 }}>
@@ -514,7 +518,7 @@ const TaskForm = ({ open, setOpen, onHandleSubmit }) => {
                   size="sm"
                   variant="outlined"
                   color="neutral"
-                  onClick={() => setOpen(false)}
+                  onClick={() => navigate("/tasks")}
                 >
                   Cancel
                 </Button>
