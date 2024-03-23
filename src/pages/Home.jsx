@@ -8,14 +8,11 @@ import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 import { useNavigate } from "react-router-dom";
 import DownloadRoundedIcon from "@mui/icons-material/DownloadRounded";
+import { DashboardQuote } from "../components/home/DashboardQuote";
+import DashboardStats from "../components/home/DashboardStats";
 
 const Home = () => {
-  // const {user} = useAuth();
-  // const {signout} = useAuth();
-
-  // const handleLogout = () => {
-  //   signout();
-  // }
+  const navigate = useNavigate();
 
   return (
     <CssVarsProvider disableTransitionOnChange>
@@ -70,14 +67,14 @@ const Home = () => {
             <Typography level="h2" component="h1">
               Dashboard
             </Typography>
-            <Button
+            {/* <Button
               onClick={() => navigate("/")}
               color="primary"
               startDecorator={<DownloadRoundedIcon />}
               size="sm"
             >
               Something Button
-            </Button>
+            </Button> */}
           </Box>
 
           <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap={1}>
@@ -87,8 +84,20 @@ const Home = () => {
             <Box gridColumn="span 8">
               <DashboardTasks />
             </Box>
-
-         
+            <Box gridColumn="span 4">
+              <Box p={2} boxShadow={3} borderRadius={4}>
+                <Typography variant="h3" mb={2}>
+                  Home Quote
+                </Typography>
+                <DashboardQuote />
+              </Box>
+              <Box p={2} mt={2} boxShadow={3} borderRadius={4}>
+                <Typography variant="h3" mb={2}>
+                  Dashboard Stats
+                </Typography>
+                <DashboardStats />
+              </Box>
+            </Box>
           </Box>
         </Box>
       </Box>
