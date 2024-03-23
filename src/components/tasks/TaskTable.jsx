@@ -679,7 +679,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                                   <Typography>No Subtasks</Typography>
                                 )}
                               </Box>
-                              <Typography>
+                              <Typography level="body-sm">
                                 Notes: {task.completion_notes}
                               </Typography>
                             </AccordionDetails>
@@ -1218,6 +1218,9 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                                 </Typography>
                               )}
                             </Box>
+                            <Typography level="body-xs">
+                              Notes: {task.completion_notes}
+                            </Typography>
                           </AccordionDetails>
                         </Accordion>
                       </AccordionGroup>
