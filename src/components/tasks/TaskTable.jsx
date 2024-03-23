@@ -372,17 +372,14 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                                   {task.task_name}
                                 </Typography>
                                 {task.projects ? (
-                                  <Typography
-                                    variant="body2"
-                                    component="div"
-                                  >
+                                  <Typography variant="body2" component="div">
                                     {task.projects.project_name}
                                   </Typography>
                                 ) : (
                                   <Typography
                                     variant="body2"
                                     component="div"
-                                    style={{ color: "#757575" }}
+                                    color="text.primary"
                                   >
                                     No Project
                                   </Typography>
@@ -406,7 +403,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                                           : "none",
                                       }}
                                     >
-                                      <Checkbox
+                                      <Checkbox 
                                         sx={{ padding: 0.5 }}
                                         checked={subtask.is_completed}
                                         onChange={() =>
@@ -553,24 +550,32 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
               {/* TABLE HEAD BEGINS HERE */}
               <thead>
                 <tr>
-                  <th
-                    style={{ width: 120, padding: "12px 6px"}}
-                  >
-                    Name
-                  </th>
+                  <th style={{ width: 120, padding: "12px 6px" }}>Name</th>
 
                   <th
-                    style={{ width: 25, padding: "12px 6px", textAlign: "center"  }}
+                    style={{
+                      width: 25,
+                      padding: "12px 6px",
+                      textAlign: "center",
+                    }}
                   >
                     By
                   </th>
                   <th
-                    style={{ width: 25, padding: "12px 6px", textAlign: "center" }}
+                    style={{
+                      width: 25,
+                      padding: "12px 6px",
+                      textAlign: "center",
+                    }}
                   >
                     Assigned
                   </th>
                   <th
-                    style={{ width: 25, padding: "12px 6px", textAlign: "center" }}
+                    style={{
+                      width: 25,
+                      padding: "12px 6px",
+                      textAlign: "center",
+                    }}
                   >
                     Completed
                   </th>
@@ -585,7 +590,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                         onClick={() => console.log("Task Clicked")}
                         style={{ cursor: "pointer", textAlign: "left" }}
                       >
-                        <Typography level="body-xs" >
+                        <Typography level="body-xs">
                           {
                             task.subtasks.filter(
                               (subtask) => subtask.is_completed
@@ -622,10 +627,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                                   {task.task_name}
                                 </Typography>
                                 {task.projects ? (
-                                  <Typography
-                                    variant="body2"
-                                    component="div"
-                                  >
+                                  <Typography variant="body2" component="div">
                                     {task.projects.project_name}
                                   </Typography>
                                 ) : (
@@ -654,9 +656,9 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                                         textDecoration: subtask.is_completed
                                           ? "line-through"
                                           : "none",
-                                        }}
+                                      }}
                                     >
-                                      <Checkbox
+                                      <Checkbox 
                                         sx={{ padding: 0.5 }}
                                         checked={subtask.is_completed}
                                       />
@@ -676,7 +678,9 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                                   <Typography>No Subtasks</Typography>
                                 )}
                               </Box>
-                              <Typography>Notes: {task.completion_notes}</Typography>
+                              <Typography>
+                                Notes: {task.completion_notes}
+                              </Typography>
                             </AccordionDetails>
                           </Accordion>
                         </AccordionGroup>
@@ -736,7 +740,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
               <thead>
                 <tr>
                   <th
-                    style={{ width: { xl: 70, md: 70 }, padding: "12px 6px"  }}
+                    style={{ width: { xl: 70, md: 70 }, padding: "12px 6px" }}
                   >
                     Name
                   </th>
@@ -888,7 +892,6 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                   "var(--joy-palette-background-level1)",
                 "--TableCell-paddingY": "4px",
                 "--TableCell-paddingX": "8px",
-                border: "1px solid #CDD7E1", // Add border here
                 borderRadius: "5px",
               }}
             >
@@ -937,39 +940,37 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                         >
                           <Accordion>
                             <AccordionSummary>
-                              <Typography
-                                level="body-sm"
-                                variant="subtitle1"
-                                component="div"
-                                style={{ color: "#212121", textAlign: "left" }}
-                              >
-                                {task.task_name}
-                              </Typography>
-                              {task.projects ? (
+                              <Box sx={{ textAlign: "left" }}>
+                                {" "}
                                 <Typography
-                                  level="body-xs"
+                                  level="body-sm"
+                                  variant="subtitle1"
                                   component="div"
-                                  style={{
-                                    color: "#757575",
-                                    textAlign: "left",
-                                  }}
+                                  sx={{ color: "text.primary" }}
                                 >
-                                  {task.projects.project_name}
+                                  {task.task_name}
                                 </Typography>
-                              ) : (
-                                <Typography
-                                  level="body-xs"
-                                  variant="body2"
-                                  component="div"
-                                  style={{
-                                    color: "#757575",
-                                    textAlign: "left",
-                                  }}
-                                >
-                                  No Project
-                                </Typography>
-                              )}
+                                {task.projects ? (
+                                  <Typography
+                                    level="body-xs"
+                                    component="div"
+                                    sx={{ color: "text.secondary", mt: 0.5 }}
+                                  >
+                                    {task.projects.project_name}
+                                  </Typography>
+                                ) : (
+                                  <Typography
+                                    level="body-xs"
+                                    variant="body2"
+                                    component="div"
+                                    sx={{ color: "text.secondary", mt: 0.5 }}
+                                  >
+                                    No Project
+                                  </Typography>
+                                )}
+                              </Box>
                             </AccordionSummary>
+
                             <AccordionDetails
                               variant="soft"
                               sx={{ padding: 0 }}
@@ -987,7 +988,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                                           : "none",
                                       }}
                                     >
-                                      <Checkbox
+                                      <Checkbox  size="sm"
                                         sx={{ padding: 0.5 }}
                                         checked={subtask.is_completed}
                                         onChange={() =>
@@ -1021,6 +1022,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                               {/* Input field for adding new subtask */}
                               <FormControl fullWidth sx={{ mt: 1 }}>
                                 <Input
+                                 size="sm"
                                   id={`subtask_name_${task.task_id}`} // Unique identifier using task_id
                                   placeholder="Add new subtask"
                                   value={subTask[task.task_id] || ""} // Retrieve value based on task_id
@@ -1035,7 +1037,8 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
 
                               {/* Button for adding new subtask */}
                               <Button
-                                variant="contained"
+                               size="sm"
+                                variant="outlined"
                                 onClick={() => {
                                   addSubTask(
                                     subTask[task.task_id],
@@ -1110,7 +1113,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
               {/* TABLE HEAD BEGINS HERE */}
               <thead>
                 <tr>
-                  <th style={{ width: 20, padding: "12px 6px" }}>Task</th>
+                  <th style={{ width: 50, padding: "12px 6px" }}>Task</th>
                   <th style={{ width: 10, padding: "12px px" }}>
                     <Typography>By</Typography>
                   </th>
@@ -1143,36 +1146,35 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                       >
                         <Accordion>
                           <AccordionSummary>
-                            <Typography
-                              variant="subtitle1"
-                              component="div"
-                              style={{ color: "#212121", textAlign: "left" }}
-                            >
-                              {task.task_name}
-                            </Typography>
-                            {task.projects ? (
+                            <Box sx={{ textAlign: "left" }}>
+                              {" "}
                               <Typography
-                                variant="body2"
+                                level="body-sm"
+                                variant="subtitle1"
                                 component="div"
-                                style={{
-                                  color: "#757575",
-                                  textAlign: "left",
-                                }}
+                                sx={{ color: "text.primary" }}
                               >
-                                {task.projects.project_name}
+                                {task.task_name}
                               </Typography>
-                            ) : (
-                              <Typography
-                                variant="body2"
-                                component="div"
-                                style={{
-                                  color: "#757575",
-                                  textAlign: "left",
-                                }}
-                              >
-                                No Project
-                              </Typography>
-                            )}
+                              {task.projects ? (
+                                <Typography
+                                  level="body-xs"
+                                  component="div"
+                                  sx={{ color: "text.secondary", mt: 0.5 }}
+                                >
+                                  {task.projects.project_name}
+                                </Typography>
+                              ) : (
+                                <Typography
+                                  level="body-xs"
+                                  variant="body2"
+                                  component="div"
+                                  sx={{ color: "text.secondary", mt: 0.5 }}
+                                >
+                                  No Project
+                                </Typography>
+                              )}
+                            </Box>
                           </AccordionSummary>
                           <AccordionDetails variant="soft" sx={{ padding: 0 }}>
                             <Box sx={{ listStyleType: "none", padding: 0 }}>
@@ -1188,7 +1190,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                                         : "none",
                                     }}
                                   >
-                                    <Checkbox
+                                    <Checkbox  size="sm"
                                       sx={{ padding: 0.5 }}
                                       checked={subtask.is_completed}
                                       onChange={() =>
@@ -1200,6 +1202,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                                       }
                                     />
                                     <Typography
+                                      level="body-xs" // Set text size to "body-xs"
                                       sx={{
                                         flexGrow: 1,
                                         textDecoration: subtask.is_completed
@@ -1212,14 +1215,17 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                                   </Box>
                                 ))
                               ) : (
-                                <Typography>No Subtasks</Typography>
+                                <Typography
+                                  level="body-xs" // Also set text size to "body-xs" for the "No Subtasks" text
+                                >
+                                  No Subtasks
+                                </Typography>
                               )}
                             </Box>
                           </AccordionDetails>
                         </Accordion>
                       </AccordionGroup>
                     </td>
-
                     <td style={{ textAlign: "left" }}>
                       <Typography level="body-xs">
                         {task.completed_by ? task.completed_by : "N/A"}
