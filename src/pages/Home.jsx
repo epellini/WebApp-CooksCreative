@@ -2,7 +2,6 @@ import { Box, Button, Typography, Breadcrumbs, Link } from "@mui/joy";
 import * as React from "react";
 import DashboardProjects from "../components/home/DashboardProjects";
 import DashboardTasks from "../components/home/DashboardTasks";
-import DashboardCompletedTasks from "../components/home/DashBoardCompletedTasks";
 import { CssVarsProvider } from "@mui/joy/styles";
 import CssBaseline from "@mui/joy/CssBaseline";
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
@@ -89,9 +88,7 @@ const Home = () => {
               <DashboardTasks />
             </Box>
 
-            <Box gridColumn="span 4">
-              <DashboardCompletedTasks />
-            </Box>
+         
           </Box>
         </Box>
       </Box>
