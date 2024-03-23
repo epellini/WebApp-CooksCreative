@@ -140,6 +140,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
     // Check if the task is completed and its creation date is within the last 30 days
     if (
       task.is_completed &&
+      !task.is_archived &&
       new Date(task.date_created).getTime() >= thirtyDaysAgoTimeStamp
     ) {
       return true; // Keep the task in the filtered array
@@ -570,6 +571,13 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                   >
                     Completed
                   </th>
+                  <th
+                    style={{
+                      width: 25,
+                      padding: "12px 6px",
+                      textAlign: "center",
+                    }}
+                  ></th>
                 </tr>
               </thead>
 
@@ -702,11 +710,28 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                               .split("T")[0]
                           : "N/A"}
                       </td>
+                      <td style={{ textAlign: "center" }}>
+                        <Stack
+                          spacing={1}
+                          direction="row"
+                          justifyContent="center"
+                          alignItems="center"
+                        >
+                          <IconButton
+                            size="sm"
+                            variant="soft"
+                            color="danger"
+                            onClick={() => archiveTask(task.task_id)}
+                          >
+                            <DeleteRoundedIcon />
+                          </IconButton>
+                        </Stack>
+                      </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="5" style={{ textAlign: "center" }}>
+                    <td colSpan="4" style={{ textAlign: "center" }}>
                       <Typography variant="h1" component="h1">
                         No Completed Tasks
                       </Typography>
@@ -1082,7 +1107,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="4" style={{ textAlign: "center" }}>
+                    <td colSpan="1" style={{ textAlign: "center" }}>
                       <Typography variant="h1" component="h1">
                         No Active Tasks
                       </Typography>
@@ -1112,122 +1137,141 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
               <thead>
                 <tr>
                   <th style={{ width: 60, padding: "12px 6px" }}>Task</th>
+                  <th style={{ width: 10, padding: "12px 6px" }}></th>
                 </tr>
               </thead>
 
               <tbody>
-                {Object.values(completedTasks).map((task, days) => (
-                  <tr key={task.task_id}>
-                    <td
-                      onClick={() => console.log("Task Clicked")}
-                      style={{ cursor: "pointer", textAlign: "left" }}
+  {completedTasks.length > 0 ? (
+    Object.values(completedTasks).map((task) => (
+      <tr key={task.task_id}>
+        <td
+          onClick={() => console.log("Task Clicked")}
+          style={{ cursor: "pointer", textAlign: "left" }}
+        >
+          <AccordionGroup
+            transition="0.2s"
+            sx={{
+              maxWidth: 400,
+              borderRadius: "lg",
+              [`& .${accordionSummaryClasses.button}:hover`]: {
+                bgcolor: "transparent",
+              },
+              [`& .${accordionDetailsClasses.content}`]: {
+                boxShadow: (theme) =>
+                  `inset 0 1px ${theme.vars.palette.divider}`,
+                [`&.${accordionDetailsClasses.expanded}`]: {
+                  paddingBlock: "0.75rem",
+                },
+              },
+            }}
+          >
+            <Accordion>
+              <AccordionSummary>
+                <Box sx={{ textAlign: "left" }}>
+                  <Typography
+                    level="body-sm"
+                    variant="subtitle1"
+                    component="div"
+                    sx={{ color: "text.primary" }}
+                  >
+                    {task.task_name}
+                  </Typography>
+                  {task.projects ? (
+                    <Typography
+                      level="body-xs"
+                      component="div"
+                      sx={{ color: "text.secondary", mt: 0.5 }}
                     >
-                      <AccordionGroup
-                        transition="0.2s"
+                      {task.projects.project_name}
+                    </Typography>
+                  ) : (
+                    <Typography
+                      level="body-xs"
+                      variant="body2"
+                      component="div"
+                      sx={{ color: "text.secondary", mt: 0.5 }}
+                    >
+                      No Project
+                    </Typography>
+                  )}
+                </Box>
+              </AccordionSummary>
+              <Typography sx={{ mt: 0.5, mb: 0.6 }} level="body-xs">
+                Completed By: {task.is_completed ? " " + (task.users?.first_name ?? "N/A") : "N/A"}
+              </Typography>
+              <AccordionDetails variant="soft" sx={{ padding: 0 }}>
+                <Box sx={{ listStyleType: "none", padding: 0 }}>
+                  {task.subtasks && task.subtasks.length > 0 ? (
+                    task.subtasks.map((subtask) => (
+                      <Box
+                        key={subtask.subtask_id}
                         sx={{
-                          maxWidth: 400,
-                          borderRadius: "lg",
-                          [`& .${accordionSummaryClasses.button}:hover`]: {
-                            bgcolor: "transparent",
-                          },
-                          [`& .${accordionDetailsClasses.content}`]: {
-                            boxShadow: (theme) =>
-                              `inset 0 1px ${theme.vars.palette.divider}`,
-                            [`&.${accordionDetailsClasses.expanded}`]: {
-                              paddingBlock: "0.75rem",
-                            },
-                          },
+                          display: "flex",
+                          alignItems: "center",
+                          textDecoration: subtask.is_completed ? "line-through" : "none",
                         }}
                       >
-                        <Accordion>
-                          <AccordionSummary>
-                            <Box sx={{ textAlign: "left" }}>
-                              {" "}
-                              <Typography
-                                level="body-sm"
-                                variant="subtitle1"
-                                component="div"
-                                sx={{ color: "text.primary" }}
-                              >
-                                {task.task_name}
-                              </Typography>
-                              {task.projects ? (
-                                <Typography
-                                  level="body-xs"
-                                  component="div"
-                                  sx={{ color: "text.secondary", mt: 0.5 }}
-                                >
-                                  {task.projects.project_name}
-                                </Typography>
-                              ) : (
-                                <Typography
-                                  level="body-xs"
-                                  variant="body2"
-                                  component="div"
-                                  sx={{ color: "text.secondary", mt: 0.5 }}
-                                >
-                                  No Project
-                                </Typography>
-                              )}
-                            </Box>
-                          </AccordionSummary>
-                          <Typography sx={{ mt: 0.5, mb: 0.6 }} level="body-xs">
-                            Completed By:
-                            {task.is_completed
-                              ? " " + task.users?.first_name ?? "N/A"
-                              : "N/A"}
-                          </Typography>
-                          <AccordionDetails variant="soft" sx={{ padding: 0 }}>
-                            <Box sx={{ listStyleType: "none", padding: 0 }}>
-                              {task.subtasks && task.subtasks.length > 0 ? (
-                                task.subtasks.map((subtask) => (
-                                  <Box
-                                    key={subtask.subtask_id}
-                                    sx={{
-                                      display: "flex",
-                                      alignItems: "center",
-                                      textDecoration: subtask.is_completed
-                                        ? "line-through"
-                                        : "none",
-                                    }}
-                                  >
-                                    <Checkbox
-                                      color="success"
-                                      size="sm"
-                                      sx={{ padding: 0.5 }}
-                                      checked={subtask.is_completed}
-                                    />
-                                    <Typography
-                                      level="body-xs" // Set text size to "body-xs"
-                                      sx={{
-                                        flexGrow: 1,
-                                        textDecoration: subtask.is_completed
-                                          ? "line-through"
-                                          : "none",
-                                      }}
-                                    >
-                                      {subtask.subtask_name}
-                                    </Typography>
-                                  </Box>
-                                ))
-                              ) : (
-                                <Typography
-                                  level="body-xs" // Also set text size to "body-xs" for the "No Subtasks" text
-                                >
-                                  No Subtasks
-                                </Typography>
-                              )}
-                            </Box>
-                            <Typography level="body-xs">
-                              Notes: {task.completion_notes}
-                            </Typography>
-                          </AccordionDetails>
-                        </Accordion>
-                      </AccordionGroup>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
+                        <Checkbox
+                          color="success"
+                          size="sm"
+                          sx={{ padding: 0.5 }}
+                          checked={subtask.is_completed}
+                        />
+                        <Typography
+                          level="body-xs"
+                          sx={{
+                            flexGrow: 1,
+                            textDecoration: subtask.is_completed ? "line-through" : "none",
+                          }}
+                        >
+                          {subtask.subtask_name}
+                        </Typography>
+                      </Box>
+                    ))
+                  ) : (
+                    <Typography level="body-xs">
+                      No Subtasks
+                    </Typography>
+                  )}
+                </Box>
+                <Typography level="body-xs">
+                  Notes: {task.completion_notes}
+                </Typography>
+              </AccordionDetails>
+            </Accordion>
+          </AccordionGroup>
+        </td>
+        <td style={{ textAlign: "center" }}>
+          <Stack
+            spacing={1}
+            direction="row"
+            justifyContent="center"
+            alignItems="center"
+          >
+            <IconButton
+              size="sm"
+              variant="soft"
+              color="danger"
+              onClick={() => archiveTask(task.task_id)}
+            >
+              <DeleteRoundedIcon />
+            </IconButton>
+          </Stack>
+        </td>
+      </tr>
+    ))
+  ) : (
+    <tr>
+      <td colSpan="2" style={{ textAlign: "center" }}>
+        <Typography variant="h1" component="h1">
+          No Completed Tasks
+        </Typography>
+      </td>
+    </tr>
+  )}
+</tbody>
+
             </Table>
           </TabPanel>
         </Tabs>
