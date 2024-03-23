@@ -10,7 +10,7 @@ const AdminPanel = () => {
     return (
         <div>
             Admin Panel
-            <Register/>
+            {/* <Register/> */}
             <Stack>
                 <Box>
                     <h2>User Management</h2>

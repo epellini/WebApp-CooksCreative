@@ -19,6 +19,7 @@ import Link from "@mui/joy/Link";
 import Card from "@mui/joy/Card";
 import CardActions from "@mui/joy/CardActions";
 import CardOverflow from "@mui/joy/CardOverflow";
+import Snackbar from '@mui/joy/Snackbar';
 
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 import EmailRoundedIcon from "@mui/icons-material/EmailRounded";
@@ -36,7 +37,9 @@ import { useNavigate, useParams } from "react-router-dom";
 import { supabaseClient } from "../../supabase-client";
 
 const TaskForm = ({ open, setOpen, onHandleSubmit }) => {
-  const [subtasks, setSubtasks] = useState([{ id: Date.now(), name: "" }]);
+  const [subtasks, setSubtasks] = useState([]);
+  const [subtask, setSubTask] = useState({});
+  
 
   const [task, setTask] = useState({
     task_name: "",
@@ -65,7 +68,7 @@ const TaskForm = ({ open, setOpen, onHandleSubmit }) => {
           .eq("task_id", taskid || "")
           .single();
 
-        console.log("taskData", taskData);
+        // console.log("taskData", taskData);
 
         const { data: projectsData, error: projectsError } = await supabase
           .from("projects")
@@ -113,12 +116,34 @@ const TaskForm = ({ open, setOpen, onHandleSubmit }) => {
     fetchData();
   }, [taskid]);
 
+  // const handleSubTaskChange = (e, value, name) =>{
+  //   subtasks.map((subtask) => {
+  //     console.log("subtasks: ", subtask);
+
+  //     if(value !== null && value !== undefined){
+  //       setSubTask((prevState) => ({
+  //         ...prevState,
+  //         [name]: value, // Use the name parameter to dynamically set the state key
+  //       }));
+  //     }else if (e.target) {
+  //       // Handle input change
+  //       const { name, value } = e.target;
+  //       setSubTask((prevState) => ({
+  //         ...prevState,
+  //         [name]: value,
+  //       }));
+  //     }
+  //   }
+
+  //   )}
+
   const handleChange = (e, value, name) => {
     // Check if e is null or undefined
-    console.log("value", value);
-    console.log("e", e);
-    console.log("name", name);
-    console.log("task", task);
+    // console.log("value", value);
+    // console.log("e", e);
+    // console.log("name", name);
+    // console.log("task", task);
+
 
     if (!e) {
       return;
@@ -142,7 +167,7 @@ const TaskForm = ({ open, setOpen, onHandleSubmit }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("task", task.task_name);
+    // console.log("task", task.task_name);
     if (task.task_name.trim() !== "") {
       try {
         let result = null;
@@ -154,8 +179,8 @@ const TaskForm = ({ open, setOpen, onHandleSubmit }) => {
             .update(task)
             .eq("task_id", taskid);
 
-          navigate("/tasks");
-          return;
+          // navigate("/tasks");
+          // return;
         } else {
           // Set is_completed value from the state
           const isCompletedValue = task.is_completed; // Get the value from the state
@@ -164,17 +189,37 @@ const TaskForm = ({ open, setOpen, onHandleSubmit }) => {
             .from("tasks")
             .insert([newTask]); // Insert the updated task object
           result = { data, error };
+
+          // subtasks.map((subtask)=> {
+          //   console.log("subtasks: " + subtask.subtask_name);
+          // })
+
+          // if(subtasks.length > 0){
+          //     const {subtaskData, subtaskError} = await supabase
+          //     .from("subtasks")
+          //     .insert(subtasks);//insert subtasks
+          //   result = {subtaskData, subtaskError};
+
+          //   console.log("subtask data: " + subtaskData);
+          // }else{
+          //   console.log("no subtasks");
+          // }
+
         }
         if (result.error) {
           console.error("Error adding task:", result.error);
         } else {
-          // navigate("/tasks");
-          onHandleSubmit();
 
-          console.log("Task added successfully");
+          navigate("/tasks");
+          
+          // onHandleSubmit();
+
+
+
         }
       } catch (error) {
-        console.error("Error adding task:", error);
+        // console.error("Error adding task:", error);
+
       }
     }
   };
@@ -186,26 +231,26 @@ const TaskForm = ({ open, setOpen, onHandleSubmit }) => {
     });
   }
 
-  const handleSubtaskChange = (id, newName) => {
-    setSubtasks((currentSubtasks) =>
-      currentSubtasks.map((subtask) =>
-        subtask.id === id ? { ...subtask, name: newName } : subtask
-      )
-    );
-  };
+  // const handleSubtaskChange = (id, newName) => {
+  //   setSubtasks((currentSubtasks) =>
+  //     currentSubtasks.map((subtask) =>
+  //       subtask.subtask_id === id ? { ...subtask, name: newName } : subtask
+  //     )
+  //   );
+  // };
 
-  const addSubtask = () => {
-    setSubtasks((currentSubtasks) => [
-      ...currentSubtasks,
-      { id: Date.now(), name: "" },
-    ]);
-  };
+  // const addSubtask = () => {
+  //   setSubtasks((currentSubtasks) => [
+  //     ...currentSubtasks,
+  //     { subtask_id: Date.now(), subtask_name: "" },
+  //   ]);
+  // };
 
-  const removeSubtask = (id) => {
-    setSubtasks((currentSubtasks) =>
-      currentSubtasks.filter((subtask) => subtask.id !== id)
-    );
-  };
+  // const removeSubtask = (id) => {
+  //   setSubtasks((currentSubtasks) =>
+  //     currentSubtasks.filter((subtask) => subtask.subtask_id !== id)
+  //   );
+  // };
 
   return (
     <form onSubmit={handleSubmit}>
@@ -329,12 +374,12 @@ const TaskForm = ({ open, setOpen, onHandleSubmit }) => {
                     </FormControl>
                   </Stack>
                 )}
-                {!taskid && (
+                {/* {!taskid && (
                   <Stack spacing={1}>
                     <FormControl sx={{ flexGrow: 1 }}>
                       {subtasks.map((subtask, index) => (
                         <Stack
-                          key={subtask.id}
+                          key={subtask.subtask_id}
                           direction="row"
                           spacing={1}
                           alignItems="center"
@@ -343,14 +388,16 @@ const TaskForm = ({ open, setOpen, onHandleSubmit }) => {
                             size="sm"
                             type="text"
                             placeholder={`Subtask #${index + 1}`}
-                            value={subtask.name}
-                            onChange={(e) =>
-                              handleSubtaskChange(subtask.id, e.target.value)
+                            id="subtask_name"
+                            name="subtask_name"
+                            value={subtask.subtask_name}
+                            onChange={(e, value) =>
+                              handleSubTaskChange(e, value, "subtask_name")
                             }
                           />
                           <IconButton
                             size="sm"
-                            onClick={() => removeSubtask(subtask.id)}
+                            onClick={() => removeSubtask(subtask.subtask_id)}
                           >
                             <EditRoundedIcon />
                           </IconButton>
@@ -361,7 +408,7 @@ const TaskForm = ({ open, setOpen, onHandleSubmit }) => {
                       </Button>
                     </FormControl>
                   </Stack>
-                )}
+                )} */}
                 {!taskid && (
                   <Stack spacing={1}>
                     <FormControl sx={{ flexGrow: 1 }}>
@@ -471,7 +518,7 @@ const TaskForm = ({ open, setOpen, onHandleSubmit }) => {
                   size="sm"
                   variant="outlined"
                   color="neutral"
-                  onClick={() => setOpen(false)}
+                  onClick={() => navigate("/tasks")}
                 >
                   Cancel
                 </Button>

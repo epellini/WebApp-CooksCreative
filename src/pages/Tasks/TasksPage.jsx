@@ -10,15 +10,23 @@ import Typography from "@mui/joy/Typography";
 import Button from "@mui/joy/Button";
 import DownloadRoundedIcon from "@mui/icons-material/DownloadRounded";
 import { Css } from "@mui/icons-material";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import TaskTable from "../../components/tasks/TaskTable";
 import Confetti from "../../components/tasks/confetti.jsx";
 import AddIcon from '@mui/icons-material/Add';
+import { useNavigate } from "react-router-dom";
+
+
+
+
 
 
 const TasksPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const toggleModal = () => setIsModalOpen(!isModalOpen);
+
+  const navigate = useNavigate();
+
 
   return (
     <CssVarsProvider disableTransitionOnChange>
@@ -74,7 +82,7 @@ const TasksPage = () => {
               Tasks
             </Typography>
             <Button
-              onClick={toggleModal} // Toggle modal on click
+              onClick={() => navigate("/tasks/new")} // Toggle modal on click
               color="primary"
               startDecorator={<AddIcon />}
               size="sm"
