@@ -403,7 +403,8 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                                           : "none",
                                       }}
                                     >
-                                      <Checkbox 
+                                      <Checkbox
+                                        color="success"
                                         sx={{ padding: 0.5 }}
                                         checked={subtask.is_completed}
                                         onChange={() =>
@@ -551,16 +552,6 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
               <thead>
                 <tr>
                   <th style={{ width: 120, padding: "12px 6px" }}>Name</th>
-
-                  <th
-                    style={{
-                      width: 25,
-                      padding: "12px 6px",
-                      textAlign: "center",
-                    }}
-                  >
-                    By
-                  </th>
                   <th
                     style={{
                       width: 25,
@@ -641,6 +632,15 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                                 )}
                               </Box>
                             </AccordionSummary>
+                            <Typography
+                              sx={{ mt: 0.5, mb: 0.6 }}
+                              level="body-xs"
+                            >
+                              Completed By:
+                              {task.is_completed
+                                ? " " + task.users?.first_name ?? "N/A"
+                                : "N/A"}
+                            </Typography>
                             <AccordionDetails
                               variant="soft"
                               sx={{ padding: 0 }}
@@ -658,7 +658,8 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                                           : "none",
                                       }}
                                     >
-                                      <Checkbox 
+                                      <Checkbox
+                                        color="success"
                                         sx={{ padding: 0.5 }}
                                         checked={subtask.is_completed}
                                       />
@@ -686,11 +687,6 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                         </AccordionGroup>
                       </td>
 
-                      <td style={{ textAlign: "center" }}>
-                        {task.is_completed
-                          ? task.users?.first_name ?? "N/A"
-                          : "N/A"}
-                      </td>
                       <td style={{ textAlign: "center" }}>
                         {task.date_created
                           ? new Date(task.date_created)
@@ -988,7 +984,9 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                                           : "none",
                                       }}
                                     >
-                                      <Checkbox  size="sm"
+                                      <Checkbox
+                                        color="success"
+                                        size="sm"
                                         sx={{ padding: 0.5 }}
                                         checked={subtask.is_completed}
                                         onChange={() =>
@@ -1022,7 +1020,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                               {/* Input field for adding new subtask */}
                               <FormControl fullWidth sx={{ mt: 1 }}>
                                 <Input
-                                 size="sm"
+                                  size="sm"
                                   id={`subtask_name_${task.task_id}`} // Unique identifier using task_id
                                   placeholder="Add new subtask"
                                   value={subTask[task.task_id] || ""} // Retrieve value based on task_id
@@ -1037,7 +1035,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
 
                               {/* Button for adding new subtask */}
                               <Button
-                               size="sm"
+                                size="sm"
                                 variant="outlined"
                                 onClick={() => {
                                   addSubTask(
@@ -1113,10 +1111,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
               {/* TABLE HEAD BEGINS HERE */}
               <thead>
                 <tr>
-                  <th style={{ width: 50, padding: "12px 6px" }}>Task</th>
-                  <th style={{ width: 10, padding: "12px px" }}>
-                    <Typography>By</Typography>
-                  </th>
+                  <th style={{ width: 60, padding: "12px 6px" }}>Task</th>
                 </tr>
               </thead>
 
@@ -1176,6 +1171,12 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                               )}
                             </Box>
                           </AccordionSummary>
+                          <Typography sx={{ mt: 0.5, mb: 0.6 }} level="body-xs">
+                            Completed By:
+                            {task.is_completed
+                              ? " " + task.users?.first_name ?? "N/A"
+                              : "N/A"}
+                          </Typography>
                           <AccordionDetails variant="soft" sx={{ padding: 0 }}>
                             <Box sx={{ listStyleType: "none", padding: 0 }}>
                               {task.subtasks && task.subtasks.length > 0 ? (
@@ -1190,16 +1191,11 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                                         : "none",
                                     }}
                                   >
-                                    <Checkbox  size="sm"
+                                    <Checkbox
+                                      color="success"
+                                      size="sm"
                                       sx={{ padding: 0.5 }}
                                       checked={subtask.is_completed}
-                                      onChange={() =>
-                                        handleSubtaskToggle(
-                                          task.task_id,
-                                          subtask.subtask_id,
-                                          !subtask.is_completed
-                                        )
-                                      }
                                     />
                                     <Typography
                                       level="body-xs" // Set text size to "body-xs"
@@ -1225,11 +1221,6 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                           </AccordionDetails>
                         </Accordion>
                       </AccordionGroup>
-                    </td>
-                    <td style={{ textAlign: "left" }}>
-                      <Typography level="body-xs">
-                        {task.completed_by ? task.completed_by : "N/A"}
-                      </Typography>
                     </td>
                   </tr>
                 ))}
