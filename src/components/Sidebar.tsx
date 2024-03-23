@@ -79,17 +79,16 @@ export default function Sidebar() {
   const navigate = useNavigate();
   const { isAdmin, user } = useAuth();
 
-  const handleLogout = async () => {
-    // await signOut(auth);
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    console.log("Logged out successfully");
-    navigate("/login");
-  };
+
 
   const Logout = async () => {
     const { error } = await supabaseClient.auth.signOut();
-    if (error) throw error;
+    if (error) {
+      console.error("Logout error:", error.message);
+    } else {
+      // Redirect to login page after successful logout
+      navigate("/login");
+    }
   };
 
   return (

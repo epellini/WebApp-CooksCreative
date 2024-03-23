@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Home from "./pages/Home.jsx";
 import ClientsPage from "./pages/Clients/ClientsPage.jsx";
@@ -21,9 +21,16 @@ import AdminPanel from './pages/AdminPanel/AdminPanel.jsx';
 import { useAuth } from "./pages/Auth/Auth.jsx";
 
 function App() {
-  const { isAdmin, user } = useAuth();
+  const { isAdmin, loading } = useAuth();
 
-  
+  // Render loading indicator while authentication data is being fetched
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  console.log("admin stats: " + isAdmin);
+
+  // Render routes once authentication data is available
   return (
     <div style={{ display: "flex" }}>
       <main style={{ flexGrow: 1 }}>
@@ -31,7 +38,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/" element={<Protected />}>
-            <Route index element={<Home/>} />
+            <Route index element={<Home />} />
             <Route path="/projects">
               <Route index element={<ProjectPage />} />
               <Route path=":id" element={<ProjectDetailsPage />} />
@@ -42,15 +49,15 @@ function App() {
               <Route path="/clients" element={<ClientsPage />} />
             )}
             <Route path="/tasks">
-              <Route index element={<TasksPage/>}/>
-              <Route path="new" element={<TaskForm/>}/>
-              <Route path="edit/:taskid" element={<TaskForm/>}/>
+              <Route index element={<TasksPage />} />
+              <Route path="new" element={<TaskForm />} />
+              <Route path="edit/:taskid" element={<TaskForm />} />
             </Route>
           </Route>
-          <Route path="/confirm-signup" element={<ConfirmationPage/>} />
-          <Route path="/set-password" element={<PasswordPage/>} />
-          <Route path="/create-user" element={<CreateUserPage/>} />
-          <Route path="/forgot-password" element={<ForgotPassword/>} />
+          <Route path="/confirm-signup" element={<ConfirmationPage />} />
+          <Route path="/set-password" element={<PasswordPage />} />
+          <Route path="/create-user" element={<CreateUserPage />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
