@@ -50,6 +50,8 @@ const ProjectTaskForm = ({projectid}) => {
   const [tasks, setTasks] = useState([]);
   const [projects, setProjects] = useState([]);
   const [users, setUsers] = useState([]);
+  const [priority, setPriority] = useState([]);
+
 
   const navigate = useNavigate();
   const supabase = supabaseClient;
@@ -75,6 +77,11 @@ const ProjectTaskForm = ({projectid}) => {
             .select("*")
             .order("user_id", { ascending: true });
 
+            const { data: priorityData, error: priorityError } = await supabase
+            .from("priority")
+            .select("*")
+            .order("priority_id", { ascending: true });
+
 
         if (tasksError) {
           console.error("Error fetching tasks:", tasksError);
@@ -92,6 +99,11 @@ const ProjectTaskForm = ({projectid}) => {
             }
             else {
             setUsers(usersData || []);
+            }
+            if (priorityError) {
+              console.error("Error fetching priority:", priorityError);
+            } else {
+              setPriority(priorityData || []);
             }
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -221,6 +233,40 @@ const ProjectTaskForm = ({projectid}) => {
                 </Stack>
               </Stack>
             </Stack>
+                  <Stack spacing={1}>
+                    <FormControl sx={{ flexGrow: 1 }}>
+                      <FormLabel>Task Priority</FormLabel>
+                      <Autocomplete
+                        id="task_priority"
+                        name="task_priority"
+                        options={priority}
+                        getOptionLabel={(option) => option.name + " "}
+                        value={
+                          priority.find(
+                            (priority) =>
+                              priority.priority_id === task.task_priority
+                          ) || null
+                        }
+                        onChange={(e, value) =>
+                          handleChange(
+                            e,
+                            value ? value.priority_id : null,
+                            "task_priority"
+                          )
+                        }
+                        renderInput={(params) => (
+                          <Input
+                            {...params}
+                            size="sm"
+                            id="task_priority"
+                            name="task_priority"
+                            required
+                          />
+                        )}
+                      />
+                    </FormControl>
+                  </Stack>
+            
             <Stack
               direction="column"
               spacing={2}

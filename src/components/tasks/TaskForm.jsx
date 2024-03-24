@@ -19,7 +19,7 @@ import Link from "@mui/joy/Link";
 import Card from "@mui/joy/Card";
 import CardActions from "@mui/joy/CardActions";
 import CardOverflow from "@mui/joy/CardOverflow";
-import Snackbar from '@mui/joy/Snackbar';
+import Snackbar from "@mui/joy/Snackbar";
 
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 import EmailRoundedIcon from "@mui/icons-material/EmailRounded";
@@ -33,13 +33,14 @@ import DropZone from "../DropZone";
 import FileUpload from "../FileUpload";
 
 //Thomas added imports
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { supabaseClient } from "../../supabase-client";
 
 const TaskForm = ({ open, setOpen, onHandleSubmit }) => {
   const [subtasks, setSubtasks] = useState([]);
   const [subtask, setSubTask] = useState({});
-  
+  const [projectid, setProjectId] = useState(null);
+  const location = useLocation();
 
   const [task, setTask] = useState({
     task_name: "",
@@ -58,63 +59,73 @@ const TaskForm = ({ open, setOpen, onHandleSubmit }) => {
   const [users, setUsers] = useState([]);
   const [priority, setPriority] = useState([]);
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        setLoading(true);
-        const { data: taskData, error: tasksError } = await supabase
-          .from("tasks")
-          .select("*")
-          .eq("task_id", taskid || "")
-          .single();
+  console.log("taskid: " + taskid);
+  console.log("projectid: " + projectid);
 
-        // console.log("taskData", taskData);
+  useEffect(
+    () => {
+      const queryParams = new URLSearchParams(location.search);
+      const projectIdFromQuery = queryParams.get("projectid");
+      setProjectId(projectIdFromQuery);
+      async function fetchData() {
+        try {
+          setLoading(true);
+          const { data: taskData, error: tasksError } = await supabase
+            .from("tasks")
+            .select("*")
+            .eq("task_id", taskid || "")
+            .single();
 
-        const { data: projectsData, error: projectsError } = await supabase
-          .from("projects")
-          .select("*")
-          .order("project_id", { ascending: true });
+          // console.log("taskData", taskData);
 
-        const { data: usersData, error: usersError } = await supabase
-          .from("users")
-          .select("*")
-          .order("user_id", { ascending: true });
+          const { data: projectsData, error: projectsError } = await supabase
+            .from("projects")
+            .select("*")
+            .order("project_id", { ascending: true });
 
-        const { data: priorityData, error: priorityError } = await supabase
-          .from("priority")
-          .select("*")
-          .order("priority_id", { ascending: true });
+          const { data: usersData, error: usersError } = await supabase
+            .from("users")
+            .select("*")
+            .order("user_id", { ascending: true });
 
-        if (tasksError) {
-          console.error("Error fetching tasks:", tasksError);
-        } else {
-          setTask(taskData || {});
+          const { data: priorityData, error: priorityError } = await supabase
+            .from("priority")
+            .select("*")
+            .order("priority_id", { ascending: true });
+
+          if (tasksError) {
+            console.error("Error fetching tasks:", tasksError);
+          } else {
+            setTask(taskData || {});
+          }
+
+          if (projectsError) {
+            console.error("Error fetching projects:", projectsError);
+          } else {
+            setProjects(projectsData || []);
+          }
+          if (usersError) {
+            console.error("Error fetching users:", usersError);
+          } else {
+            setUsers(usersData || []);
+          }
+          if (priorityError) {
+            console.error("Error fetching priority:", priorityError);
+          } else {
+            setPriority(priorityData || []);
+          }
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        } finally {
+          setLoading(false);
         }
-
-        if (projectsError) {
-          console.error("Error fetching projects:", projectsError);
-        } else {
-          setProjects(projectsData || []);
-        }
-        if (usersError) {
-          console.error("Error fetching users:", usersError);
-        } else {
-          setUsers(usersData || []);
-        }
-        if (priorityError) {
-          console.error("Error fetching priority:", priorityError);
-        } else {
-          setPriority(priorityData || []);
-        }
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setLoading(false);
       }
-    }
 
-    fetchData();
-  }, [taskid]);
+      fetchData();
+    },
+    [taskid],
+    [location.search]
+  );
 
   // const handleSubTaskChange = (e, value, name) =>{
   //   subtasks.map((subtask) => {
@@ -144,7 +155,6 @@ const TaskForm = ({ open, setOpen, onHandleSubmit }) => {
     // console.log("name", name);
     // console.log("task", task);
 
-
     if (!e) {
       return;
     }
@@ -165,9 +175,18 @@ const TaskForm = ({ open, setOpen, onHandleSubmit }) => {
     }
   };
 
+  const handleCancel = () => {
+    if (projectid) {
+      // If projectId exists, navigate to the project details page
+      navigate(`/projects/${projectid}`);
+    } else {
+      // If projectId doesn't exist, navigate to the tasks page
+      navigate("/tasks");
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // console.log("task", task.task_name);
     if (task.task_name.trim() !== "") {
       try {
         let result = null;
@@ -178,51 +197,30 @@ const TaskForm = ({ open, setOpen, onHandleSubmit }) => {
             .from("tasks")
             .update(task)
             .eq("task_id", taskid);
-
-          // navigate("/tasks");
-          // return;
         } else {
-          // Set is_completed value from the state
-          const isCompletedValue = task.is_completed; // Get the value from the state
-          const newTask = { ...task, is_completed: isCompletedValue }; // Update the task object with the is_completed value
+          const isCompletedValue = task.is_completed;
+          const newTask = { ...task, is_completed: isCompletedValue };
           const { data, error } = await supabase
             .from("tasks")
-            .insert([newTask]); // Insert the updated task object
+            .insert([newTask]);
           result = { data, error };
-
-          // subtasks.map((subtask)=> {
-          //   console.log("subtasks: " + subtask.subtask_name);
-          // })
-
-          // if(subtasks.length > 0){
-          //     const {subtaskData, subtaskError} = await supabase
-          //     .from("subtasks")
-          //     .insert(subtasks);//insert subtasks
-          //   result = {subtaskData, subtaskError};
-
-          //   console.log("subtask data: " + subtaskData);
-          // }else{
-          //   console.log("no subtasks");
-          // }
-
         }
         if (result.error) {
           console.error("Error adding task:", result.error);
         } else {
-
-          navigate("/tasks");
-          
-          // onHandleSubmit();
-
-
-
+          if (projectid) {
+            // If projectid exists, redirect to the project details page
+            navigate(`/projects/${projectid}`);
+          } else {
+            navigate("/tasks");
+          }
         }
       } catch (error) {
-        // console.error("Error adding task:", error);
-
+        console.error("Error adding task:", error);
       }
     }
   };
+  
 
   function playConfetti() {
     confetti({
@@ -518,7 +516,7 @@ const TaskForm = ({ open, setOpen, onHandleSubmit }) => {
                   size="sm"
                   variant="outlined"
                   color="neutral"
-                  onClick={() => navigate("/tasks")}
+                  onClick={handleCancel}
                 >
                   Cancel
                 </Button>
