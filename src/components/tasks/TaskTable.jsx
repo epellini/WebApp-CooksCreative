@@ -28,7 +28,7 @@ import { supabaseClient } from "../../supabase-client"; // Import the supabase c
 // ICONS:
 import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
-import ReplayIcon from '@mui/icons-material/Replay';
+import ReplayIcon from "@mui/icons-material/Replay";
 
 import AccordionGroup from "@mui/joy/AccordionGroup";
 import Accordion from "@mui/joy/Accordion";
@@ -118,7 +118,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
     getTasks();
   }
 
-  async function restoreTask(task_id) {
+  async function restoreDeletedTask(task_id) {
     const { data, error } = await supabaseClient
       .from("tasks")
       .update({
@@ -133,6 +133,22 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
     getTasks();
   }
 
+  async function restoreCompletedTask(task_id) {
+    const { data, error } = await supabaseClient
+      .from("tasks")
+      .update({
+        is_archived: false,
+        date_archived: null,
+        is_completed: false,
+        date_completed: null,
+      })
+      .match({ task_id: task_id });
+    if (error) {
+      console.error("Error updating Task status:", error);
+    }
+    console.log("Task restored successfully", data);
+    getTasks();
+  }
 
   async function deleteTask(task_id) {
     const { data, error } = await supabaseClient
@@ -807,6 +823,15 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                           >
                             <DeleteRoundedIcon />
                           </IconButton>
+                          <IconButton
+                            size="sm"
+                            variant="soft"
+                            s
+                            color="primary"
+                            onClick={() => restoreCompletedTask(task.task_id)}
+                          >
+                            <ReplayIcon />
+                          </IconButton>
                         </Stack>
                       </td>
                     </tr>
@@ -990,7 +1015,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                             size="sm"
                             variant="soft"
                             color="primary"
-                            onClick={() => restoreTask(task.task_id)}
+                            onClick={() => restoreDeletedTask(task.task_id)}
                           >
                             <ReplayIcon />
                           </IconButton>
@@ -1445,6 +1470,16 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                           >
                             <DeleteRoundedIcon />
                           </IconButton>
+
+                          <IconButton
+                            size="sm"
+                            variant="soft"
+                            s
+                            color="primary"
+                            onClick={() => restoreCompletedTask(task.task_id)}
+                          >
+                            <ReplayIcon />
+                          </IconButton>
                         </Stack>
                       </td>
                     </tr>
@@ -1507,7 +1542,12 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                       <td style={{ textAlign: "left" }}>
                         {/* Use a Box to stack the task name and project name vertically */}
                         <Box sx={{ textAlign: "left" }}>
-                          <Typography component="div" color="text.primary" level="body-sm"  sx={{ color: "text.primary" }}>
+                          <Typography
+                            component="div"
+                            color="text.primary"
+                            level="body-sm"
+                            sx={{ color: "text.primary" }}
+                          >
                             {task.task_name}
                           </Typography>
                           {task.projects ? (
@@ -1550,7 +1590,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                             size="sm"
                             variant="soft"
                             color="primary"
-                            onClick={() => restoreTask(task.task_id)}
+                            onClick={() => restoreDeletedTask(task.task_id)}
                           >
                             <ReplayIcon />
                           </IconButton>
