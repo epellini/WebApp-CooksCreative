@@ -3,48 +3,32 @@ import {
   Autocomplete,
   Box,
   Button,
-  AspectRatio,
-  Divider,
   FormControl,
-  FormLabel,
-  FormHelperText,
   Input,
   IconButton,
-  Textarea,
   Stack,
-  Select,
-  Option,
   Typography,
   Tabs,
   TabList,
-  Modal,
-  ModalDialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   Sheet,
   Chip,
-  Badge,
   TabPanel,
   Tab,
   tabClasses,
   Table,
 } from "@mui/joy";
+import Modal from "@mui/joy/Modal";
+import { ModalDialog } from "@mui/joy";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import { useNavigate } from "react-router-dom";
 import Checkbox, { checkboxClasses } from "@mui/joy/Checkbox";
-import Dropdown from "@mui/joy/Dropdown";
-import MenuButton from "@mui/joy/MenuButton";
-import MenuItem from "@mui/joy/MenuItem";
-import Menu from "@mui/joy/Menu";
 import { useEffect, useState } from "react";
 import { supabaseClient } from "../../supabase-client"; // Import the supabase client
+
 // ICONS:
-import Add from "@mui/icons-material/Add";
-import AddIcon from "@mui/icons-material/Add";
 import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
-import ArchiveIcon from "@mui/icons-material/Archive";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
+import ReplayIcon from '@mui/icons-material/Replay';
 
 import AccordionGroup from "@mui/joy/AccordionGroup";
 import Accordion from "@mui/joy/Accordion";
@@ -71,6 +55,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
   const options = ["The Godfather", "Pulp Fiction"];
   const [index, setIndex] = React.useState(0);
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   let [days, setDays] = useState(30);
 
   const navigate = useNavigate();
@@ -132,6 +117,59 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
     }
     getTasks();
   }
+
+  async function restoreTask(task_id) {
+    const { data, error } = await supabaseClient
+      .from("tasks")
+      .update({
+        is_archived: false,
+        date_archived: null,
+      })
+      .match({ task_id: task_id });
+    if (error) {
+      console.error("Error updating Task status:", error);
+    }
+    console.log("Task restored successfully", data);
+    getTasks();
+  }
+
+
+  async function deleteTask(task_id) {
+    const { data, error } = await supabaseClient
+      .from("tasks")
+      .delete()
+      .match({ task_id: task_id });
+    if (error) {
+      console.error("Error deleting Task:", error);
+    } else {
+      getTasks();
+    }
+  }
+
+  async function deleteAllTasks() {
+    const { data, error } = await supabaseClient
+      .from("tasks")
+      .delete()
+      .match({ is_archived: true });
+    if (error) {
+      console.error("Error deleting Task:", error);
+    } else {
+      console.log("All Tasks deleted successfully", data);
+      getTasks();
+    }
+  }
+
+  const handleSnackbarOpen = (index) => {
+    const updatedOpen = [...open];
+    updatedOpen[index] = true;
+    setOpen(updatedOpen);
+  };
+
+  const handleSnackbarClose = (index) => {
+    const updatedOpen = [...open];
+    updatedOpen[index] = false;
+    setOpen(updatedOpen);
+  };
 
   const completedTasks = tasks.filter((task) => {
     const dayLength = days * 24 * 60 * 60 * 1000; // 30 days in milliseconds
@@ -222,6 +260,50 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
 
   return (
     <React.Fragment>
+      <Modal
+        aria-labelledby="delete-confirmation-dialog-title"
+        aria-describedby="delete-confirmation-dialog-description"
+        open={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)} // Close the modal when clicking away or pressing escape
+      >
+        <ModalDialog
+          id="delete-confirmation-dialog"
+          aria-labelledby="delete-confirmation-dialog-title"
+          aria-describedby="delete-confirmation-dialog-description"
+          role="dialog"
+          sx={{ p: 2 }}
+        >
+          <Typography level="h2" id="delete-confirmation-dialog-title" mb={2}>
+            Confirm Deletion
+          </Typography>
+          <Typography id="delete-confirmation-dialog-description" mb={3}>
+            Are you sure you want to permanently delete all recently deleted
+            tasks? <br />
+            This action cannot be undone.
+          </Typography>
+
+          <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}>
+            <Button
+              variant="outlined"
+              color="neutral"
+              onClick={() => setIsDeleteModalOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="solid"
+              color="danger"
+              onClick={() => {
+                deleteAllTasks();
+                setIsDeleteModalOpen(false);
+              }}
+            >
+              Delete
+            </Button>
+          </Box>
+        </ModalDialog>
+      </Modal>
+
       <Sheet
         className="OrderTableContainer"
         variant="outlined"
@@ -647,7 +729,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                               Completed By:
                               {task.is_completed
                                 ? " " + task.users?.first_name ?? "N/A"
-                                : "N/A"}
+                                : " " + "N/A"}
                             </Typography>
                             <AccordionDetails
                               variant="soft"
@@ -760,26 +842,41 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
               {/* TABLE HEAD BEGINS HERE */}
               <thead>
                 <tr>
+                  <th style={{ width: 70, padding: "12px 6px" }}>Name</th>
                   <th
-                    style={{ width: { xl: 70, md: 70 }, padding: "12px 6px" }}
-                  >
-                    Name
-                  </th>
-
-                  <th
-                    style={{ width: { xl: 20, md: 10 }, padding: "12px 6px" }}
-                  >
-                    By
-                  </th>
-                  <th
-                    style={{ width: { xl: 20, md: 15 }, padding: "12px 6px" }}
+                    style={{
+                      width: 25,
+                      padding: "12px 6px",
+                      textAlign: "center",
+                    }}
                   >
                     Assigned
                   </th>
                   <th
-                    style={{ width: { xl: 20, md: 15 }, padding: "12px 6px" }}
+                    style={{
+                      width: 25,
+                      padding: "12px 6px",
+                      textAlign: "center",
+                    }}
                   >
                     Completed
+                  </th>
+                  <th
+                    style={{
+                      width: 25,
+                      padding: "12px 6px",
+                      textAlign: "center",
+                    }}
+                  >
+                    <Button
+                      size="sm"
+                      variant="soft"
+                      color="danger"
+                      onClick={() => setIsDeleteModalOpen(true)}
+                      endDecorator={<DeleteRoundedIcon />}
+                    >
+                      Delete All
+                    </Button>
                   </th>
                 </tr>
               </thead>
@@ -788,25 +885,78 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                 {archivedTasks.length > 0 ? (
                   Object.values(archivedTasks).map((task, days) => (
                     <tr key={task.task_id}>
-                      <td
-                        onClick={() => console.log("Task Clicked")}
-                        style={{ textAlign: "left", cursor: "pointer" }}
-                      >
-                        {`${task.task_name}`}
+                      <td style={{ textAlign: "left" }}>
+                        {/* Use a Box to stack the task name and project name vertically */}
+                        <Box sx={{ textAlign: "left" }}>
+                          <Typography
+                            variant="subtitle1"
+                            component="div"
+                            color="text.primary"
+                          >
+                            {task.task_name}
+                          </Typography>
+                          {task.projects ? (
+                            <Typography variant="body2" component="div">
+                              {task.projects.project_name}
+                            </Typography>
+                          ) : (
+                            <Typography
+                              variant="body2"
+                              component="div"
+                              color="text.primary"
+                            >
+                              No Project
+                            </Typography>
+                          )}
+                        </Box>
+                        <Typography sx={{ mt: 0.5, mb: 0.6 }} level="body-xs">
+                          Completed By:
+                          {task.is_completed
+                            ? " " + task.users?.first_name ?? "N/A"
+                            : " " + "N/A"}
+                        </Typography>
+                        <AccordionDetails variant="soft" sx={{ padding: 0 }}>
+                          <Box sx={{ listStyleType: "none", padding: 0 }}>
+                            {task.subtasks && task.subtasks.length > 0 ? (
+                              task.subtasks.map((subtask) => (
+                                <Box
+                                  key={subtask.subtask_id}
+                                  sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    textDecoration: subtask.is_completed
+                                      ? "line-through"
+                                      : "none",
+                                  }}
+                                >
+                                  <Checkbox
+                                    color="success"
+                                    sx={{ padding: 0.5 }}
+                                    checked={subtask.is_completed}
+                                  />
+                                  <Typography
+                                    sx={{
+                                      flexGrow: 1,
+                                      textDecoration: subtask.is_completed
+                                        ? "line-through"
+                                        : "none",
+                                    }}
+                                  >
+                                    {subtask.subtask_name}
+                                  </Typography>
+                                </Box>
+                              ))
+                            ) : (
+                              <Typography>No Subtasks</Typography>
+                            )}
+                          </Box>
+                          <Typography level="body-sm">
+                            Notes: {task.completion_notes}
+                          </Typography>
+                        </AccordionDetails>
                       </td>
 
-                      <td style={{ textAlign: "left" }}>
-                        {task.projects ? (
-                          <>{task.projects.project_name}</>
-                        ) : (
-                          <>No Project</>
-                        )}
-                      </td>
-
-                      <td style={{ textAlign: "left" }}>
-                        {task.completed_by ? task.completed_by : "N/A"}
-                      </td>
-                      <td style={{ textAlign: "left" }}>
+                      <td style={{ textAlign: "center" }}>
                         {task.date_created
                           ? new Date(task.date_created)
                               .toISOString()
@@ -814,18 +964,43 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                           : "N/A"}
                       </td>
 
-                      <td style={{ textAlign: "left" }}>
+                      <td style={{ textAlign: "center" }}>
                         {task.date_completed
                           ? new Date(task.date_completed)
                               .toISOString()
                               .split("T")[0]
                           : "N/A"}
                       </td>
+                      <td style={{ textAlign: "center" }}>
+                        <Stack
+                          spacing={1}
+                          direction="row"
+                          justifyContent="center"
+                          alignItems="center"
+                        >
+                          <IconButton
+                            size="sm"
+                            variant="soft"
+                            color="danger"
+                            onClick={() => deleteTask(task.task_id)}
+                          >
+                            <DeleteRoundedIcon />
+                          </IconButton>
+                          <IconButton
+                            size="sm"
+                            variant="soft"
+                            color="primary"
+                            onClick={() => restoreTask(task.task_id)}
+                          >
+                            <ReplayIcon />
+                          </IconButton>
+                        </Stack>
+                      </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="5" style={{ textAlign: "center" }}>
+                    <td colSpan="4" style={{ textAlign: "center" }}>
                       <Typography variant="h1" component="h1">
                         No Recently Deleted Tasks
                       </Typography>
@@ -1142,136 +1317,257 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
               </thead>
 
               <tbody>
-  {completedTasks.length > 0 ? (
-    Object.values(completedTasks).map((task) => (
-      <tr key={task.task_id}>
-        <td
-          onClick={() => console.log("Task Clicked")}
-          style={{ cursor: "pointer", textAlign: "left" }}
-        >
-          <AccordionGroup
-            transition="0.2s"
-            sx={{
-              maxWidth: 400,
-              borderRadius: "lg",
-              [`& .${accordionSummaryClasses.button}:hover`]: {
-                bgcolor: "transparent",
-              },
-              [`& .${accordionDetailsClasses.content}`]: {
-                boxShadow: (theme) =>
-                  `inset 0 1px ${theme.vars.palette.divider}`,
-                [`&.${accordionDetailsClasses.expanded}`]: {
-                  paddingBlock: "0.75rem",
-                },
-              },
-            }}
-          >
-            <Accordion>
-              <AccordionSummary>
-                <Box sx={{ textAlign: "left" }}>
-                  <Typography
-                    level="body-sm"
-                    variant="subtitle1"
-                    component="div"
-                    sx={{ color: "text.primary" }}
-                  >
-                    {task.task_name}
-                  </Typography>
-                  {task.projects ? (
-                    <Typography
-                      level="body-xs"
-                      component="div"
-                      sx={{ color: "text.secondary", mt: 0.5 }}
-                    >
-                      {task.projects.project_name}
-                    </Typography>
-                  ) : (
-                    <Typography
-                      level="body-xs"
-                      variant="body2"
-                      component="div"
-                      sx={{ color: "text.secondary", mt: 0.5 }}
-                    >
-                      No Project
-                    </Typography>
-                  )}
-                </Box>
-              </AccordionSummary>
-              <Typography sx={{ mt: 0.5, mb: 0.6 }} level="body-xs">
-                Completed By: {task.is_completed ? " " + (task.users?.first_name ?? "N/A") : "N/A"}
-              </Typography>
-              <AccordionDetails variant="soft" sx={{ padding: 0 }}>
-                <Box sx={{ listStyleType: "none", padding: 0 }}>
-                  {task.subtasks && task.subtasks.length > 0 ? (
-                    task.subtasks.map((subtask) => (
-                      <Box
-                        key={subtask.subtask_id}
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          textDecoration: subtask.is_completed ? "line-through" : "none",
-                        }}
+                {completedTasks.length > 0 ? (
+                  Object.values(completedTasks).map((task) => (
+                    <tr key={task.task_id}>
+                      <td
+                        onClick={() => console.log("Task Clicked")}
+                        style={{ cursor: "pointer", textAlign: "left" }}
                       >
-                        <Checkbox
-                          color="success"
-                          size="sm"
-                          sx={{ padding: 0.5 }}
-                          checked={subtask.is_completed}
-                        />
-                        <Typography
-                          level="body-xs"
+                        <AccordionGroup
+                          transition="0.2s"
                           sx={{
-                            flexGrow: 1,
-                            textDecoration: subtask.is_completed ? "line-through" : "none",
+                            maxWidth: 400,
+                            borderRadius: "lg",
+                            [`& .${accordionSummaryClasses.button}:hover`]: {
+                              bgcolor: "transparent",
+                            },
+                            [`& .${accordionDetailsClasses.content}`]: {
+                              boxShadow: (theme) =>
+                                `inset 0 1px ${theme.vars.palette.divider}`,
+                              [`&.${accordionDetailsClasses.expanded}`]: {
+                                paddingBlock: "0.75rem",
+                              },
+                            },
                           }}
                         >
-                          {subtask.subtask_name}
-                        </Typography>
-                      </Box>
-                    ))
-                  ) : (
-                    <Typography level="body-xs">
-                      No Subtasks
-                    </Typography>
-                  )}
-                </Box>
-                <Typography level="body-xs">
-                  Notes: {task.completion_notes}
-                </Typography>
-              </AccordionDetails>
-            </Accordion>
-          </AccordionGroup>
-        </td>
-        <td style={{ textAlign: "center" }}>
-          <Stack
-            spacing={1}
-            direction="row"
-            justifyContent="center"
-            alignItems="center"
-          >
-            <IconButton
-              size="sm"
-              variant="soft"
-              color="danger"
-              onClick={() => archiveTask(task.task_id)}
-            >
-              <DeleteRoundedIcon />
-            </IconButton>
-          </Stack>
-        </td>
-      </tr>
-    ))
-  ) : (
-    <tr>
-      <td colSpan="2" style={{ textAlign: "center" }}>
-        <Typography variant="h1" component="h1">
-          No Completed Tasks
-        </Typography>
-      </td>
-    </tr>
-  )}
-</tbody>
+                          <Accordion>
+                            <AccordionSummary>
+                              <Box sx={{ textAlign: "left" }}>
+                                <Typography
+                                  level="body-sm"
+                                  variant="subtitle1"
+                                  component="div"
+                                  sx={{ color: "text.primary" }}
+                                >
+                                  {task.task_name}
+                                </Typography>
+                                {task.projects ? (
+                                  <Typography
+                                    level="body-xs"
+                                    component="div"
+                                    sx={{ color: "text.secondary", mt: 0.5 }}
+                                  >
+                                    {task.projects.project_name}
+                                  </Typography>
+                                ) : (
+                                  <Typography
+                                    level="body-xs"
+                                    variant="body2"
+                                    component="div"
+                                    sx={{ color: "text.secondary", mt: 0.5 }}
+                                  >
+                                    No Project
+                                  </Typography>
+                                )}
+                              </Box>
+                            </AccordionSummary>
+                            <Typography
+                              sx={{ mt: 0.5, mb: 0.6 }}
+                              level="body-xs"
+                            >
+                              Completed By:{" "}
+                              {task.is_completed
+                                ? " " + (task.users?.first_name ?? "N/A")
+                                : "N/A"}
+                            </Typography>
+                            <AccordionDetails
+                              variant="soft"
+                              sx={{ padding: 0 }}
+                            >
+                              <Box sx={{ listStyleType: "none", padding: 0 }}>
+                                {task.subtasks && task.subtasks.length > 0 ? (
+                                  task.subtasks.map((subtask) => (
+                                    <Box
+                                      key={subtask.subtask_id}
+                                      sx={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        textDecoration: subtask.is_completed
+                                          ? "line-through"
+                                          : "none",
+                                      }}
+                                    >
+                                      <Checkbox
+                                        color="success"
+                                        size="sm"
+                                        sx={{ padding: 0.5 }}
+                                        checked={subtask.is_completed}
+                                      />
+                                      <Typography
+                                        level="body-xs"
+                                        sx={{
+                                          flexGrow: 1,
+                                          textDecoration: subtask.is_completed
+                                            ? "line-through"
+                                            : "none",
+                                        }}
+                                      >
+                                        {subtask.subtask_name}
+                                      </Typography>
+                                    </Box>
+                                  ))
+                                ) : (
+                                  <Typography level="body-xs">
+                                    No Subtasks
+                                  </Typography>
+                                )}
+                              </Box>
+                              <Typography level="body-xs">
+                                Notes: {task.completion_notes}
+                              </Typography>
+                            </AccordionDetails>
+                          </Accordion>
+                        </AccordionGroup>
+                      </td>
+                      <td style={{ textAlign: "center" }}>
+                        <Stack
+                          spacing={1}
+                          direction="row"
+                          justifyContent="center"
+                          alignItems="center"
+                        >
+                          <IconButton
+                            size="sm"
+                            variant="soft"
+                            color="danger"
+                            onClick={() => archiveTask(task.task_id)}
+                          >
+                            <DeleteRoundedIcon />
+                          </IconButton>
+                        </Stack>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="2" style={{ textAlign: "center" }}>
+                      <Typography variant="h1" component="h1">
+                        No Completed Tasks
+                      </Typography>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </Table>
+          </TabPanel>
 
+          <TabPanel value={2}>
+            <Table
+              stickyHeader
+              hoverRow
+              sx={{
+                "--TableCell-headBackground":
+                  "var(--joy-palette-background-level1)",
+                "--Table-headerUnderlineThickness": "1px",
+                "--TableRow-hoverBackground":
+                  "var(--joy-palette-background-level1)",
+                "--TableCell-paddingY": "4px",
+                "--TableCell-paddingX": "8px",
+                borderRadius: "5px",
+              }}
+            >
+              {/* TABLE HEAD BEGINS HERE */}
+              <thead>
+                <tr>
+                  <th style={{ width: 70, padding: "12px 6px" }}>Name</th>
+                  <th
+                    style={{
+                      width: 20,
+                      padding: "12px 6px",
+                      textAlign: "center",
+                    }}
+                  >
+                    <Button
+                      textAlign="center"
+                      size="xs"
+                      variant="soft"
+                      color="danger"
+                      onClick={() => setIsDeleteModalOpen(true)}
+                    >
+                      <Typography level="body-xs">DLT All</Typography>
+                    </Button>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {archivedTasks.length > 0 ? (
+                  Object.values(archivedTasks).map((task, days) => (
+                    <tr key={task.task_id}>
+                      <td style={{ textAlign: "left" }}>
+                        {/* Use a Box to stack the task name and project name vertically */}
+                        <Box sx={{ textAlign: "left" }}>
+                          <Typography component="div" color="text.primary" level="body-sm"  sx={{ color: "text.primary" }}>
+                            {task.task_name}
+                          </Typography>
+                          {task.projects ? (
+                            <Typography variant="body2" component="div">
+                              {task.projects.project_name}
+                            </Typography>
+                          ) : (
+                            <Typography
+                              variant="body2"
+                              component="div"
+                              color="text.primary"
+                            >
+                              No Project
+                            </Typography>
+                          )}
+                        </Box>
+                        <Typography sx={{ mt: 0.5, mb: 0.6 }} level="body-xs">
+                          Completed By:
+                          {task.is_completed
+                            ? " " + task.users?.first_name ?? "N/A"
+                            : " " + "N/A"}
+                        </Typography>
+                      </td>
+                      <td style={{ textAlign: "center" }}>
+                        <Stack
+                          spacing={1}
+                          direction="row"
+                          justifyContent="center"
+                          alignItems="center"
+                        >
+                          <IconButton
+                            size="sm"
+                            variant="soft"
+                            color="danger"
+                            onClick={() => deleteTask(task.task_id)}
+                          >
+                            <DeleteRoundedIcon />
+                          </IconButton>
+                          <IconButton
+                            size="sm"
+                            variant="soft"
+                            color="primary"
+                            onClick={() => restoreTask(task.task_id)}
+                          >
+                            <ReplayIcon />
+                          </IconButton>
+                        </Stack>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="2" style={{ textAlign: "center" }}>
+                      <Typography variant="h1" component="h1">
+                        No Recently Deleted Tasks
+                      </Typography>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
             </Table>
           </TabPanel>
         </Tabs>
