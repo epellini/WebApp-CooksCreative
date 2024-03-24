@@ -50,7 +50,8 @@ export default function DashboardTasks() {
     const { data, error } = await supabaseClient.from("tasks").select(`
     *,
     projects(*)
-  `);
+  `)
+  .eq('is_completed', false);
     // Hey Thomas, do we need to add this here too? Broke this view when I added priorities to the tasks table
   // priority:task_priority (name) 
   

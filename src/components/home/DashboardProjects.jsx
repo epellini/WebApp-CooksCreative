@@ -34,7 +34,8 @@ export default function DashboardProjects() {
         images(image_urls)
       `
       )
-      .order("created_date", { ascending: false });
+      .order("created_date", { ascending: false })
+      .eq("status_id", 1);
 
     if (error) {
       console.error(error);
