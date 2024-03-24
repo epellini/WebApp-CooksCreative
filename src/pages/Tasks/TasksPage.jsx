@@ -13,20 +13,14 @@ import { Css } from "@mui/icons-material";
 import React, { useState } from "react";
 import TaskTable from "../../components/tasks/TaskTable";
 import Confetti from "../../components/tasks/confetti.jsx";
-import AddIcon from '@mui/icons-material/Add';
+import AddIcon from "@mui/icons-material/Add";
 import { useNavigate } from "react-router-dom";
-
-
-
-
-
 
 const TasksPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const toggleModal = () => setIsModalOpen(!isModalOpen);
 
   const navigate = useNavigate();
-
 
   return (
     <CssVarsProvider disableTransitionOnChange>
@@ -48,7 +42,6 @@ const TasksPage = () => {
             flexDirection: "column",
             minWidth: 0,
             height: "100dvh",
-            overflowY: "auto",
             gap: 1,
           }}
         >
@@ -59,7 +52,13 @@ const TasksPage = () => {
               separator={<ChevronRightRoundedIcon fontSize="sm" />}
               sx={{ pl: 0 }}
             >
-              <Link underline="none" color="neutral" href="/" aria-label="Home">
+              <Link
+                underline="none"
+                color="neutral"
+                href="/"
+                // to={"/"}
+                aria-label="Home"
+              >
                 <HomeRoundedIcon />
               </Link>
               <Typography color="primary" fontWeight={500} fontSize={12}>
@@ -91,8 +90,7 @@ const TasksPage = () => {
             </Button>
           </Box>
 
-          <TaskTable isModalOpen={isModalOpen} toggleModal={toggleModal}  />
-
+          <TaskTable isModalOpen={isModalOpen} toggleModal={toggleModal} />
         </Box>
       </Box>
     </CssVarsProvider>

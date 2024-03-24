@@ -44,7 +44,7 @@ const Home = () => {
               separator={<ChevronRightRoundedIcon fontSize="sm" />}
               sx={{ pl: 0 }}
             >
-              <Link underline="none" color="neutral" href="/" aria-label="Home">
+              <Link underline="none" color="neutral" to={"/"} aria-label="Home">
                 <HomeRoundedIcon />
               </Link>
               <Typography color="primary" fontWeight={500} fontSize={12}>
@@ -77,27 +77,27 @@ const Home = () => {
             </Button> */}
           </Box>
 
-          <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap={1}>
+          <Box display="grid" gridTemplateColumns="repeat(8, 1fr)" gap={1}>
             <Box gridColumn="span 8">
               <DashboardProjects />
             </Box>
             <Box gridColumn="span 8">
               <DashboardTasks />
             </Box>
-            <Box gridColumn="span 4">
-              <Box p={2} boxShadow={3} borderRadius={4}>
+            {/* <Box gridColumn="span 4"> */}
+              {/* <Box p={2} boxShadow={3} borderRadius={4}>
                 <Typography variant="h3" mb={2}>
                   Home Quote
                 </Typography>
                 <DashboardQuote />
-              </Box>
-              <Box p={2} mt={2} boxShadow={3} borderRadius={4}>
+              </Box> */}
+              {/* <Box p={2} mt={2} boxShadow={3} borderRadius={4}>
                 <Typography variant="h3" mb={2}>
                   Dashboard Stats
                 </Typography>
                 <DashboardStats />
-              </Box>
-            </Box>
+              </Box> */}
+            {/* </Box> */}
           </Box>
         </Box>
       </Box>

@@ -54,12 +54,13 @@ const ClientsPage = () => {
               <Link
                 underline="none"
                 color="neutral"
-                href="/"
+                // href="/"
+                to={"/"}
                 aria-label="Home"
               >
                 <HomeRoundedIcon />
               </Link>
-              <Link
+              {/* <Link
                 underline="hover"
                 color="neutral"
                 to={"/"}
@@ -67,7 +68,7 @@ const ClientsPage = () => {
                 fontWeight={500}
               >
                 Dashboard
-              </Link>
+              </Link> */}
 
               <Typography color="primary" fontWeight={500} fontSize={12}>
                 Clients

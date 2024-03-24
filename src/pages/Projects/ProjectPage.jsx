@@ -90,7 +90,8 @@ const ProjectPage = () => {
             <Link
               underline="none"
               color="neutral"
-              href="/"
+              // href="/"
+              to={"/"}
               aria-label="Home"
             >
               <HomeRoundedIcon />
