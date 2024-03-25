@@ -81,7 +81,9 @@ const TaskForm = ({ open, setOpen, onHandleSubmit }) => {
           const { data: projectsData, error: projectsError } = await supabase
             .from("projects")
             .select("*")
-            .order("project_id", { ascending: true });
+            .order("project_id", { ascending: true })
+            .eq("status_id", 2);
+
 
           const { data: usersData, error: usersError } = await supabase
             .from("users")
