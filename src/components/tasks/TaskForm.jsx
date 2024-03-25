@@ -1,36 +1,19 @@
 import React, { useState, useEffect } from "react";
-
-import AspectRatio from "@mui/joy/AspectRatio";
 import confetti from "https://esm.run/canvas-confetti@1";
 import Box from "@mui/joy/Box";
 import Button from "@mui/joy/Button";
-import Divider from "@mui/joy/Divider";
 import FormControl from "@mui/joy/FormControl";
 import FormLabel from "@mui/joy/FormLabel";
 import Input from "@mui/joy/Input";
-import IconButton from "@mui/joy/IconButton";
 import Textarea from "@mui/joy/Textarea";
 import Stack from "@mui/joy/Stack";
 import Select from "@mui/joy/Select";
 import Option from "@mui/joy/Option";
 import Typography from "@mui/joy/Typography";
-import Breadcrumbs from "@mui/joy/Breadcrumbs";
-import Link from "@mui/joy/Link";
 import Card from "@mui/joy/Card";
 import CardActions from "@mui/joy/CardActions";
 import CardOverflow from "@mui/joy/CardOverflow";
-import Snackbar from "@mui/joy/Snackbar";
-
-import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
-import EmailRoundedIcon from "@mui/icons-material/EmailRounded";
-import AccessTimeFilledRoundedIcon from "@mui/icons-material/AccessTimeFilledRounded";
-import VideocamRoundedIcon from "@mui/icons-material/VideocamRounded";
-import InsertDriveFileRoundedIcon from "@mui/icons-material/InsertDriveFileRounded";
-import EditRoundedIcon from "@mui/icons-material/EditRounded";
-
 import Autocomplete from "@mui/joy/Autocomplete";
-import DropZone from "../DropZone";
-import FileUpload from "../FileUpload";
 
 //Thomas added imports
 import { useNavigate, useParams, useLocation } from "react-router-dom";
@@ -129,33 +112,7 @@ const TaskForm = ({ open, setOpen, onHandleSubmit }) => {
     [location.search]
   );
 
-  // const handleSubTaskChange = (e, value, name) =>{
-  //   subtasks.map((subtask) => {
-  //     console.log("subtasks: ", subtask);
-
-  //     if(value !== null && value !== undefined){
-  //       setSubTask((prevState) => ({
-  //         ...prevState,
-  //         [name]: value, // Use the name parameter to dynamically set the state key
-  //       }));
-  //     }else if (e.target) {
-  //       // Handle input change
-  //       const { name, value } = e.target;
-  //       setSubTask((prevState) => ({
-  //         ...prevState,
-  //         [name]: value,
-  //       }));
-  //     }
-  //   }
-
-  //   )}
-
   const handleChange = (e, value, name) => {
-    // Check if e is null or undefined
-    // console.log("value", value);
-    // console.log("e", e);
-    // console.log("name", name);
-    // console.log("task", task);
 
     if (!e) {
       return;
@@ -230,27 +187,6 @@ const TaskForm = ({ open, setOpen, onHandleSubmit }) => {
       spread: 180,
     });
   }
-
-  // const handleSubtaskChange = (id, newName) => {
-  //   setSubtasks((currentSubtasks) =>
-  //     currentSubtasks.map((subtask) =>
-  //       subtask.subtask_id === id ? { ...subtask, name: newName } : subtask
-  //     )
-  //   );
-  // };
-
-  // const addSubtask = () => {
-  //   setSubtasks((currentSubtasks) => [
-  //     ...currentSubtasks,
-  //     { subtask_id: Date.now(), subtask_name: "" },
-  //   ]);
-  // };
-
-  // const removeSubtask = (id) => {
-  //   setSubtasks((currentSubtasks) =>
-  //     currentSubtasks.filter((subtask) => subtask.subtask_id !== id)
-  //   );
-  // };
 
   return (
     <form onSubmit={handleSubmit}>
@@ -374,41 +310,6 @@ const TaskForm = ({ open, setOpen, onHandleSubmit }) => {
                     </FormControl>
                   </Stack>
                 )}
-                {/* {!taskid && (
-                  <Stack spacing={1}>
-                    <FormControl sx={{ flexGrow: 1 }}>
-                      {subtasks.map((subtask, index) => (
-                        <Stack
-                          key={subtask.subtask_id}
-                          direction="row"
-                          spacing={1}
-                          alignItems="center"
-                        >
-                          <Input
-                            size="sm"
-                            type="text"
-                            placeholder={`Subtask #${index + 1}`}
-                            id="subtask_name"
-                            name="subtask_name"
-                            value={subtask.subtask_name}
-                            onChange={(e, value) =>
-                              handleSubTaskChange(e, value, "subtask_name")
-                            }
-                          />
-                          <IconButton
-                            size="sm"
-                            onClick={() => removeSubtask(subtask.subtask_id)}
-                          >
-                            <EditRoundedIcon />
-                          </IconButton>
-                        </Stack>
-                      ))}
-                      <Button size="sm" onClick={addSubtask}>
-                        Add Subtask
-                      </Button>
-                    </FormControl>
-                  </Stack>
-                )} */}
                 {!taskid && (
                   <Stack spacing={1}>
                     <FormControl sx={{ flexGrow: 1 }}>
@@ -492,23 +393,171 @@ const TaskForm = ({ open, setOpen, onHandleSubmit }) => {
             >
               {/* MOBILE VIEW */}
               <Stack direction="row" spacing={2}>
-                <Stack spacing={1} sx={{ flexGrow: 1 }}>
+              <Stack spacing={2} sx={{ flexGrow: 1 }}>
+                <Stack direction="row" spacing={1}>
                   <FormControl sx={{ flexGrow: 1 }}>
                     <FormLabel>Task Name</FormLabel>
                     <Input
-                      disabled={taskid ? true : false}
+                      disabled={taskid ? true : false} // Set directly to true or false based on the condition
                       size="sm"
                       type="text"
                       id="task_name"
                       name="task_name"
                       value={task.task_name}
-                      onChange={handleChange}
+                      onChange={handleChange} // Pass the event object directly
                       required
                     />
                   </FormControl>
                 </Stack>
+                <FormControl sx={{ flexGrow: 1 }}>
+                  <FormLabel>Project Name</FormLabel>
+                  <Autocomplete
+                    disabled={taskid ? true : false}
+                    id="project_id"
+                    name="project_id"
+                    options={projects}
+                    getOptionLabel={(option) =>
+                      option.project_name +
+                      " " +
+                      "(ID: " +
+                      option.project_id +
+                      ")"
+                    }
+                    value={
+                      projects.find(
+                        (project) => project.project_id === task.project_id
+                      ) || null
+                    }
+                    onChange={(e, value) =>
+                      handleChange(
+                        e,
+                        value ? value.project_id : null,
+                        "project_id"
+                      )
+                    }
+                    renderInput={(params) => (
+                      <Input
+                        {...params}
+                        size="sm"
+                        id="project_id"
+                        name="project_id"
+                        required
+                      />
+                    )}
+                  />
+                </FormControl>
+
+                {!taskid && (
+                  <Stack spacing={1}>
+                    <FormControl sx={{ flexGrow: 1 }}>
+                      <FormLabel>Task Priority</FormLabel>
+                      <Autocomplete
+                        id="task_priority"
+                        name="task_priority"
+                        options={priority}
+                        getOptionLabel={(option) => option.name + " "}
+                        value={
+                          priority.find(
+                            (priority) =>
+                              priority.priority_id === task.task_priority
+                          ) || null
+                        }
+                        onChange={(e, value) =>
+                          handleChange(
+                            e,
+                            value ? value.priority_id : null,
+                            "task_priority"
+                          )
+                        }
+                        renderInput={(params) => (
+                          <Input
+                            {...params}
+                            size="sm"
+                            id="task_priority"
+                            name="task_priority"
+                            required
+                          />
+                        )}
+                      />
+                    </FormControl>
+                  </Stack>
+                )}
+                {!taskid && (
+                  <Stack spacing={1}>
+                    <FormControl sx={{ flexGrow: 1 }}>
+                      <FormLabel>Completed</FormLabel>
+                      <Select
+                        placeholder="Select Status"
+                        id="is_completed"
+                        name="is_completed" // Add the name attribute
+                        value={task.is_completed}
+                        onChange={(e, value) =>
+                          handleChange(e, value, "is_completed")
+                        } // Pass the name along with the value
+                        required
+                      >
+                        <Option value={true}>Yes</Option>
+                        <Option value={false}>No</Option>
+                      </Select>
+                    </FormControl>
+                  </Stack>
+                )}
+                {taskid && (
+                  <FormControl sx={{ flexGrow: 1 }}>
+                    <FormLabel>Completed By</FormLabel>
+                    <Autocomplete
+                      id="user_id"
+                      name="user_id"
+                      options={users}
+                      getOptionLabel={(option) => option.first_name + " "}
+                      value={
+                        users.find((user) => user.user_id === task.user_id) ||
+                        null
+                      }
+                      onChange={(e, value) =>
+                        handleChange(
+                          e,
+                          value ? value.user_id : null, // Pass the user ID directly to handleChange
+                          "user_id"
+                        )
+                      }
+                      renderInput={(params) => (
+                        <Input
+                          {...params}
+                          size="sm"
+                          id="user_id"
+                          name="user_id"
+                          required
+                        />
+                      )}
+                    />
+                  </FormControl>
+                )}
+
+                {taskid && (
+                  <Stack spacing={1}>
+                    <FormLabel>Completion Notes</FormLabel>
+                    <FormControl
+                      sx={{
+                        display: { sm: "flex-column", md: "flex-row" },
+                        gap: 2,
+                      }}
+                    >
+                      <Textarea
+                        size="sm"
+                        minRows={4}
+                        sx={{ flexGrow: 1 }}
+                        id="completion_notes"
+                        name="completion_notes"
+                        value={task.completion_notes}
+                        onChange={handleChange}
+                        required
+                      />
+                    </FormControl>
+                  </Stack>
+                )}
               </Stack>
-              <div></div>
+              </Stack>
             </Stack>
             <CardOverflow
               sx={{ borderTop: "1px solid", borderColor: "divider" }}
