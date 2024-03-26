@@ -24,7 +24,7 @@ const ClientsPage = () => {
   return (
     <CssVarsProvider disableTransitionOnChange>
       <CssBaseline />
-      <Box sx={{ display: "flex", minHeight: "100dvh" }}>
+      <Box sx={{ display: "flex", minHeight: "100vh" }}>
         <Box
           component="main"
           className="MainContent"
@@ -40,7 +40,8 @@ const ClientsPage = () => {
             display: "flex",
             flexDirection: "column",
             minWidth: 0,
-            height: "100dvh",
+            height: "100vh",
+            overflowY: "auto",
             gap: 1,
           }}
         >
