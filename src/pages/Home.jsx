@@ -1,26 +1,18 @@
-import { Box, Button, Typography, Breadcrumbs, Link } from "@mui/joy";
+import { Box, Button, Typography, Breadcrumbs, Link, Stack } from "@mui/joy";
 import * as React from "react";
 import DashboardProjects from "../components/home/DashboardProjects";
 import DashboardTasks from "../components/home/DashboardTasks";
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 import { useNavigate } from "react-router-dom";
-import DownloadRoundedIcon from "@mui/icons-material/DownloadRounded";
 import { DashboardQuote } from "../components/home/DashboardQuote";
 import DashboardStats from "../components/home/DashboardStats";
-import {
-  experimental_extendTheme as materialExtendTheme,
-  Experimental_CssVarsProvider as MaterialCssVarsProvider,
-  THEME_ID as MATERIAL_THEME_ID,
-} from '@mui/material/styles';
+import DashboardStatsMobile from "../components/home/DashboardStatsMobile";
 
 const Home = () => {
   const navigate = useNavigate();
-  const materialTheme = materialExtendTheme();
-
   return (
     <>
-    <MaterialCssVarsProvider theme={{ [MATERIAL_THEME_ID]: materialTheme }}>
       <Box sx={{ display: "flex", minHeight: "100vh" }}>
         <Box
           component="main"
@@ -61,52 +53,49 @@ const Home = () => {
             </Breadcrumbs>
           </Box>
 
-          <Box
-            sx={{
-              display: "flex",
-              mb: 1,
-              gap: 1,
-              flexDirection: { xs: "column", sm: "row" },
-              alignItems: { xs: "start", sm: "center" },
-              flexWrap: "wrap",
-              justifyContent: "space-between",
-            }}
-          >
-            <Typography level="h2" component="h1">
-              Dashboard
-            </Typography>
-          </Box>
-
-              <Box gridColumn="span 8" p={2} mt={2} boxShadow={3} borderRadius={4}>
-                <Typography variant="h3" mb={2}>
-                  Dashboard Stats
-                </Typography>
-                <DashboardStats />
-
-                <br>
-                </br>
-
-          <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap={1}>
-            <Box gridColumn="span 8">
+          {/* Adjust the layout for Stats and Projects */}
+          <Box sx={{ display: { xs: 'none', md: 'none', lg:'flex' }, mt: 2, gap: 2 }}>
+            {/* Projects taking up 60% */}
+            <Box sx={{ flex: 6, boxShadow: 3, p: 2, borderRadius: 4 }}>
               <DashboardProjects />
             </Box>
-            <Box gridColumn="span 8">
-              <DashboardTasks />
+
+            {/* Stats taking up 40% */}
+            <Box sx={{ flex: 4, boxShadow: 3, p: 2, borderRadius: 4 }}>
+              <DashboardStats />
             </Box>
-            <Box gridColumn="span 4">
-              <Box p={2} boxShadow={3} borderRadius={4}>
-                <Typography variant="h3" mb={2}>
-                  Home Quote
-                </Typography>
-                <DashboardQuote />
-              </Box>
-              </Box>
+          </Box>
+
+          {/* Remaining components under each other */}
+          <Box sx={{ mt: 2, boxShadow: 3, borderRadius: 4, p: 2 }}>
+            <DashboardTasks />
+          </Box>
+
+
+          {/* Mobile View Goes here: */}
+
+          <Box sx={{
+            display: { xs: 'block', md: 'none' }, // Only visible on xs and sm screens
+            mt: 2,
+            p: 2
+          }}>
+            {/* You can add mobile-specific components or adjust styles here */}
+            <Typography variant="body1" gutterBottom>
+              Mobile-specific content here
+            </Typography>
+            {/* Example: A compact view of stats and projects for mobile users */}
+            <Box sx={{ mt: 2, boxShadow: 3, borderRadius: 4, p: 2 }}>
+            <DashboardStatsMobile />
+              {/* Mobile version of DashboardStats might go here */}
+            </Box>
+            <Box sx={{ mt: 2, boxShadow: 3, borderRadius: 4, p: 2 }}>
+            <DashboardProjects />
+              {/* Mobile version of DashboardProjects might go here */}
             </Box>
           </Box>
         </Box>
       </Box>
-      </MaterialCssVarsProvider>
-      </>
+    </>
   );
 };
 

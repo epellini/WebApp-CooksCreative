@@ -4,7 +4,6 @@ import { supabaseClient } from "../../supabase-client"; // Import the supabase c
 import { PieChart } from "@mui/x-charts/PieChart";
 import { BarChart } from "@mui/x-charts/BarChart"; // Make sure to import BarChart
 
-
 import {
   experimental_extendTheme as materialExtendTheme,
   Experimental_CssVarsProvider as MaterialCssVarsProvider,
@@ -106,14 +105,14 @@ const DashboardStats = () => {
           series={[
             {
               data: projectStatusCounts,
-              innerRadius: 30,
-              outerRadius: 100,
+              innerRadius: 20,
+              outerRadius: 50,
               paddingAngle: 5,
               cornerRadius: 5,
             },
           ]}
-          width={400}
-          height={200}
+          width={300}
+          height={100}
         />
 
         {/* BarChart for Projects by Month */}
@@ -122,7 +121,7 @@ const DashboardStats = () => {
           yAxis={[{ scaleType: 'band', dataKey: 'month' }]}
           series={[{ dataKey: 'projects', label: 'Projects by Month', valueFormatter }]}
           layout="horizontal"
-          width={600} // Increased width
+          width={300}
           height={300}
           margin={{ left: 100 }}
         />
