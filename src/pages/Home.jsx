@@ -54,7 +54,7 @@ const Home = () => {
           </Box>
 
           {/* Adjust the layout for Stats and Projects */}
-          <Box sx={{ display: { xs: 'none', md: 'none', lg:'flex' }, mt: 2, gap: 2 }}>
+          <Box sx={{ display: { xs: 'none', md: 'none', lg: 'flex' }, mt: 2, gap: 2 }}>
             {/* Projects taking up 60% */}
             <Box sx={{ flex: 6, boxShadow: 3, p: 2, borderRadius: 4 }}>
               <DashboardProjects />
@@ -65,32 +65,26 @@ const Home = () => {
               <DashboardStats />
             </Box>
           </Box>
+            {/* Remaining components under each other */}
+            <Box sx={{     display: { xs: 'none', lg: 'block' }, mt: 2, boxShadow: 3, borderRadius: 4, p: 2 }}>
+              <DashboardTasks />
+            </Box>
 
-          {/* Remaining components under each other */}
-          <Box sx={{ mt: 2, boxShadow: 3, borderRadius: 4, p: 2 }}>
-            <DashboardTasks />
-          </Box>
-
-
-          {/* Mobile View Goes here: */}
+          {/* MOBILE HERE */}
 
           <Box sx={{
-            display: { xs: 'block', md: 'none' }, // Only visible on xs and sm screens
+            display: { xs: 'block', md: 'block', lg: 'none' },
             mt: 2,
             p: 2
           }}>
-            {/* You can add mobile-specific components or adjust styles here */}
-            <Typography variant="body1" gutterBottom>
-              Mobile-specific content here
-            </Typography>
-            {/* Example: A compact view of stats and projects for mobile users */}
             <Box sx={{ mt: 2, boxShadow: 3, borderRadius: 4, p: 2 }}>
-            <DashboardStatsMobile />
-              {/* Mobile version of DashboardStats might go here */}
+              <DashboardProjects />
             </Box>
             <Box sx={{ mt: 2, boxShadow: 3, borderRadius: 4, p: 2 }}>
-            <DashboardProjects />
-              {/* Mobile version of DashboardProjects might go here */}
+              <DashboardTasks />
+            </Box>
+            <Box sx={{ mt: 2, boxShadow: 3, borderRadius: 4, p: 2 }}>
+              <DashboardStatsMobile />
             </Box>
           </Box>
         </Box>

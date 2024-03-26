@@ -99,7 +99,6 @@ const DashboardStats = () => {
   return (
     <MaterialCssVarsProvider theme={{ [MATERIAL_THEME_ID]: materialTheme }}>
       <Stack spacing={2} direction="column" alignItems="center">
-        <Typography>Stats</Typography>
         <Typography>Total Projects: {projects.length}</Typography>
         <Typography>Total Tasks: {tasks.length}</Typography>
         <PieChart
@@ -107,7 +106,7 @@ const DashboardStats = () => {
             {
               data: projectStatusCounts,
               innerRadius: 30,
-              outerRadius: 100,
+              outerRadius: 90,
               paddingAngle: 5,
               cornerRadius: 5,
             },
@@ -122,11 +121,10 @@ const DashboardStats = () => {
           yAxis={[{ scaleType: 'band', dataKey: 'month' }]}
           series={[{ dataKey: 'projects', label: 'Projects by Month', valueFormatter }]}
           layout="horizontal"
-          width={600} // Increased width
-          height={300}
+          width={500} // Increased width
+          height={280}
           margin={{ left: 100 }}
         />
-
       </Stack>
     </MaterialCssVarsProvider>
   );

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { LinearProgress, Typography, Stack } from "@mui/joy"; // Import Joy UI components
+import { LinearProgress, Typography, Stack, Divider } from "@mui/joy"; // Import Joy UI components
 import { supabaseClient } from "../../supabase-client"; // Import the supabase client
 import { PieChart } from "@mui/x-charts/PieChart";
 import { BarChart } from "@mui/x-charts/BarChart"; // Make sure to import BarChart
@@ -97,7 +97,7 @@ const DashboardStats = () => {
 
   return (
     <MaterialCssVarsProvider theme={{ [MATERIAL_THEME_ID]: materialTheme }}>
-      <Stack spacing={2} direction="column" alignItems="center">
+      <Stack spacing={4} direction="column" alignItems="center">
         <Typography>Stats</Typography>
         <Typography>Total Projects: {projects.length}</Typography>
         <Typography>Total Tasks: {tasks.length}</Typography>
@@ -106,14 +106,15 @@ const DashboardStats = () => {
             {
               data: projectStatusCounts,
               innerRadius: 20,
-              outerRadius: 50,
+              outerRadius: 55,
               paddingAngle: 5,
               cornerRadius: 5,
             },
           ]}
           width={300}
-          height={100}
+          height={120}
         />
+        <Divider/>
 
         {/* BarChart for Projects by Month */}
         <BarChart
@@ -122,8 +123,8 @@ const DashboardStats = () => {
           series={[{ dataKey: 'projects', label: 'Projects by Month', valueFormatter }]}
           layout="horizontal"
           width={300}
-          height={300}
-          margin={{ left: 100 }}
+          height={250}
+          margin={{ left: 90 }}
         />
 
       </Stack>
