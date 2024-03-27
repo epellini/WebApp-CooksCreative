@@ -9,6 +9,7 @@ import { DashboardQuote } from "../components/home/DashboardQuote";
 import DashboardStats from "../components/home/DashboardStats";
 import DashboardStatsMobile from "../components/home/DashboardStatsMobile";
 
+
 const Home = () => {
   const navigate = useNavigate();
   return (
@@ -56,8 +57,13 @@ const Home = () => {
           {/* Adjust the layout for Stats and Projects */}
           <Box sx={{ display: { xs: 'none', md: 'none', lg: 'flex' }, mt: 2, gap: 2 }}>
             {/* Projects taking up 60% */}
-            <Box sx={{ flex: 6, boxShadow: 3, p: 2, borderRadius: 4 }}>
+            <Box sx={{ flex: 6, boxShadow: 3, p: 2, borderRadius: 4,  }}>
+              <Stack spacing={2} direction="column" alignItems="center">
               <DashboardProjects />
+
+              <DashboardTasks  />
+              </Stack>
+
             </Box>
 
             {/* Stats taking up 40% */}
@@ -66,9 +72,9 @@ const Home = () => {
             </Box>
           </Box>
             {/* Remaining components under each other */}
-            <Box sx={{     display: { xs: 'none', lg: 'block' }, mt: 2, boxShadow: 3, borderRadius: 4, p: 2 }}>
+            {/* <Box sx={{     display: { xs: 'none', lg: 'block' }, mt: 2, boxShadow: 3, borderRadius: 4, p: 2 }}>
               <DashboardTasks />
-            </Box>
+            </Box> */}
 
           {/* MOBILE HERE */}
 
