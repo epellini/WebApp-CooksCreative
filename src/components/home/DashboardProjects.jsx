@@ -36,6 +36,7 @@ export default function DashboardProjects() {
       )
       .order("created_date", { ascending: false })
       .eq("status_id", 2);
+      
 
     if (error) {
       console.error(error);
