@@ -36,14 +36,12 @@ export default function DashboardProjects() {
       )
       .order("created_date", { ascending: false })
       .eq("status_id", 2);
-      
 
     if (error) {
       console.error(error);
       return;
     } else {
       const projectsWithImages = data.map((project) => {
-        
         const imageUrl =
           project.images.length > 0
             ? `https://khqunikzqiyqnqgpcaml.supabase.co/storage/v1/object/public/images/${project.images[0].image_urls}`
@@ -67,7 +65,29 @@ export default function DashboardProjects() {
   }, []);
 
   return (
-    <Sheet variant="outlined" color="neutral">
+    <Sheet
+      className="OrderTableContainer"
+      variant="outlined"
+      sx={{
+        display: {
+          xs: "none",
+          sm: "block",
+          md: "block",
+          lg: "block",
+          xl: "block",
+          maxWidth: "1600px",
+          mx: "auto",
+          borderRadius: "sm",
+          px: { xs: 2, md: 6 },
+          py: { xs: 2, md: 3 },
+        },
+        width: "100%", // if you want to make the table full width <----- HERE
+        borderRadius: "sm",
+        flexShrink: 1,
+        // overflow: "auto",
+        minHeight: 0,
+      }}
+    >
       <Grid
         container
         spacing={1}
@@ -86,11 +106,11 @@ export default function DashboardProjects() {
             key={project.project_id}
             onClick={() => navigate(`/projects/${project.project_id}`)}
             style={{ cursor: "pointer" }}
-            xs={12} 
-            sm={6} 
+            xs={12}
+            sm={6}
             sx={{
               display: "flex",
-              justifyContent: "center" 
+              justifyContent: "center",
             }}
           >
             <Card
