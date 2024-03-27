@@ -21,7 +21,7 @@ import { closeSidebar } from "../utils";
 import { useNavigate } from "react-router-dom";
 import { supabaseClient } from "../supabase-client";
 import { useAuth } from "../pages/Auth/Auth";
-import ConstructionIcon from '@mui/icons-material/Construction';
+import ConstructionIcon from "@mui/icons-material/Construction";
 
 function Toggler({
   defaultExpanded = false,
@@ -129,11 +129,18 @@ export default function Sidebar() {
         onClick={() => closeSidebar()}
       />
       <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
-        <IconButton variant="soft" color="primary" size="sm" component={Link} to="/">
+        <IconButton
+          variant="soft"
+          color="primary"
+          size="sm"
+          component={Link}
+          to="/"
+        >
           <ConstructionIcon />
         </IconButton>
         <Typography level="title-lg">Cooks CC</Typography>
-        <ColorSchemeToggle sx={{ ml: "auto" }} />
+        {/* TURNED THIS OFF SINCE THERE ARE SOME INCONSISTENCIES IN DARK MODE */}
+        {/* <ColorSchemeToggle sx={{ ml: "auto" }} /> */}
       </Box>
       <Box
         sx={{
@@ -197,7 +204,7 @@ export default function Sidebar() {
       <Divider />
       <Box sx={{ display: "flex", gap: 1, alignItems: "left" }}>
         <Box sx={{ minWidth: 0, flex: 1 }}>
-          <Typography  level="title-sm">
+          <Typography level="title-sm">
             {user?.first_name || "Default Name"}
           </Typography>
           <Typography level="body-xs">
