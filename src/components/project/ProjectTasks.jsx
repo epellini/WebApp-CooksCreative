@@ -1,49 +1,11 @@
 import * as React from "react";
-import {
-  Autocomplete,
-  Box,
-  Button,
-  AspectRatio,
-  Divider,
-  FormControl,
-  FormLabel,
-  FormHelperText,
-  Input,
-  IconButton,
-  Textarea,
-  Stack,
-  Select,
-  Option,
-  Typography,
-  Tabs,
-  TabList,
-  Modal,
-  ModalDialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Sheet,
-  Chip,
-  Badge,
-  TabPanel,
-  Tab,
-  tabClasses,
-  Table,
-} from "@mui/joy";
-import EditNoteIcon from "@mui/icons-material/EditNote";
+import { Box, Button, FormControl, Input, IconButton, Stack, Typography, Tabs, TabList, Sheet, Chip, TabPanel, Tab, Table } from "@mui/joy";
 import { useNavigate } from "react-router-dom";
 import Checkbox, { checkboxClasses } from "@mui/joy/Checkbox";
-import Dropdown from "@mui/joy/Dropdown";
-import MenuButton from "@mui/joy/MenuButton";
-import MenuItem from "@mui/joy/MenuItem";
-import Menu from "@mui/joy/Menu";
 import { useEffect, useState } from "react";
 import { supabaseClient } from "../../supabase-client"; // Import the supabase client
 // ICONS:
-import Add from "@mui/icons-material/Add";
-import AddIcon from "@mui/icons-material/Add";
 import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
-import ArchiveIcon from "@mui/icons-material/Archive";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 
 import AccordionGroup from "@mui/joy/AccordionGroup";
@@ -248,19 +210,6 @@ const ProjectTasks = ({ projectid }) => {
                 {completedTasks.length}
               </Chip>
             </Tab>
-
-            <Tab indicatorInset>
-              Recently Deleted Tasks{" "}
-              <Chip
-                size="sm"
-                variant="soft"
-                color={index === 2 ? "primary" : "neutral"}
-              >
-                {archivedTasks.length}
-              </Chip>
-            </Tab>
-
-            <Tab indicatorInset>Add Task </Tab>
           </TabList>
 
           <TabPanel value={0}>
@@ -721,107 +670,10 @@ const ProjectTasks = ({ projectid }) => {
               </tbody>
             </Table>
           </TabPanel>
-          <TabPanel value={2}>
-            <Table
-              stickyHeader
-              hoverRow
-              sx={{
-                "--TableCell-headBackground":
-                  "var(--joy-palette-background-level1)",
-                "--Table-headerUnderlineThickness": "1px",
-                "--TableRow-hoverBackground":
-                  "var(--joy-palette-background-level1)",
-                "--TableCell-paddingY": "4px",
-                "--TableCell-paddingX": "8px",
-                borderRadius: "5px",
-              }}
-            >
-              {/* TABLE HEAD BEGINS HERE */}
-              <thead>
-                <tr>
-                  <th
-                    style={{ width: { xl: 70, md: 70 }, padding: "12px 6px" }}
-                  >
-                    Name
-                  </th>
 
-                  <th
-                    style={{ width: { xl: 20, md: 10 }, padding: "12px 6px" }}
-                  >
-                    By
-                  </th>
-                  <th
-                    style={{ width: { xl: 20, md: 15 }, padding: "12px 6px" }}
-                  >
-                    Assigned
-                  </th>
-                  <th
-                    style={{ width: { xl: 20, md: 15 }, padding: "12px 6px" }}
-                  >
-                    Created
-                  </th>
-                  <th
-                    style={{ width: { xl: 20, md: 15 }, padding: "12px 6px" }}
-                  >
-                    Completed
-                  </th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {archivedTasks.length > 0 ? (
-                  Object.values(archivedTasks).map((task, days) => (
-                    <tr key={task.task_id}>
-                      <td
-                        onClick={() => console.log("Task Clicked")}
-                        style={{ textAlign: "left", cursor: "pointer" }}
-                      >
-                        {`${task.task_name}`}
-                      </td>
-
-                      <td style={{ textAlign: "left" }}>
-                        {task.projects ? (
-                          <>{task.projects.project_name}</>
-                        ) : (
-                          <>No Project</>
-                        )}
-                      </td>
-
-                      <td style={{ textAlign: "left" }}>
-                        {task.completed_by ? task.completed_by : "N/A"}
-                      </td>
-                      <td style={{ textAlign: "left" }}>
-                        {task.date_created
-                          ? new Date(task.date_created)
-                              .toISOString()
-                              .split("T")[0]
-                          : "N/A"}
-                      </td>
-
-                      <td style={{ textAlign: "left" }}>
-                        {task.date_completed
-                          ? new Date(task.date_completed)
-                              .toISOString()
-                              .split("T")[0]
-                          : "N/A"}
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="5" style={{ textAlign: "center" }}>
-                      <Typography variant="h1" component="h1">
-                        No Recently Deleted Tasks
-                      </Typography>
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </Table>
-          </TabPanel>
-          <TabPanel value={3}>
+          {/* <TabPanel value={3}>
             <ProjectTaskForm projectid={projectid} />
-          </TabPanel>
+          </TabPanel> */}
         </Tabs>
       </Sheet>
       {/* Mobile View Table goes here? */}
@@ -872,17 +724,6 @@ const ProjectTasks = ({ projectid }) => {
                 color={index === 1 ? "primary" : "neutral"}
               >
                 {completedTasks.length}
-              </Chip>
-            </Tab>
-
-            <Tab indicatorInset>
-              <Typography level="body-sm">Recently Deleted</Typography>
-              <Chip
-                size="sm"
-                variant="soft"
-                color={index === 2 ? "primary" : "neutral"}
-              >
-                {archivedTasks.length}
               </Chip>
             </Tab>
           </TabList>
