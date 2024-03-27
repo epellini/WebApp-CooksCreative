@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { LinearProgress, Typography, Stack } from "@mui/joy"; // Import Joy UI components
+import { LinearProgress, Typography, Stack, Box } from "@mui/joy"; // Import Joy UI components
 import { supabaseClient } from "../../supabase-client"; // Import the supabase client
 import { PieChart } from "@mui/x-charts/PieChart";
 import { BarChart } from "@mui/x-charts/BarChart"; // Make sure to import BarChart
@@ -99,32 +99,75 @@ const DashboardStats = () => {
   return (
     <MaterialCssVarsProvider theme={{ [MATERIAL_THEME_ID]: materialTheme }}>
       <Stack spacing={2} direction="column" alignItems="center">
-        <Typography>Total Projects: {projects.length}</Typography>
-        <Typography>Total Tasks: {tasks.length}</Typography>
-        <PieChart
-          series={[
-            {
-              data: projectStatusCounts,
-              innerRadius: 30,
-              outerRadius: 90,
-              paddingAngle: 5,
-              cornerRadius: 5,
-            },
-          ]}
-          width={400}
-          height={200}
-        />
+        <Box sx={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            alignItems: 'center', 
+            gap: 1, 
+            p: 2, 
+            border: '1px solid', 
+            borderColor: 'divider', 
+            borderRadius: 'md', 
+            width: '100%', 
+            maxWidth: 'sm' 
+          }}>
+          <Typography component="div" sx={{ fontWeight: 'bold', fontSize: '1.25rem' }}>
+            Total Projects: <span style={{ fontSize: '1.5rem' }}>{projects.length}</span>
+          </Typography>
+          <Typography component="div" sx={{ fontWeight: 'bold', fontSize: '1.25rem' }}>
+            Total Tasks: <span style={{ fontSize: '1.5rem' }}>{tasks.length}</span>
+          </Typography>
+        </Box>
 
-        {/* BarChart for Projects by Month */}
-        <BarChart
-          dataset={projectsByMonth}
-          yAxis={[{ scaleType: 'band', dataKey: 'month' }]}
-          series={[{ dataKey: 'projects', label: 'Projects by Month', valueFormatter }]}
-          layout="horizontal"
-          width={500} // Increased width
-          height={280}
-          margin={{ left: 100 }}
-        />
+        {/* PieChart */}
+        <Box sx={{ 
+            p: 2, 
+            border: '1px solid', 
+            borderColor: 'divider', 
+            borderRadius: 'md', 
+            width: '100%', 
+            maxWidth: 'md',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}>
+          <PieChart
+            series={[
+              {
+                data: projectStatusCounts,
+                innerRadius: 30,
+                outerRadius: 90,
+                paddingAngle: 5,
+                cornerRadius: 5,
+              },
+            ]}
+            width={400}
+            height={200}
+          />
+        </Box>
+
+        {/* BarChart */}
+        <Box sx={{ 
+            p: 2, 
+            border: '1px solid', 
+            borderColor: 'divider', 
+            borderRadius: 'md', 
+            width: '100%', 
+            maxWidth: 'lg',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}>
+          <BarChart
+            dataset={projectsByMonth}
+            yAxis={[{ scaleType: 'band', dataKey: 'month' }]}
+            series={[{ dataKey: 'projects', label: 'Projects by Month', valueFormatter }]}
+            layout="horizontal"
+            width={500}
+            height={280}
+            margin={{ left: 100 }}
+          />
+        </Box>
       </Stack>
     </MaterialCssVarsProvider>
   );
