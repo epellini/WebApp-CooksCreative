@@ -550,15 +550,20 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                               <Button
                                 variant="outlined"
                                 onClick={() => {
-                                  addSubTask(
-                                    subTask[task.task_id],
-                                    task.task_id,
-                                    false
-                                  );
-                                  setSubTask((prevState) => ({
-                                    ...prevState,
-                                    [task.task_id]: "", // Reset the corresponding task_id key to an empty string
-                                  }));
+                                  const subtaskName =
+                                    subTask[task.task_id].trim(); // Trim whitespace from input value
+                                  // Check if the trimmed input value is not empty
+                                  if (subtaskName !== "") {
+                                    addSubTask(
+                                      subtaskName,
+                                      task.task_id,
+                                      false
+                                    ); // Call addSubTask only if input value is not empty
+                                    setSubTask((prevState) => ({
+                                      ...prevState,
+                                      [task.task_id]: "", // Reset the corresponding task_id key to an empty string
+                                    }));
+                                  }
                                 }}
                                 sx={{ mt: 1 }}
                               >
@@ -1260,18 +1265,22 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
 
                               {/* Button for adding new subtask */}
                               <Button
-                                size="sm"
                                 variant="outlined"
                                 onClick={() => {
-                                  addSubTask(
-                                    subTask[task.task_id],
-                                    task.task_id,
-                                    false
-                                  );
-                                  setSubTask((prevState) => ({
-                                    ...prevState,
-                                    [task.task_id]: "", // Reset the corresponding task_id key to an empty string
-                                  }));
+                                  const subtaskName =
+                                    subTask[task.task_id].trim(); // Trim whitespace from input value
+                                  // Check if the trimmed input value is not empty
+                                  if (subtaskName !== "") {
+                                    addSubTask(
+                                      subtaskName,
+                                      task.task_id,
+                                      false
+                                    ); // Call addSubTask only if input value is not empty
+                                    setSubTask((prevState) => ({
+                                      ...prevState,
+                                      [task.task_id]: "", // Reset the corresponding task_id key to an empty string
+                                    }));
+                                  }
                                 }}
                                 sx={{ mt: 1 }}
                               >

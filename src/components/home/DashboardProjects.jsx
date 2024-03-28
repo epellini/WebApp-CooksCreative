@@ -14,6 +14,7 @@ import {
 import { useEffect, useState } from "react";
 import { supabaseClient } from "../../supabase-client";
 import { useNavigate } from "react-router-dom";
+import CardOverflow from "@mui/joy/CardOverflow";
 
 export default function DashboardProjects() {
   const [projects, setProjects] = useState([]);
@@ -65,41 +66,37 @@ export default function DashboardProjects() {
   }, []);
 
   return (
+
+    <React.Fragment>
+    
     <Sheet
-      className="OrderTableContainer"
-      variant="outlined"
-      sx={{
-        display: {
-          xs: "block",
-          sm: "block",
-          md: "block",
-          lg: "block",
-          xl: "block",
-          maxWidth: "1600px",
-          mx: "auto",
-          borderRadius: "sm",
-          px: { xs: 2, md: 6 },
-          py: { xs: 2, md: 3 },
-        },
-        width: "100%", // if you want to make the table full width <----- HERE
+    className="OrderTableContainer"
+    variant="outlined"
+    sx={{
+      display: {
+        xs: "block",
+        sm: "block",
+        md: "block",
+        lg: "block",
+        xl: "block",
+        maxWidth: "1600px",
+        mx: "auto",
         borderRadius: "sm",
-        flexShrink: 1,
-        // overflow: "auto",
-        minHeight: 0,
-      }}
-    >
+        px: { xs: 2, md: 6 },
+        py: { xs: 2, md: 3 },
+      },
+      width: "100%", // if you want to make the table full width <----- HERE
+      borderRadius: "sm",
+      flexShrink: 1,
+      overflow: "auto",
+      minHeight: 0,
+    }}
+  >
       <Grid
         container
         spacing={1}
-        sx={{ maxWidth: "800px", mx: "auto", width: "100%" }}
+        sx={{ m: 1}}
       >
-        <Grid item xs={12} sx={{ textAlign: "center" }}>
-          <div style={{ gridArea: "title", placeSelf: "center" }}>
-            <Typography sx={{ margin: 3 }} level="h3" component="h3">
-              New Projects
-            </Typography>
-          </div>
-        </Grid>
         {/* Map over the projects to create a card for each one */}
         {projects.slice(0, 6).map((project) => (
           <Grid
@@ -114,16 +111,71 @@ export default function DashboardProjects() {
             }}
           >
             <Card
+              orientation="horizontal"
+              variant="outlined"
+              sx={{ width: "100%", 
+              "&:hover": {
+                boxShadow: "md",
+                borderColor: "neutral.outlinedHoverBorder",
+              },
+              cursor: "pointer",
+            }}
+            >
+              <CardOverflow>
+                <AspectRatio ratio="1" sx={{ width: 120 }}>
+                  <img
+                    src={
+                      project.project_image_url ||
+                      "https://via.placeholder.com/90"
+                    }
+                    alt={project.category.name}
+                    loading="lazy"
+                  />
+                </AspectRatio>
+              </CardOverflow>
+              <CardContent>
+                <Typography
+                  fontWeight="md"
+                  textColor="success.plainColor"
+                  noWrap
+                >
+                  {project.project_name}
+                </Typography>
+                <Typography level="body-sm">{project.category.name}</Typography>
+                <Typography level="body-sm">
+                  {project.clients.first_name} {project.clients.last_name}
+                </Typography>
+              </CardContent>
+              <CardOverflow
+                variant="soft"
+                color="primary"
+                sx={{
+                  px: 0.2,
+                  writingMode: "vertical-rl",
+                  justifyContent: "center",
+                  fontSize: "xs",
+                  fontWeight: "xl",
+                  letterSpacing: "1px",
+                  textTransform: "uppercase",
+                  borderLeft: "1px solid",
+                  borderColor: "divider",
+                }}
+              >
+                {project.project_id}
+              </CardOverflow>
+            </Card>
+
+            {/* <Card
               key={project.id}
               variant="outlined"
               orientation="horizontal"
               sx={{
-                width: 320,
+                width: "100%",
                 "&:hover": {
                   boxShadow: "md",
                   borderColor: "neutral.outlinedHoverBorder",
                 },
-                mb: 2,
+                m: 1,
                 cursor: "pointer",
               }}
               onClick={() => navigate(`/projects/${project.id}`)}
@@ -149,16 +201,16 @@ export default function DashboardProjects() {
                 <Typography
                   level="body-sm"
                   aria-describedby={`card-description-${project.id}`}
-                  mb={1}
                   sx={{ textAlign: "left" }}
                 >
                   {project.clients.first_name} {project.clients.last_name}
                 </Typography>
               </CardContent>
-            </Card>
+            </Card> */}
           </Grid>
         ))}
       </Grid>
-    </Sheet>
+      </Sheet>
+    </React.Fragment>
   );
 }

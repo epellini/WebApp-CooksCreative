@@ -75,6 +75,11 @@ export default function Sidebar() {
     }
   };
 
+  // Function to close the sidebar
+  const handleSidebarClose = () => {
+    closeSidebar();
+  };
+
   return (
     <Sheet
       className="Sidebar"
@@ -163,7 +168,7 @@ export default function Sidebar() {
           }}
         >
           <ListItem>
-            <ListItemButton component={Link} to="/">
+            <ListItemButton component={Link} to="/" onClick={handleSidebarClose}>
               <HomeRoundedIcon />
               <ListItemContent>
                 <Typography level="title-sm">Home</Typography>
@@ -173,7 +178,7 @@ export default function Sidebar() {
 
           {isAdmin && (
             <ListItem>
-              <ListItemButton component={Link} to="/clients">
+              <ListItemButton component={Link} to="/clients" onClick={handleSidebarClose}>
                 <DashboardRoundedIcon />
                 <ListItemContent>
                   <Typography level="title-sm">Clients</Typography>
@@ -183,7 +188,7 @@ export default function Sidebar() {
           )}
 
           <ListItem>
-            <ListItemButton component={Link} to="/projects">
+            <ListItemButton component={Link} to="/projects" onClick={handleSidebarClose}>
               <ShoppingCartRoundedIcon />
               <ListItemContent>
                 <Typography level="title-sm">Projects</Typography>
@@ -192,7 +197,7 @@ export default function Sidebar() {
           </ListItem>
 
           <ListItem>
-            <ListItemButton component={Link} to="/tasks">
+            <ListItemButton component={Link} to="/tasks" onClick={handleSidebarClose}>
               <AssignmentRoundedIcon />
               <ListItemContent>
                 <Typography level="title-sm">Tasks</Typography>

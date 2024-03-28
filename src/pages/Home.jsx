@@ -9,7 +9,6 @@ import { DashboardQuote } from "../components/home/DashboardQuote";
 import DashboardStats from "../components/home/DashboardStats";
 import DashboardStatsMobile from "../components/home/DashboardStatsMobile";
 
-
 const Home = () => {
   const navigate = useNavigate();
   return (
@@ -25,7 +24,6 @@ const Home = () => {
               sm: "calc(12px + var(--Header-height))",
               md: 3,
             },
-            pb: { xs: 2, sm: 2, md: 3 },
             flex: 1,
             display: "flex",
             flexDirection: "column",
@@ -54,36 +52,36 @@ const Home = () => {
             </Breadcrumbs>
           </Box>
 
-          {/* Adjust the layout for Stats and Projects */}
+          {/* Adjust the layout for Stats, Projects, and Tasks */}
           <Box sx={{ display: { xs: 'none', md: 'none', lg: 'flex' }, mt: 2, gap: 2 }}>
-            {/* Projects taking up 60% */}
-            <Box sx={{ flex: 6, boxShadow: 3, p: 2, borderRadius: 4,  }}>
-              <Stack spacing={2} direction="column" alignItems="center">
-              <DashboardProjects />
-              <DashboardTasks  />
-              </Stack>
+            {/* Projects and Tasks taking up 60% */}
+            <Box sx={{ flex: 6, display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <Box sx={{ flex: 1, boxShadow: 3,  borderRadius: 4 }}>
+                <DashboardProjects />
+              </Box>
+              <Box sx={{ flex: 1, boxShadow: 3, borderRadius: 4 }}>
+                <DashboardTasks />
+              </Box>
             </Box>
             {/* Stats taking up 40% */}
-            <Box sx={{ flex: 4, boxShadow: 3, p: 2, borderRadius: 4 }}>
+            <Box sx={{ flex: 4, boxShadow: 3, borderRadius: 4 }}>
               <DashboardStats />
             </Box>
           </Box>
-
 
           {/* MOBILE HERE */}
 
           <Box sx={{
             display: { xs: 'block', md: 'block', lg: 'none' },
             mt: 2,
-            p: 2
           }}>
-            <Box sx={{ mt: 2, boxShadow: 3, borderRadius: 4, p: 2 }}>
+            <Box sx={{ mt: 2, boxShadow: 3, borderRadius: 4}}>
               <DashboardProjects />
             </Box>
-            <Box sx={{ mt: 2, boxShadow: 3, borderRadius: 4, p: 2 }}>
+            <Box sx={{ mt: 2, boxShadow: 3, borderRadius: 4}}>
               <DashboardTasks />
             </Box>
-            <Box sx={{ mt: 2, boxShadow: 3, borderRadius: 4, p: 2 }}>
+            <Box sx={{ mt: 2, boxShadow: 3, borderRadius: 4 }}>
               <DashboardStatsMobile />
             </Box>
           </Box>

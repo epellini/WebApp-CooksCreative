@@ -162,7 +162,7 @@ const DashboardTasks = ({ projectid }) => {
   });
 
   return (
-    <React.Fragment>
+    <>
       <Sheet
         className="OrderTableContainer"
         variant="outlined"
@@ -186,54 +186,20 @@ const DashboardTasks = ({ projectid }) => {
           minHeight: 0,
         }}
       >
-        <Tabs
-          aria-label="Pipeline"
-          value={index}
-          onChange={(event, value) => setIndex(value)}
-        >
-          <TabList>
-            <Tab indicatorInset>
-              New Tasks{" "}
-              {/* <Chip
-                size="sm"
-                variant="soft"
-                color={index === 0 ? "primary" : "neutral"}
-              >
-                {activeTasks.length}
-              </Chip> */}
-            </Tab>
+          {/* </TabList> */}
 
-            {/* <Tab indicatorInset>
-              Completed Tasks{" "}
-              <Chip
-                size="sm"
-                variant="soft"
-                color={index === 1 ? "primary" : "neutral"}
-              >
-                {completedTasks.length}
-              </Chip>
-            </Tab> */}
-          </TabList>
-
-          <TabPanel value={0}>
+          <Sheet sx={{ height: 270, overflow: "auto" }}>
             <Table
+              borderAxis="x"
+              sixe="md"
               stickyHeader
               hoverRow
-              sx={{
-                "--TableCell-headBackground":
-                  "var(--joy-palette-background-level1)",
-                "--Table-headerUnderlineThickness": "1px",
-                "--TableRow-hoverBackground":
-                  "var(--joy-palette-background-level1)",
-                "--TableCell-paddingY": "4px",
-                "--TableCell-paddingX": "8px",
-                borderRadius: "5px",
-              }}
+              variant="plain"
             >
               {/* TABLE HEAD BEGINS HERE */}
               <thead>
                 <tr>
-                  <th style={{ width: 120, padding: "12px 12px" }}>
+                  <th style={{ width: 25, padding: "12px 12px" }}>
                     Task Name
                   </th>
                   <th
@@ -254,7 +220,6 @@ const DashboardTasks = ({ projectid }) => {
                   >
                     Created
                   </th>
-                  <th style={{ width: 25, padding: "12px 6px" }}></th>
                 </tr>
               </thead>
 
@@ -336,18 +301,7 @@ const DashboardTasks = ({ projectid }) => {
                                           : "none",
                                       }}
                                     >
-                                      {/* <Checkbox
-                                        color="success"
-                                        sx={{ padding: 0.5 }}
-                                        checked={subtask.is_completed}
-                                        onChange={() =>
-                                          handleSubtaskToggle(
-                                            task.task_id,
-                                            subtask.subtask_id,
-                                            !subtask.is_completed
-                                          )
-                                        }
-                                      /> */}
+         
                                       <Typography
                                         sx={{
                                           flexGrow: 1,
@@ -374,40 +328,6 @@ const DashboardTasks = ({ projectid }) => {
                                   <Typography>No Subtasks</Typography>
                                 )}
                               </Box>
-
-                              {/* Input field for adding new subtask */}
-                              {/* <FormControl fullWidth sx={{ mt: 1 }}>
-                                <Input
-                                  id={`subtask_name_${task.task_id}`} // Unique identifier using task_id
-                                  placeholder="Add new subtask"
-                                  value={subTask[task.task_id] || ""} // Retrieve value based on task_id
-                                  onChange={(e) =>
-                                    setSubTask((prevState) => ({
-                                      ...prevState,
-                                      [task.task_id]: e.target.value,
-                                    }))
-                                  } // Update the corresponding task_id key in the state object
-                                />
-                              </FormControl> */}
-
-                              {/* Button for adding new subtask */}
-                              {/* <Button
-                                variant="outlined"
-                                onClick={() => {
-                                  addSubTask(
-                                    subTask[task.task_id],
-                                    task.task_id,
-                                    false
-                                  );
-                                  setSubTask((prevState) => ({
-                                    ...prevState,
-                                    [task.task_id]: "", // Reset the corresponding task_id key to an empty string
-                                  }));
-                                }}
-                                sx={{ mt: 1 }}
-                              >
-                                Add Subtask
-                              </Button> */}
                             </AccordionDetails>
                           </Accordion>
                         </AccordionGroup>
@@ -433,29 +353,6 @@ const DashboardTasks = ({ projectid }) => {
                               .split("T")[0]
                           : "N/A"}
                       </td>
-
-                      <td style={{ textAlign: "center" }}>
-                        {/* <Stack
-                          spacing={1}
-                          direction="row"
-                          justifyContent="center"
-                          alignItems="center"
-                        >
-                          <IconButton
-                            size="sm"
-                            variant="soft"
-                            color="success"
-                            onClick={() =>
-                              navigate(
-                                `/tasks/edit/${task.task_id}?projectid=${projectid}`
-                              )
-                            }
-                          >
-                            <CheckBox />
-                          </IconButton>
-
-                        </Stack> */}
-                      </td>
                     </tr>
                   ))
                 ) : (
@@ -469,236 +366,27 @@ const DashboardTasks = ({ projectid }) => {
                 )}
               </tbody>
             </Table>
-          </TabPanel>
-
-          {/* <TabPanel value={1}>
-            <Table
-              stickyHeader
-              hoverRow
-              sx={{
-                "--TableCell-headBackground":
-                  "var(--joy-palette-background-level1)",
-                "--Table-headerUnderlineThickness": "1px",
-                "--TableRow-hoverBackground":
-                  "var(--joy-palette-background-level1)",
-                "--TableCell-paddingY": "4px",
-                "--TableCell-paddingX": "8px",
-                borderRadius: "5px",
-              }}
-            > */}
-              {/* TABLE HEAD BEGINS HERE */}
-              {/* <thead>
-                <tr>
-                  <th style={{ width: 120, padding: "12px 6px" }}>Name</th>
-                  <th
-                    style={{
-                      width: 25,
-                      padding: "12px 6px",
-                      textAlign: "center",
-                    }}
-                  >
-                    Assigned
-                  </th>
-                  <th
-                    style={{
-                      width: 25,
-                      padding: "12px 6px",
-                      textAlign: "center",
-                    }}
-                  >
-                    Completed
-                  </th>
-                  <th
-                    style={{
-                      width: 25,
-                      padding: "12px 6px",
-                      textAlign: "center",
-                    }}
-                  ></th>
-                </tr>
-              </thead> */}
-
-              {/* <tbody>
-                {completedTasks.length > 0 ? (
-                  Object.values(completedTasks).map((task, days) => (
-                    <tr key={task.task_id}>
-                      <td
-                        onClick={() => console.log("Task Clicked")}
-                        style={{ cursor: "pointer", textAlign: "left" }}
-                      >
-                        <Typography level="body-xs">
-                          {
-                            task.subtasks.filter(
-                              (subtask) => subtask.is_completed
-                            ).length
-                          }{" "}
-                          / {task.subtasks.length} Subtasks completed
-                        </Typography>
-                        <AccordionGroup
-                          transition="0.4s"
-                          sx={{
-                            width: "100%",
-                            borderRadius: "lg",
-                            [`& .${accordionSummaryClasses.button}:hover`]: {
-                              bgcolor: "transparent",
-                            },
-                            [`& .${accordionDetailsClasses.content}`]: {
-                              boxShadow: (theme) =>
-                                `inset 0 1px ${theme.vars.palette.divider}`,
-                              [`&.${accordionDetailsClasses.expanded}`]: {
-                                paddingBlock: "0.75rem",
-                              },
-                            },
-                          }}
-                        > */}
-                          {/* <Accordion>
-                            <AccordionSummary> */}
-                              {/* Use a Box to stack the task name and project name vertically */}
-                              {/* <Box sx={{ textAlign: "left" }}>
-                                <Typography
-                                  variant="subtitle1"
-                                  component="div"
-                                  color="text.primary"
-                                >
-                                  {task.task_name}
-                                </Typography>
-                                {task.projects ? (
-                                  <Typography variant="body2" component="div">
-                                    {task.projects.project_name}
-                                  </Typography>
-                                ) : (
-                                  <Typography
-                                    variant="body2"
-                                    component="div"
-                                    color="text.primary"
-                                  >
-                                    No Project
-                                  </Typography>
-                                )}
-                              </Box>
-                            </AccordionSummary>
-                            <Typography
-                              sx={{ mt: 0.5, mb: 0.6 }}
-                              level="body-xs"
-                            >
-                              Completed By:
-                              {task.is_completed
-                                ? " " + task.users?.first_name ?? "N/A"
-                                : "N/A"}
-                            </Typography>
-                            <AccordionDetails
-                              variant="soft"
-                              sx={{ padding: 0 }}
-                            > */}
-                              {/* <Box sx={{ listStyleType: "none", padding: 0 }}>
-                                {task.subtasks && task.subtasks.length > 0 ? (
-                                  task.subtasks.map((subtask) => (
-                                    <Box
-                                      key={subtask.subtask_id}
-                                      sx={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                        textDecoration: subtask.is_completed
-                                          ? "line-through"
-                                          : "none",
-                                      }}
-                                    >
-                                      <Checkbox
-                                        color="success"
-                                        sx={{ padding: 0.5 }}
-                                        checked={subtask.is_completed}
-                                      />
-                                      <Typography
-                                        sx={{
-                                          flexGrow: 1,
-                                          textDecoration: subtask.is_completed
-                                            ? "line-through"
-                                            : "none",
-                                        }}
-                                      >
-                                        {subtask.subtask_name}
-                                      </Typography>
-                                    </Box>
-                                  ))
-                                ) : (
-                                  <Typography>No Subtasks</Typography>
-                                )}
-                              </Box>
-                              <Typography level="body-sm">
-                                Notes: {task.completion_notes}
-                              </Typography>
-                            </AccordionDetails>
-                          </Accordion>
-                        </AccordionGroup>
-                      </td> */}
-
-                      {/* <td style={{ textAlign: "center" }}>
-                        {task.date_created
-                          ? new Date(task.date_created)
-                              .toISOString()
-                              .split("T")[0]
-                          : "N/A"}
-                      </td>
-
-                      <td style={{ textAlign: "center" }}>
-                        {task.date_completed
-                          ? new Date(task.date_completed)
-                              .toISOString()
-                              .split("T")[0]
-                          : "N/A"}
-                      </td>
-                      <td style={{ textAlign: "center" }}>
-                        <Stack
-                          spacing={1}
-                          direction="row"
-                          justifyContent="center"
-                          alignItems="center"
-                        >
-                          <IconButton
-                            size="sm"
-                            variant="soft"
-                            color="danger"
-                            onClick={() => archiveTask(task.task_id)}
-                          >
-                            <DeleteRoundedIcon />
-                          </IconButton>
-                        </Stack>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="4" style={{ textAlign: "center" }}>
-                      <Typography variant="h1" component="h1">
-                        No Completed Tasks
-                      </Typography>
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </Table>
-          </TabPanel> */}
-
-          {/* <TabPanel value={3}>
-            <ProjectTaskForm projectid={projectid} />
-          </TabPanel> */}
-        </Tabs>
+            </Sheet>
       </Sheet>
+      
+                       
       {/* Mobile View Table goes here? */}
-
       <Sheet
         className="OrderTableContainer"
         variant="outlined"
         sx={{
           display: {
+            xs: "block",
             sm: "none",
             md: "none",
-            xl: "none",
             lg: "auto",
+            xl: "auto",
+            maxWidth: "1600px",
             mx: "auto",
             borderRadius: "sm",
             px: { xs: 2, md: 6 },
             py: { xs: 2, md: 3 },
+            
           },
           width: "100%", // if you want to make the table full width <----- HERE
           borderRadius: "sm",
@@ -707,36 +395,9 @@ const DashboardTasks = ({ projectid }) => {
           minHeight: 0,
         }}
       >
-        <Tabs
-          aria-label="Pipeline"
-          value={index}
-          onChange={(event, value) => setIndex(value)}
-        >
-          <TabList>
-            <Tab indicatorInset>
-              <Typography level="body-sm">New Tasks</Typography>
-              {/* <Chip
-                size="sm"
-                variant="soft"
-                color={index === 0 ? "primary" : "neutral"}
-              >
-                // {activeTasks.length}
-              </Chip> */}
-            </Tab>
 
-            {/* <Tab indicatorInset>
-              <Typography level="body-sm">Completed</Typography>
-              <Chip
-                size="sm"
-                variant="soft"
-                color={index === 1 ? "primary" : "neutral"}
-              >
-                {completedTasks.length}
-              </Chip>
-            </Tab> */}
-          </TabList>
 
-          <TabPanel value={0}>
+
             <Table
               stickyHeader
               hoverRow
@@ -754,10 +415,9 @@ const DashboardTasks = ({ projectid }) => {
               {/* TABLE HEAD BEGINS HERE */}
               <thead>
                 <tr>
-                  <th style={{ width: 120, padding: "12px 12px" }}>
+                  <th style={{ width: "100%", padding: "12px 12px" }}>
                     Task Name
                   </th>
-                  <th style={{ width: 25, padding: "12px 6px" }}></th>
                 </tr>
               </thead>
 
@@ -844,19 +504,6 @@ const DashboardTasks = ({ projectid }) => {
                                           : "none",
                                       }}
                                     >
-                                      {/* <Checkbox
-                                        color="success"
-                                        size="sm"
-                                        sx={{ padding: 0.5 }}
-                                        checked={subtask.is_completed}
-                                        onChange={() =>
-                                          handleSubtaskToggle(
-                                            task.task_id,
-                                            subtask.subtask_id,
-                                            !subtask.is_completed
-                                          )
-                                        }
-                                      /> */}
                                       <Typography
                                         level="body-xs"
                                         sx={{
@@ -877,67 +524,12 @@ const DashboardTasks = ({ projectid }) => {
                                 )}
                               </Box>
 
-                              {/* Input field for adding new subtask */}
-                              {/* <FormControl fullWidth sx={{ mt: 1 }}>
-                                <Input
-                                  size="sm"
-                                  id={`subtask_name_${task.task_id}`} // Unique identifier using task_id
-                                  placeholder="Add new subtask"
-                                  value={subTask[task.task_id] || ""} // Retrieve value based on task_id
-                                  onChange={(e) =>
-                                    setSubTask((prevState) => ({
-                                      ...prevState,
-                                      [task.task_id]: e.target.value,
-                                    }))
-                                  } // Update the corresponding task_id key in the state object
-                                />
-                              </FormControl> */}
 
-                              {/* Button for adding new subtask */}
-                              {/* <Button
-                                size="sm"
-                                variant="outlined"
-                                onClick={() => {
-                                  addSubTask(
-                                    subTask[task.task_id],
-                                    task.task_id,
-                                    false
-                                  );
-                                  setSubTask((prevState) => ({
-                                    ...prevState,
-                                    [task.task_id]: "", 
-                                  }));
-                                }}
-                                sx={{ mt: 1 }}
-                              >
-                                Add Subtask
-                              </Button> */}
                             </AccordionDetails>
                           </Accordion>
                         </AccordionGroup>
                       </td>
-                      {/* <td style={{ textAlign: "center" }}> */}
-                        {/* <Stack spacing={1}>
-                          <IconButton
-                            size="sm"
-                            variant="soft"
-                            color="success"
-                            onClick={() =>
-                              navigate(`/tasks/edit/${task.task_id}`)
-                            }
-                          >
-                            <CheckBoxIcon />
-                          </IconButton>
-                          <IconButton
-                            size="sm"
-                            variant="soft"
-                            color="danger"
-                            onClick={() => archiveTask(task.task_id)}
-                          >
-                            <DeleteRoundedIcon />
-                          </IconButton>
-                        </Stack> */}
-                      {/* </td> */}
+
                     </tr>
                   ))
                 ) : (
@@ -951,179 +543,10 @@ const DashboardTasks = ({ projectid }) => {
                 )}
               </tbody>
             </Table>
-          </TabPanel>
-
-          {/* <TabPanel value={1}>
-            <Table
-              stickyHeader
-              hoverRow
-              sx={{
-                "--TableCell-headBackground":
-                  "var(--joy-palette-background-level1)",
-                "--Table-headerUnderlineThickness": "1px",
-                "--TableRow-hoverBackground":
-                  "var(--joy-palette-background-level1)",
-                "--TableCell-paddingY": "4px",
-                "--TableCell-paddingX": "8px",
-                borderRadius: "5px",
-              }}
-            > */}
-              {/* TABLE HEAD BEGINS HERE */}
-              {/* <thead>
-                <tr>
-                  <th style={{ width: 60, padding: "12px 6px" }}>Task</th>
-                  <th style={{ width: 10, padding: "12px 6px" }}></th>
-                </tr>
-              </thead> */}
-
-              {/* <tbody>
-                {completedTasks.length > 0 ? (
-                  Object.values(completedTasks).map((task) => (
-                    <tr key={task.task_id}>
-                      <td
-                        onClick={() => console.log("Task Clicked")}
-                        style={{ cursor: "pointer", textAlign: "left" }}
-                      >
-                        <AccordionGroup
-                          transition="0.2s"
-                          sx={{
-                            maxWidth: 400,
-                            borderRadius: "lg",
-                            [`& .${accordionSummaryClasses.button}:hover`]: {
-                              bgcolor: "transparent",
-                            },
-                            [`& .${accordionDetailsClasses.content}`]: {
-                              boxShadow: (theme) =>
-                                `inset 0 1px ${theme.vars.palette.divider}`,
-                              [`&.${accordionDetailsClasses.expanded}`]: {
-                                paddingBlock: "0.75rem",
-                              },
-                            },
-                          }}
-                        >
-                          <Accordion>
-                            <AccordionSummary>
-                              <Box sx={{ textAlign: "left" }}>
-                                <Typography
-                                  level="body-sm"
-                                  variant="subtitle1"
-                                  component="div"
-                                  sx={{ color: "text.primary" }}
-                                >
-                                  {task.task_name}
-                                </Typography>
-                                {task.projects ? (
-                                  <Typography
-                                    level="body-xs"
-                                    component="div"
-                                    sx={{ color: "text.secondary", mt: 0.5 }}
-                                  >
-                                    {task.projects.project_name}
-                                  </Typography>
-                                ) : (
-                                  <Typography
-                                    level="body-xs"
-                                    variant="body2"
-                                    component="div"
-                                    sx={{ color: "text.secondary", mt: 0.5 }}
-                                  >
-                                    No Project
-                                  </Typography>
-                                )}
-                              </Box>
-                            </AccordionSummary>
-                            <Typography
-                              sx={{ mt: 0.5, mb: 0.6 }}
-                              level="body-xs"
-                            >
-                              Completed By:{" "}
-                              {task.is_completed
-                                ? " " + (task.users?.first_name ?? "N/A")
-                                : "N/A"}
-                            </Typography>
-                            <AccordionDetails
-                              variant="soft"
-                              sx={{ padding: 0 }}
-                            >
-                              <Box sx={{ listStyleType: "none", padding: 0 }}>
-                                {task.subtasks && task.subtasks.length > 0 ? (
-                                  task.subtasks.map((subtask) => (
-                                    <Box
-                                      key={subtask.subtask_id}
-                                      sx={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                        textDecoration: subtask.is_completed
-                                          ? "line-through"
-                                          : "none",
-                                      }}
-                                    >
-                                      <Checkbox
-                                        color="success"
-                                        size="sm"
-                                        sx={{ padding: 0.5 }}
-                                        checked={subtask.is_completed}
-                                      />
-                                      <Typography
-                                        level="body-xs"
-                                        sx={{
-                                          flexGrow: 1,
-                                          textDecoration: subtask.is_completed
-                                            ? "line-through"
-                                            : "none",
-                                        }}
-                                      >
-                                        {subtask.subtask_name}
-                                      </Typography>
-                                    </Box>
-                                  ))
-                                ) : (
-                                  <Typography level="body-xs">
-                                    No Subtasks
-                                  </Typography>
-                                )}
-                              </Box>
-                              <Typography level="body-xs">
-                                Notes: {task.completion_notes}
-                              </Typography>
-                            </AccordionDetails>
-                          </Accordion>
-                        </AccordionGroup>
-                      </td>
-                      <td style={{ textAlign: "center" }}>
-                        <Stack
-                          spacing={1}
-                          direction="row"
-                          justifyContent="center"
-                          alignItems="center"
-                        > */}
-                          {/* <IconButton
-                            size="sm"
-                            variant="soft"
-                            color="danger"
-                            onClick={() => archiveTask(task.task_id)}
-                          >
-                            <DeleteRoundedIcon />
-                          </IconButton> */}
-                        {/* </Stack>
-                      </td> */}
-                    {/* </tr> */}
-                  {/* ))
-                ) : (
-                  <tr>
-                    <td colSpan="2" style={{ textAlign: "center" }}>
-                      <Typography variant="h1" component="h1">
-                        No Completed Tasks
-                      </Typography>
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </Table>
-          </TabPanel> */}
-        </Tabs>
       </Sheet>
-    </React.Fragment>
+    </>
+
+    
   );
 };
 

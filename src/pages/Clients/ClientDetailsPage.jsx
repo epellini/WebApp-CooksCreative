@@ -105,33 +105,21 @@ const ClientDetailsPage = () => {
             gap: 1,
           }}
         >
+        <Box sx={{ display: "flex", alignItems: "center" }}>
           <Breadcrumbs
             size="sm"
             aria-label="breadcrumbs"
-            separator={<ChevronRightRoundedIcon fontSize="small" />}
-            sx={{ mb: 2 }} // Add margin bottom for spacing
+            separator={<ChevronRightRoundedIcon fontSize="sm" />}
+            sx={{ pl: 0 }}
           >
-            <Link
-              component={Link}
-              to="/"
-              underline="none"
-              color="neutral"
-              aria-label="Home"
-            >
+            <Link underline="none" color="neutral" to="/" aria-label="Home">
               <HomeRoundedIcon />
             </Link>
-            <Link
-              component={Link}
-              to="/clients"
-              underline="hover"
-              color="neutral"
-            >
-              Clients
-            </Link>
-            <Typography color="primary" fontWeight={500}>
-              Details
+            <Typography color="primary" fontWeight={500} fontSize={12}>
+              <Link to="/clients">Clients</Link>
             </Typography>
           </Breadcrumbs>
+        </Box>
 
           <Box sx={{ display: "flex" }}>
             <Sheet
