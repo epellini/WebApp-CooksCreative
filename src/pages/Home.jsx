@@ -60,21 +60,15 @@ const Home = () => {
             <Box sx={{ flex: 6, boxShadow: 3, p: 2, borderRadius: 4,  }}>
               <Stack spacing={2} direction="column" alignItems="center">
               <DashboardProjects />
-
               <DashboardTasks  />
               </Stack>
-
             </Box>
-
             {/* Stats taking up 40% */}
             <Box sx={{ flex: 4, boxShadow: 3, p: 2, borderRadius: 4 }}>
               <DashboardStats />
             </Box>
           </Box>
-            {/* Remaining components under each other */}
-            {/* <Box sx={{     display: { xs: 'none', lg: 'block' }, mt: 2, boxShadow: 3, borderRadius: 4, p: 2 }}>
-              <DashboardTasks />
-            </Box> */}
+
 
           {/* MOBILE HERE */}
 

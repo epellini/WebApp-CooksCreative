@@ -70,7 +70,7 @@ export default function DashboardProjects() {
       variant="outlined"
       sx={{
         display: {
-          xs: "none",
+          xs: "block",
           sm: "block",
           md: "block",
           lg: "block",
