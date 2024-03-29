@@ -209,7 +209,7 @@ const ProjectForm = () => {
             <Box sx={{ mb: 1 }}>
               <Typography level="title-md">Project Information</Typography>
               <Typography level="body-sm">
-                Add a title, description, and other details to your project.
+                Add a title, notes, and other details to your project.
               </Typography>
             </Box>
             <Divider />
@@ -298,7 +298,7 @@ const ProjectForm = () => {
                     />
                   </Box>
 
-                  <FormLabel>Project Description</FormLabel>
+                  <FormLabel>Project Notes</FormLabel>
                   <FormControl
                     sx={{
                       display: { sm: "flex-column", md: "flex-row" },
@@ -549,31 +549,6 @@ const ProjectForm = () => {
                 </Button>
               </CardActions>
             </CardOverflow>
-          </Card>
-
-          <Card>
-            <Box sx={{ mb: 1 }}>
-              <Typography level="title-md">Project Images</Typography>
-              <Typography level="body-sm">
-                Add before and after images here to showcase your project.
-              </Typography>
-            </Box>
-            <Divider />
-            <Stack spacing={2} sx={{ my: 1 }}>
-              <DropZone />
-              <FileUpload
-                icon={<InsertDriveFileRoundedIcon />}
-                fileName="kitchen-before.png"
-                fileSize="200 kB"
-                progress={100}
-              />
-              <FileUpload
-                icon={<VideocamRoundedIcon />}
-                fileName="kitchen-after.png"
-                fileSize="1 MB"
-                progress={40}
-              />
-            </Stack>
           </Card>
         </Stack>
       </Box>

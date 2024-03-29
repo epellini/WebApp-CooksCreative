@@ -1,41 +1,27 @@
 import * as React from "react";
-import Avatar from "@mui/joy/Avatar";
 import Box from "@mui/joy/Box";
 import Button from "@mui/joy/Button";
 import Chip from "@mui/joy/Chip";
 import Divider from "@mui/joy/Divider";
 import FormControl from "@mui/joy/FormControl";
 import FormLabel from "@mui/joy/FormLabel";
-import Link from "@mui/joy/Link";
 import Input from "@mui/joy/Input";
-import Modal from "@mui/joy/Modal";
-import ModalDialog from "@mui/joy/ModalDialog";
-import ModalClose from "@mui/joy/ModalClose";
-import Select from "@mui/joy/Select";
-import Option from "@mui/joy/Option";
 import Table from "@mui/joy/Table";
 import Sheet from "@mui/joy/Sheet";
-import Checkbox from "@mui/joy/Checkbox";
-import Badge from "@mui/joy/Badge";
 import IconButton, { iconButtonClasses } from "@mui/joy/IconButton";
 import Typography from "@mui/joy/Typography";
 import Menu from "@mui/joy/Menu";
 import MenuButton from "@mui/joy/MenuButton";
 import MenuItem from "@mui/joy/MenuItem";
 import Dropdown from "@mui/joy/Dropdown";
-import SearchIcon from "@mui/icons-material/Search";
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded";
 import BlockIcon from "@mui/icons-material/Block";
 import AutorenewRoundedIcon from "@mui/icons-material/AutorenewRounded";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 import MoreHorizRoundedIcon from "@mui/icons-material/MoreHorizRounded";
-import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import { useNavigate } from "react-router-dom";
 import Autocomplete from "@mui/joy/Autocomplete";
-import { MoreVertOutlined } from "@mui/icons-material";
-
 import { useEffect, useState } from "react";
 import { supabaseClient } from "../../supabase-client"; // Import the supabase client
 import { Skeleton } from "@mui/joy";
@@ -43,7 +29,6 @@ import { usePagination } from "../../hooks/usePagination";
 
 function RowMenu({ projectId }) {
   const navigate = useNavigate();
-
   return (
     <Dropdown>
       <MenuButton
@@ -98,10 +83,13 @@ export default function ProjectTable() {
         setClients(data.map((project) => project.clients));
         setStatus(data.map((project) => project.status));
         setCategory(data.map((project) => project.category));
-        console.log(clients);
-        console.log("categories" + categories);
-        console.log();
-        setLoading(false); // Set loading to false when data is fetched
+
+        const activeStatus = data
+          .map((project) => project.status)
+          .find((status) => status.name === "Active");
+        setSelectedStatus(activeStatus);
+
+        setLoading(false);
       }
     }
     getProjects();
@@ -111,7 +99,7 @@ export default function ProjectTable() {
     const clientMatches =
       !selectedClient ||
       `${project.clients.first_name} ${project.clients.last_name}`.toLowerCase() ===
-      `${selectedClient.first_name} ${selectedClient.last_name}`.toLowerCase();
+        `${selectedClient.first_name} ${selectedClient.last_name}`.toLowerCase();
 
     const statusMatches =
       !selectedStatus ||
@@ -120,7 +108,7 @@ export default function ProjectTable() {
     const categoryMatches =
       !selectedCategory ||
       project.category.name.toLowerCase() ===
-      selectedCategory.name.toLowerCase();
+        selectedCategory.name.toLowerCase();
 
     return (
       clientMatches &&
@@ -136,25 +124,27 @@ export default function ProjectTable() {
     handlePageChange,
     handlePrevious,
     handleNext,
-  } = usePagination(filteredProjects, 10);
+  } = usePagination(filteredProjects, 15);
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
       //select all projects
-      const newSelected = projects.map((project) => project.project_id.toString());
+      const newSelected = projects.map((project) =>
+        project.project_id.toString()
+      );
       setSelected(newSelected);
     } else {
-      //clear selection 
+      //clear selection
       setSelected([]);
     }
-  }
+  };
 
   const getStatusColor = (statusName) => {
     switch (statusName.toLowerCase()) {
       case "completed":
-        return "success";
-      case "active":
         return "warning";
+      case "active":
+        return "success";
       case "cancelled":
         return "danger";
     }
@@ -169,16 +159,15 @@ export default function ProjectTable() {
           my: 1,
           gap: 1,
         }}
-      >
-      </Sheet>
+      ></Sheet>
       <Box
         className="SearchAndFilters-tabletUp"
         sx={{
           borderRadius: "sm",
           py: 2,
           display: {
-            xs: "none",
-            sm: "none",
+            xs: "flex",
+            sm: "flex",
             md: "flex",
             lg: "flex",
             xl: "flex",
@@ -215,7 +204,10 @@ export default function ProjectTable() {
               ); // Update selectedProject
               console.log("Selected client:", newValue);
             }}
-            renderInput={(params) => <Input {...params} />}
+            // Pass the renderInput function directly to inputProps
+            inputProps={{
+              renderInput: (params) => <Input {...params} />,
+            }}
           />
         </FormControl>
         <FormControl sx={{ flex: 1 }} size="sm">
@@ -250,7 +242,7 @@ export default function ProjectTable() {
             value={selectedStatus}
             onChange={(event, newValue) => {
               setSelectedStatus(newValue);
-              setSelectedProject(newValue ? `${newValue.name}` : null); // Update selectedProject
+              setSelectedProject(newValue ? `${newValue.name}` : null);
               console.log("Selected status:", newValue);
             }}
             renderInput={(params) => <Input {...params} />}
@@ -268,7 +260,7 @@ export default function ProjectTable() {
             lg: "initial",
             xl: "initial",
           },
-          width: "100%", // if you want to make the table full width <----- HERE
+          width: "100%",
           borderRadius: "sm",
           flexShrink: 1,
           overflow: "auto",
@@ -292,27 +284,13 @@ export default function ProjectTable() {
           {/* TABLE HEAD BEGINS HERE */}
           <thead>
             <tr>
-
-              <th style={{ width: 120, padding: "12px 6px" }}>
-                Project
-              </th>
-              <th style={{ width: 100, padding: "12px 6px" }}>Client Name</th>
+              <th style={{ width: 120, padding: "12px 6px" }}>Project</th>
               <th
-                style={{ width: 140, padding: "12px 6px", textAlign: "center" }}
+                style={{ width: 100, padding: "12px 6px", textAlign: "center" }}
               >
                 Status
               </th>
-              <th
-            
-                style={{ width: 100, padding: "12px 6px", textAlign: "left" }}
-              >
-                Start Date
-              </th>
-              <th
-                style={{ width: 140, padding: "12px 6px", textAlign: "left" }}
-              >
-                End Date
-              </th>
+
               <th
                 style={{ width: 140, padding: "12px 6px", textAlign: "left" }}
               >
@@ -320,8 +298,15 @@ export default function ProjectTable() {
               </th>
 
               <th
-                style={{ width: 140, padding: "12px 6px", textAlign: "left" }}
-              ></th>
+                style={{ width: 100, padding: "12px 6px", textAlign: "left" }}
+              >
+                Start Date
+              </th>
+              <th
+                style={{ width: 100, padding: "12px 6px", textAlign: "left" }}
+              >
+                End Date
+              </th>
             </tr>
           </thead>
 
@@ -329,165 +314,168 @@ export default function ProjectTable() {
           <tbody>
             {loading
               ? Array.from(new Array(5)).map(
-                (
-                  _,
-                  index // Assuming 5 rows of skeletons
-                ) => (
-                  <tr key={index}>
-                    <td style={{ textAlign: "center", width: 48 }}>
-                      <Skeleton
-                        variant="rectangular"
-                        width={24}
-                        height={24}
-                      />
-                    </td>
-                    <td>
-                      <Skeleton variant="text" width="100%" /> {/* Project */}
-                    </td>
-                    <td>
-                      <Skeleton variant="text" width="100%" />{" "}
-                      {/* Client Name */}
-                    </td>
-                    <td style={{ textAlign: "center" }}>
-                      <Skeleton
-                        variant="rectangular"
-                        width="80%"
-                        height={20}
-                      />{" "}
-                      {/* Status */}
-                    </td>
-                    <td>
-                      <Skeleton variant="text" width="70%" />{" "}
-                      {/* Start Date */}
-                    </td>
-                    <td>
-                      <Skeleton variant="text" width="70%" /> {/* End Date */}
-                    </td>
-                    <td>
-                      <Skeleton variant="text" width="100%" />{" "}
-                      {/* Category */}
-                    </td>
-                    <td style={{ textAlign: "right" }}>
-                      <Skeleton variant="circular" width={24} height={24} />{" "}
-                      {/* Actions */}
-                    </td>
-                  </tr>
+                  (
+                    _,
+                    index // Assuming 5 rows of skeletons
+                  ) => (
+                    <tr key={index}>
+                      <td style={{ textAlign: "center", width: 48 }}>
+                        <Skeleton
+                          variant="rectangular"
+                          width={24}
+                          height={24}
+                        />
+                      </td>
+                      <td>
+                        <Skeleton variant="text" width="100%" /> {/* Project */}
+                      </td>
+                      <td style={{ textAlign: "center" }}>
+                        <Skeleton
+                          variant="rectangular"
+                          width="80%"
+                          height={20}
+                        />{" "}
+                        {/* Status */}
+                      </td>
+                      <td>
+                        <Skeleton variant="text" width="70%" />{" "}
+                        {/* Start Date */}
+                      </td>
+                      <td>
+                        <Skeleton variant="text" width="70%" /> {/* End Date */}
+                      </td>
+                      <td>
+                        <Skeleton variant="text" width="100%" />{" "}
+                        {/* Category */}
+                      </td>
+                      <td style={{ textAlign: "right" }}>
+                        <Skeleton variant="circular" width={24} height={24} />{" "}
+                        {/* Actions */}
+                      </td>
+                    </tr>
+                  )
                 )
-              )
               : currentProjects.map((project) => {
-                return (
-                  <tr key={project.project_id}>
-                    <td style={{ textAlign: "left" }}>
-                      {project ? (
-                        <Typography
-                          level="body-xs"
-                          onClick={() =>
-                            navigate(`/projects/${project.project_id}`)
-                          }
-                          style={{ cursor: "pointer" }}
-                        >{`${project.project_name}`}</Typography>
-                      ) : (
-                        <Typography level="body-xs">N/A</Typography>
-                      )}
-                    </td>
-                    <td style={{ textAlign: "left" }}>
-                      {/* Displaying client's first name and last name if available */}
-                      {project.clients ? (
-                        <Typography
-                          level="body-xs"
-                          onClick={() =>
-                            navigate(`/projects/${project.project_id}`)
-                          }
-                          style={{ cursor: "pointer" }}
-                        >{`${project.clients.first_name} ${project.clients.last_name}`}</Typography>
-                      ) : (
-                        <Typography level="body-xs">N/A</Typography>
-                      )}
-                    </td>
+                  return (
+                    <tr key={project.project_id}>
+                      <td style={{ textAlign: "left" }}>
+                        {project ? (
+                          <Typography
+                            component="div"
+                            level="body-sm"
+                            onClick={() =>
+                              navigate(`/projects/${project.project_id}`)
+                            }
+                            sx={{
+                              cursor: "pointer",
+                              color: "text.primary", // Use the theme's primary text color
+                              fontWeight: 500, // Correctly apply font weight
+                            }}
+                          >
+                            {`${project.project_name}`}
+                          </Typography>
+                        ) : (
+                          <Typography level="body-sm">N/A</Typography>
+                        )}
 
-                    <td style={{ textAlign: "center" }}>
-                      <Chip
-                        onClick={() =>
-                          navigate(`/projects/${project.project_id}`)
-                        }
-                        style={{ cursor: "pointer" }}
-                        variant="soft"
-                        size="sm"
-                        startDecorator={
-                          project.status.name == "Completed" ? (
-                            <CheckRoundedIcon />
-                          ) : project.status.name == "Cancelled" ? (
-                            <BlockIcon />
-                          ) : project.status.name == "Active" ? (
-                            <AutorenewRoundedIcon />
-                          ) : undefined // No icon for "N/A" or other statuses
-                        }
-                        color={
-                          project.status.name == "Completed"
-                            ? "success"
-                            : project.status.name == "Active"
+                        {/* Displaying client's first name and last name if available */}
+                        {project.clients ? (
+                          <Typography
+                            level="body-xs"
+                            variant="body2"
+                            component="div"
+                            onClick={() =>
+                              navigate(`/projects/${project.project_id}`)
+                            }
+                            style={{ cursor: "pointer" }}
+                          >{`${project.clients.first_name} ${project.clients.last_name}`}</Typography>
+                        ) : (
+                          <Typography level="body-sm">N/A</Typography>
+                        )}
+                      </td>
+
+                      <td style={{ textAlign: "center" }}>
+                        <Chip
+                          onClick={() =>
+                            navigate(`/projects/${project.project_id}`)
+                          }
+                          style={{ cursor: "pointer" }}
+                          variant="soft"
+                          size="sm"
+                          startDecorator={
+                            project.status.name == "Completed" ? (
+                              <CheckRoundedIcon />
+                            ) : project.status.name == "Cancelled" ? (
+                              <BlockIcon />
+                            ) : project.status.name == "Active" ? (
+                              <AutorenewRoundedIcon />
+                            ) : undefined // No icon for "N/A" or other statuses
+                          }
+                          color={
+                            project.status.name == "Completed"
                               ? "neutral"
+                              : project.status.name == "Active"
+                              ? "success"
                               : project.status.name == "Cancelled"
-                                ? "danger"
-                                : "default" // Use default color for "N/A" or other statuses
-                        }
-                      >
-                        {project.status.name}
-                      </Chip>
-                    </td>
+                              ? "danger"
+                              : "default" // Use default color for "N/A" or other statuses
+                          }
+                        >
+                          {project.status.name}
+                        </Chip>
+                      </td>
 
-                    <td style={{ textAlign: "left" }}>
-                      {project ? (
-                        <Typography
-                          onClick={() =>
-                            navigate(`/projects/${project.project_id}`)
-                          }
-                          style={{ cursor: "pointer" }}
-                          level="body-xs"
-                        >{`${project.start_date}`}</Typography>
-                      ) : (
-                        <Typography level="body-xs">N/A</Typography>
-                      )}
-                    </td>
-                    <td style={{ textAlign: "left" }}>
-                      {project ? (
-                        <Typography
-                          onClick={() =>
-                            navigate(`/projects/${project.project_id}`)
-                          }
-                          style={{ cursor: "pointer" }}
-                          level="body-xs"
-                        >{`${project.end_date}`}</Typography>
-                      ) : (
-                        <Typography level="body-xs">N/A</Typography>
-                      )}
-                    </td>
-                    <td style={{ textAlign: "left" }}>
-                      {project ? (
-                        <Typography
-                          onClick={() =>
-                            navigate(`/projects/${project.project_id}`)
-                          }
-                          style={{ cursor: "pointer" }}
-                          level="body-xs"
-                        >{`${project.category.name}`}</Typography>
-                      ) : (
-                        <Typography level="body-xs">N/A</Typography>
-                      )}
-                    </td>
-                    <td>
-                      <Box
-                        sx={{ display: "flex", gap: 2, alignItems: "center" }}
-                      >
-                        {/* <Link level="body-xs" component="button" >
-                        Download
-                      </Link> */}
-                        <RowMenu projectId={project.project_id} />
-                      </Box>
-                    </td>
-                  </tr>
-                );
-              })}
+                      <td style={{ textAlign: "left" }}>
+                        {project ? (
+                          <Typography
+                            onClick={() =>
+                              navigate(`/projects/${project.project_id}`)
+                            }
+                            sx={{
+                              cursor: "pointer",
+                              fontWeight: 500, // Correctly setting font weight
+                              color: "text.primary", // Explicitly setting the text color to black or primary text color
+                            }}
+                            level="body-xs"
+                            variant="body2"
+                            component="div"
+                          >
+                            {`${project.category.name}`}
+                          </Typography>
+                        ) : (
+                          <Typography level="body-xs">N/A</Typography>
+                        )}
+                      </td>
+
+                      <td style={{ textAlign: "left" }}>
+                        {project ? (
+                          <Typography
+                            onClick={() =>
+                              navigate(`/projects/${project.project_id}`)
+                            }
+                            style={{ cursor: "pointer", fontWeight: 500 }}
+                            level="body-xs"
+                          >{`${project.start_date}`}</Typography>
+                        ) : (
+                          <Typography level="body-xs">N/A</Typography>
+                        )}
+                      </td>
+                      <td style={{ textAlign: "left" }}>
+                        {project ? (
+                          <Typography
+                            onClick={() =>
+                              navigate(`/projects/${project.project_id}`)
+                            }
+                            style={{ cursor: "pointer" }}
+                            level="body-xs"
+                          >{`${project.end_date}`}</Typography>
+                        ) : (
+                          <Typography level="body-xs">N/A</Typography>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
           </tbody>
         </Table>
       </Sheet>
@@ -522,97 +510,92 @@ export default function ProjectTable() {
         >
           <thead>
             <tr>
-              <th style={{ width: 48, textAlign: "center" }}></th>
-              <th>Project</th>
-              <th>Client</th>
-              <th style={{ textAlign: "center" }} >Status</th>
-              <th style={{ width: 48, textAlign: "center" }}></th>
+              <th style={{ width: 120, padding: "12px 6px" }}>Project</th>
+              <th
+                style={{ width: 50, padding: "12px 6px", textAlign: "center" }}
+              >
+                Status
+              </th>
             </tr>
           </thead>
           <tbody>
             {loading
               ? Array.from(new Array(5)).map((_, index) => (
-                <tr key={index}>
-                  <td colSpan={5} style={{ textAlign: "left" }}>
-                    <Skeleton variant="text" width="100%" height={30} />
-                  </td>
-                </tr>
-              ))
+                  <tr key={index}>
+                    <td colSpan={5} style={{ textAlign: "left" }}>
+                      <Skeleton variant="text" width="100%" height={30} />
+                    </td>
+                  </tr>
+                ))
               : currentProjects.map((project) => (
-                <tr key={project.project_id}>
-                  <td style={{ textAlign: "left" }}>
-                    <Checkbox
-                      size="sm"
-                      checked={selected.includes(
-                        project.project_id.toString()
+                  <tr key={project.project_id}>
+                    <td style={{ textAlign: "left" }}>
+                      {project ? (
+                        <Typography
+                          component="div"
+                          level="body-sm"
+                          onClick={() =>
+                            navigate(`/projects/${project.project_id}`)
+                          }
+                          sx={{
+                            cursor: "pointer",
+                            color: "text.primary", // Use the theme's primary text color
+                            fontWeight: 500, // Correctly apply font weight
+                          }}
+                        >
+                          {`${project.project_name}`}
+                        </Typography>
+                      ) : (
+                        <Typography level="body-sm">N/A</Typography>
                       )}
-                      onChange={(event) => {
-                        if (event.target.checked) {
-                          setSelected([
-                            ...selected,
-                            project.project_id.toString(),
-                          ]);
-                        } else {
-                          setSelected(
-                            selected.filter(
-                              (id) => id !== project.project_id.toString()
-                            )
-                          );
+
+                      {/* Displaying client's first name and last name if available */}
+                      {project.clients ? (
+                        <Typography
+                          level="body-xs"
+                          variant="body2"
+                          component="div"
+                          onClick={() =>
+                            navigate(`/projects/${project.project_id}`)
+                          }
+                          style={{ cursor: "pointer" }}
+                        >{`${project.clients.first_name} ${project.clients.last_name}`}</Typography>
+                      ) : (
+                        <Typography level="body-sm">N/A</Typography>
+                      )}
+                    </td>
+                    <td style={{ textAlign: "center" }}>
+                      <Chip
+                        onClick={() =>
+                          navigate(`/projects/${project.project_id}`)
                         }
-                      }}
-                    />
-                  </td>
-                  <td
-                    onClick={() =>
-                      navigate(`/projects/${project.project_id}`)
-                    }
-                    style={{ cursor: "pointer" }}
-                  >
-                    <Typography
-                      sx={{
-                        textAlign: "left",
-                        fontSize: {
-                          xs: "0.8rem",
-                          sm: "0.85rem",
-                        },
-                      }}
-                    >
-                      {project.project_name}
-                    </Typography>
-                  </td>
-                  <td>
-                    <Typography
-                      sx={{
-                        textAlign: "left",
-                        fontSize: {
-                          xs: "0.8rem",
-                          sm: "0.85rem",
-                        },
-                      }}
-                    >
-                      {project.clients.first_name} {project.clients.last_name}
-                    </Typography>
-                  </td>
-                  <td style={{ justifyContent: 'center', alignItems: 'center' }}>
-                    <Badge
-                      alignItems="center"
-                      variant="outlined"
-                      label={project.status.name}
-                      color={getStatusColor(project.status.name)}
-                    />
-                  </td>
-                  <td>
-                    <Box
-                      sx={{ display: "flex", gap: 2, alignItems: "center" }}
-                    >
-                      {/* <Link level="body-xs" component="button" >
-                        Download
-                      </Link> */}
-                      <RowMenu projectId={project.project_id} />
-                    </Box>
-                  </td>
-                </tr>
-              ))}
+                        style={{ cursor: "pointer" }}
+                        variant="soft"
+                        size="sm"
+                        startDecorator={
+                          project.status.name == "Completed" ? (
+                            <CheckRoundedIcon />
+                          ) : project.status.name == "Cancelled" ? (
+                            <BlockIcon />
+                          ) : project.status.name == "Active" ? (
+                            <AutorenewRoundedIcon />
+                          ) : undefined // No icon for "N/A" or other statuses
+                        }
+                        color={
+                          project.status.name == "Completed"
+                            ? "neutral"
+                            : project.status.name == "Active"
+                            ? "success"
+                            : project.status.name == "Cancelled"
+                            ? "danger"
+                            : "default" // Use default color for "N/A" or other statuses
+                        }
+                      >
+                        {project.status.name}
+                      </Chip>
+                    </td>
+                  </tr>
+                ))}
           </tbody>
         </Table>
       </Sheet>
@@ -624,7 +607,7 @@ export default function ProjectTable() {
           gap: 1,
           [`& .${iconButtonClasses.root}`]: { borderRadius: "50%" },
           display: {
-            xs: "none",
+            xs: "flex",
             md: "flex",
           },
         }}
@@ -686,8 +669,6 @@ export default function ProjectTable() {
           Next
         </Button>
       </Box>
-
-
     </React.Fragment>
   );
 }
