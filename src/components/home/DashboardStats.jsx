@@ -48,8 +48,8 @@ const DashboardStats = () => {
   // Function to group projects by month
   const groupProjectsByMonth = (projects) => {
     const projectCounts = projects.reduce((acc, project) => {
-      const month = new Date(project.created_date).getMonth();
-      const year = new Date(project.created_date).getFullYear();
+      const month = new Date(project.end_date).getMonth();
+      const year = new Date(project.end_date).getFullYear();
       const monthYear = `${getMonthName(month)} ${year}`;
       acc[monthYear] = (acc[monthYear] || 0) + 1;
       return acc;
