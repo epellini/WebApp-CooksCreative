@@ -143,7 +143,7 @@ export default function DashboardProjects() {
                 </Typography>
                 <Typography level="body-sm">{project.category.name}</Typography>
                 <Typography level="body-sm">
-                  {project.clients.first_name} {project.clients.last_name}
+                  {project.clients?.first_name} {project.clients?.last_name}
                 </Typography>
               </CardContent>
               <CardOverflow
