@@ -59,15 +59,21 @@ const Home = () => {
               <Box sx={{ flex: 1, boxShadow: 3,  borderRadius: 4 }}>
                 <DashboardProjects />
               </Box>
-              <Box sx={{ flex: 1, boxShadow: 3, borderRadius: 4 }}>
-                <DashboardTasks />
-              </Box>
             </Box>
             {/* Stats taking up 40% */}
             <Box sx={{ flex: 4, boxShadow: 3, borderRadius: 4 }}>
               <DashboardStats />
             </Box>
+
+            
           </Box>
+
+          <Box sx={{ display: {xs: 'none', md: 'none', lg: 'block'}, flex: 12, boxShadow: 3, borderRadius: 4 }}>
+                <DashboardTasks />
+          </Box>
+
+
+
 
           {/* MOBILE HERE */}
 
