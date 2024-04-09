@@ -99,7 +99,7 @@ const DashboardStats = () => {
   return (
     <MaterialCssVarsProvider theme={{ [MATERIAL_THEME_ID]: materialTheme }}>
       <Stack spacing={2} direction="column" alignItems="center">
-        <Box sx={{ 
+        {/* <Box sx={{ 
             display: 'flex', 
             flexDirection: 'column', 
             alignItems: 'center', 
@@ -111,13 +111,13 @@ const DashboardStats = () => {
             width: '100%', 
             maxWidth: 'sm' 
           }}>
-          <Typography component="div" sx={{ fontWeight: 'bold', fontSize: '1.25rem' }}>
-            Total Projects: <span style={{ fontSize: '1.5rem' }}>{projects.length}</span>
+          <Typography component="div" sx={{ fontWeight: 'bold', fontSize: '1 rem' }}>
+            Total Projects: <span style={{ fontSize: '1 rem' }}>{projects.length}</span>
           </Typography>
-          <Typography component="div" sx={{ fontWeight: 'bold', fontSize: '1.25rem' }}>
-            Total Tasks: <span style={{ fontSize: '1.5rem' }}>{tasks.length}</span>
+          <Typography component="div" sx={{ fontWeight: 'bold', fontSize: '1 rem' }}>
+            Total Tasks: <span style={{ fontSize: '1 rem' }}>{tasks.length}</span>
           </Typography>
-        </Box>
+        </Box> */}
 
         {/* PieChart */}
         <Box sx={{ 
@@ -135,14 +135,14 @@ const DashboardStats = () => {
             series={[
               {
                 data: projectStatusCounts,
-                innerRadius: 30,
-                outerRadius: 90,
-                paddingAngle: 5,
-                cornerRadius: 5,
+                innerRadius: 15,
+                outerRadius: 45,
+                paddingAngle: 2.5,
+                cornerRadius: 2.5,
               },
             ]}
-            width={400}
-            height={200}
+            width={300}
+            height={100}
           />
         </Box>
 
@@ -164,7 +164,7 @@ const DashboardStats = () => {
             series={[{ dataKey: 'projects', label: 'Projects by Month', valueFormatter }]}
             layout="horizontal"
             width={500}
-            height={280}
+            height={225}
             margin={{ left: 100 }}
           />
         </Box>
