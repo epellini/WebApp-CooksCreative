@@ -646,14 +646,14 @@ const ProjectTasks = ({ projectid }) => {
                           justifyContent="center"
                           alignItems="center"
                         >
-                          <IconButton
+                          {/* <IconButton
                             size="sm"
                             variant="soft"
                             color="danger"
                             onClick={() => archiveTask(task.task_id)}
                           >
                             <DeleteRoundedIcon />
-                          </IconButton>
+                          </IconButton> */}
                         </Stack>
                       </td>
                     </tr>
