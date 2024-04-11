@@ -166,25 +166,6 @@ export default function DashboardProjects() {
       </Sheet>
   )} :
 
-<Box
-          sx={{
-            p: 2,
-            border: "1px solid",
-            borderColor: "divider",
-            borderRadius: "md",
-            width: "100%",
-            maxWidth: "md",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-
-      <Typography>No Projects To Display</Typography>
-
-      </Box>
-
-
     </React.Fragment>
   
     

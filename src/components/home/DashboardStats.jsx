@@ -135,10 +135,9 @@ const DashboardStats = () => {
                 },
               ]}
               width={300}
-              height={115}
+              height={100}
             />
-          )}{" "}
-          : <Typography>No Projects</Typography>
+          )}
         </Box>
 
         {/* BarChart */}
