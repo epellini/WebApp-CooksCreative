@@ -108,75 +108,72 @@ const DashboardStats = () => {
   return (
     <MaterialCssVarsProvider theme={{ [MATERIAL_THEME_ID]: materialTheme }}>
       <Stack spacing={2} direction="column" alignItems="center">
-        {/* <Box sx={{ 
-            display: 'flex', 
-            flexDirection: 'column', 
-            alignItems: 'center', 
-            gap: 1, 
-            p: 2, 
-            border: '1px solid', 
-            borderColor: 'divider', 
-            borderRadius: 'md', 
-            width: '100%', 
-            maxWidth: 'sm' 
-          }}>
-          <Typography component="div" sx={{ fontWeight: 'bold', fontSize: '1 rem' }}>
-            Total Projects: <span style={{ fontSize: '1 rem' }}>{projects.length}</span>
-          </Typography>
-          <Typography component="div" sx={{ fontWeight: 'bold', fontSize: '1 rem' }}>
-            Total Tasks: <span style={{ fontSize: '1 rem' }}>{tasks.length}</span>
-          </Typography>
-        </Box> */}
-
         {/* PieChart */}
-        <Box sx={{ 
-            p: 2, 
-            border: '1px solid', 
-            borderColor: 'divider', 
-            borderRadius: 'md', 
-            width: '100%', 
-            maxWidth: 'md',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center'
-          }}>
-          <PieChart
-            series={[
-              {
-                data: projectStatusCounts,
-                innerRadius: 15,
-                outerRadius: 45,
-                paddingAngle: 2.5,
-                cornerRadius: 2.5,
-              },
-            ]}
-            width={300}
-            height={100}
-          />
+
+        <Box
+          sx={{
+            p: 2,
+            border: "1px solid",
+            borderColor: "divider",
+            borderRadius: "md",
+            width: "100%",
+            maxWidth: "md",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          {projects.length > 0 && (
+            <PieChart
+              series={[
+                {
+                  data: projectStatusCounts,
+                  innerRadius: 15,
+                  outerRadius: 45,
+                  paddingAngle: 2.5,
+                  cornerRadius: 2.5,
+                },
+              ]}
+              width={300}
+              height={115}
+            />
+          )}{" "}
+          : <Typography>No Projects</Typography>
         </Box>
 
         {/* BarChart */}
-        <Box sx={{ 
-            p: 2, 
-            border: '1px solid', 
-            borderColor: 'divider', 
-            borderRadius: 'md', 
-            width: '100%', 
-            maxWidth: 'lg',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center'
-          }}>
-          <BarChart
-            dataset={projectsByMonth}
-            yAxis={[{ scaleType: 'band', dataKey: 'month' }]}
-            series={[{ dataKey: 'projects', label: 'Projects by Month', valueFormatter }]}
-            layout="horizontal"
-            width={500}
-            height={225}
-            margin={{ left: 100 }}
-          />
+        {projectsByMonth.length > 0 && (
+        <Box
+          sx={{
+            p: 2,
+            border: "1px solid",
+            borderColor: "divider",
+            borderRadius: "md",
+            width: "100%",
+            maxWidth: "lg",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+            <BarChart
+              dataset={projectsByMonth}
+              yAxis={[{ scaleType: "band", dataKey: "month" }]}
+              series={[
+                {
+                  dataKey: "projects",
+                  label: "Projects by Month",
+                  valueFormatter,
+                },
+              ]}
+              layout="horizontal"
+              width={500}
+              height={225}
+              margin={{ left: 100 }}
+            />
         </Box>
+          )}
+
       </Stack>
     </MaterialCssVarsProvider>
   );
