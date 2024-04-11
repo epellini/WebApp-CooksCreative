@@ -117,15 +117,17 @@ const DashboardStats = () => {
         <Divider/>
 
         {/* BarChart for Projects by Month */}
-        <BarChart
-          dataset={projectsByMonth}
-          yAxis={[{ scaleType: 'band', dataKey: 'month' }]}
-          series={[{ dataKey: 'projects', label: 'Projects by Month', valueFormatter }]}
-          layout="horizontal"
-          width={300}
-          height={250}
-          margin={{ left: 90 }}
-        />
+        {projectsByMonth.length > 0 && (
+          <BarChart
+            dataset={projectsByMonth}
+            yAxis={[{ scaleType: 'band', dataKey: 'month' }]}
+            series={[{ dataKey: 'projects', label: 'Projects by Month', valueFormatter }]}
+            layout="horizontal"
+            width={300}
+            height={250}
+            margin={{ left: 90 }}
+          />
+        )}
 
       </Stack>
     </MaterialCssVarsProvider>
