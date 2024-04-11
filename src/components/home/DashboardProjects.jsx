@@ -137,7 +137,6 @@ export default function DashboardProjects() {
                 <Typography
                   fontWeight="md"
                   textColor="success.plainColor"
-                  noWrap
                 >
                   {project.project_name}
                 </Typography>
@@ -165,48 +164,7 @@ export default function DashboardProjects() {
               </CardOverflow>
             </Card>
 
-            {/* <Card
-              key={project.id}
-              variant="outlined"
-              orientation="horizontal"
-              sx={{
-                width: "100%",
-                "&:hover": {
-                  boxShadow: "md",
-                  borderColor: "neutral.outlinedHoverBorder",
-                },
-                m: 1,
-                cursor: "pointer",
-              }}
-              onClick={() => navigate(`/projects/${project.id}`)}
-            >
-              <AspectRatio ratio="1" sx={{ width: 70 }}>
-                <img
-                  src={
-                    project.project_image_url ||
-                    "https://via.placeholder.com/70"
-                  }
-                  alt={project.category.name}
-                  loading="lazy"
-                />
-              </AspectRatio>
-              <CardContent>
-                <Typography
-                  level="title-lg"
-                  id={`card-description-${project.id}`}
-                  sx={{ textAlign: "left" }}
-                >
-                  {project.project_name}
-                </Typography>
-                <Typography
-                  level="body-sm"
-                  aria-describedby={`card-description-${project.id}`}
-                  sx={{ textAlign: "left" }}
-                >
-                  {project.clients.first_name} {project.clients.last_name}
-                </Typography>
-              </CardContent>
-            </Card> */}
+
           </Grid>
         ))}
       </Grid>

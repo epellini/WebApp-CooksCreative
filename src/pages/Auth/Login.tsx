@@ -33,6 +33,7 @@ function Login() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [loading, setLoading] = useState(false);
+  const [loginError, setLoginError] = useState('');
   const navigate = useNavigate();
   //const { isAdmin, user } = useAuth();
 
@@ -40,6 +41,7 @@ function Login() {
 
   const handleLogin = async (email: string, password: string) => {
     setLoading(true);
+    setLoginError('');
     try {
       const { data, error } = await supabaseClient.auth.signInWithPassword({
         email,
@@ -48,10 +50,9 @@ function Login() {
       if (error) throw error;
 
       navigate("/");
-      //window.location.reload();
-      //window.location.href = "/";  // Nasty fix but it works for now, found no issues
     } catch (err) {
       console.error("Login error:", err.message);
+      setLoginError(err.error_description || err.message);
     } finally {
       setEmail("");
       setPassword("");
@@ -191,7 +192,7 @@ function Login() {
                     <Input type="password" name="password" />
                   </FormControl>
                   <Stack gap={4} sx={{ mt: 2 }}>
-                    <Box
+                    {/* <Box
                       sx={{
                         display: "flex",
                         justifyContent: "space-between",
@@ -210,11 +211,19 @@ function Login() {
                           Forgot your password?
                         </Link>
                       </Box>
-                    </Box>
+                    </Box> */}
                     <Button fullWidth type="submit">
                       Sign in
                     </Button>
                   </Stack>
+                  {loginError && (
+                    <Typography color="danger" sx={{ mb: 2 }}>
+                      {loginError}
+                    </Typography>
+                  )}
+
+
+
                 </form>
               </Stack>
             </Box>
