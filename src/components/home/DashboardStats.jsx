@@ -109,7 +109,6 @@ const DashboardStats = () => {
     <MaterialCssVarsProvider theme={{ [MATERIAL_THEME_ID]: materialTheme }}>
       <Stack spacing={2} direction="column" alignItems="center">
         {/* PieChart */}
-
         <Box
           sx={{
             p: 2,
@@ -139,7 +138,6 @@ const DashboardStats = () => {
             />
           )}
         </Box>
-
         {/* BarChart */}
         {projectsByMonth.length > 0 && (
         <Box

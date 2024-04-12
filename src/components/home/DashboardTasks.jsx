@@ -173,7 +173,6 @@ const DashboardTasks = ({ projectid }) => {
             md: "block",
             lg: "block",
             xl: "block",
-            maxWidth: "1600px",
             mx: "auto",
             borderRadius: "sm",
             px: { xs: 2, md: 6 },
@@ -188,7 +187,7 @@ const DashboardTasks = ({ projectid }) => {
       >
           {/* </TabList> */}
 
-          <Sheet sx={{ height: 270, overflow: "auto" }}>
+          <Sheet sx={{ height: 470, overflow: "auto" }}>
             <Table
               borderAxis="x"
               size="md"
