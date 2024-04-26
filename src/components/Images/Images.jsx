@@ -9,8 +9,10 @@ import Card from "@mui/joy/Card";
 import CircularProgress from "@mui/material/CircularProgress";
 import Snackbar from "@mui/joy/Snackbar";
 import Grid from "@mui/material/Grid";
+import {useAuth} from "../../pages/Auth/Auth";
 
 const Images = (projectid, ref) => {
+  const { isAdmin } = useAuth();
   const [images, setImages] = useState([]);
   const [project, setProject] = useState({ project_id: projectid.projectid });
   const [imageUrl, setImageUrl] = useState("");
@@ -279,9 +281,11 @@ const Images = (projectid, ref) => {
                     padding: "2px",
                   }}
                 >
+                  {isAdmin && (
                   <Button color="danger" onClick={() => deleteImage(imageUrl)}>
                     Delete
                   </Button>
+                  )}
                   <Button color="primary" onClick={() => downloadImage(imageUrl)}>
                     Download
                   </Button>

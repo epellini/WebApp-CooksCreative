@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useAuth } from "../../pages/Auth/Auth";
 import {
   Autocomplete,
   Box,
@@ -44,6 +45,7 @@ import TaskForm from "./TaskForm";
 import { CheckBox } from "@mui/icons-material";
 
 export default function TaskTable({ isModalOpen, toggleModal }) {
+  const { isAdmin } = useAuth();
   const [open, setOpen] = React.useState(false);
   const [tasks, setTasks] = useState([]);
   const [users, setUsers] = useState([]);
@@ -306,6 +308,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
             >
               Cancel
             </Button>
+            
             <Button
               variant="solid"
               color="danger"
@@ -612,6 +615,8 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                           >
                             <CheckBox />
                           </IconButton>
+                          {isAdmin && (
+
                           <IconButton
                             size="sm"
                             variant="soft"
@@ -620,6 +625,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                           >
                             <DeleteRoundedIcon />
                           </IconButton>
+                          )}
                         </Stack>
                       </td>
                     </tr>
@@ -820,6 +826,8 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                           justifyContent="center"
                           alignItems="center"
                         >
+                           {isAdmin && (
+
                           <IconButton
                             size="sm"
                             variant="soft"
@@ -828,6 +836,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                           >
                             <DeleteRoundedIcon />
                           </IconButton>
+                           )}
                           <IconButton
                             size="sm"
                             variant="soft"
@@ -898,6 +907,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                       textAlign: "center",
                     }}
                   >
+                      {isAdmin && (
                     <Button
                       size="sm"
                       variant="soft"
@@ -907,6 +917,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                     >
                       Delete All
                     </Button>
+                  )}
                   </th>
                 </tr>
               </thead>
@@ -1008,6 +1019,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                           justifyContent="center"
                           alignItems="center"
                         >
+                            {isAdmin && (
                           <IconButton
                             size="sm"
                             variant="soft"
@@ -1016,6 +1028,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                           >
                             <DeleteRoundedIcon />
                           </IconButton>
+                        )}
                           <IconButton
                             size="sm"
                             variant="soft"
@@ -1302,6 +1315,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                           >
                             <CheckBoxIcon />
                           </IconButton>
+                          {isAdmin && (
                           <IconButton
                             size="sm"
                             variant="soft"
@@ -1310,6 +1324,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                           >
                             <DeleteRoundedIcon />
                           </IconButton>
+                          )}
                         </Stack>
                       </td>
                     </tr>
@@ -1471,6 +1486,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                           justifyContent="center"
                           alignItems="center"
                         >
+                           {isAdmin && (
                           <IconButton
                             size="sm"
                             variant="soft"
@@ -1479,6 +1495,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                           >
                             <DeleteRoundedIcon />
                           </IconButton>
+                            )}
 
                           <IconButton
                             size="sm"
@@ -1532,6 +1549,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                       textAlign: "center",
                     }}
                   >
+                     {isAdmin && (
                     <Button
                       textAlign="center"
                       size="xs"
@@ -1541,6 +1559,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                     >
                       <Typography level="body-xs">DLT All</Typography>
                     </Button>
+                     )} 
                   </th>
                 </tr>
               </thead>
@@ -1587,6 +1606,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                           justifyContent="center"
                           alignItems="center"
                         >
+                           {isAdmin && (
                           <IconButton
                             size="sm"
                             variant="soft"
@@ -1595,6 +1615,7 @@ export default function TaskTable({ isModalOpen, toggleModal }) {
                           >
                             <DeleteRoundedIcon />
                           </IconButton>
+                          )}
                           <IconButton
                             size="sm"
                             variant="soft"

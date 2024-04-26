@@ -27,8 +27,10 @@ import Link from "@mui/joy/Link";
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
+import { useAuth } from "../Auth/Auth";
 
 export default function ProjectDetailsPage() {
+  const { isAdmin } = useAuth();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const [project, setProject] = useState({
@@ -319,6 +321,7 @@ export default function ProjectDetailsPage() {
               >
                 {/* For small screens */}
                 <Box sx={{ display: { xs: 'block', md: 'none' } }}>
+                {isAdmin && (
                   <IconButton
                     size="sm"
                     color="neutral"
@@ -327,10 +330,12 @@ export default function ProjectDetailsPage() {
                   >
                     <EditNoteIcon />
                   </IconButton>
+                )}
                 </Box>
 
                 {/* For larger screens */}
                 <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+                {isAdmin && (
                   <Button
                     size="sm"
                     variant="soft"
@@ -340,6 +345,7 @@ export default function ProjectDetailsPage() {
                   >
                     Update Project
                   </Button>
+                )}
                 </Box>
 
                 {/* For small screens */}
@@ -388,7 +394,9 @@ export default function ProjectDetailsPage() {
                 </Snackbar>
 
                 {/* For small screens */}
+                
                 <Box sx={{ display: { xs: 'block', md: 'none' } }}>
+                {isAdmin && (
                   <IconButton
                     size="sm"
                     color="danger"
@@ -397,10 +405,12 @@ export default function ProjectDetailsPage() {
                   >
                     <DeleteRoundedIcon />
                   </IconButton>
+                )}
                 </Box>
 
                 {/* For larger screens: */}
                 <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+                {isAdmin && (
                   <Button
                     size="sm"
                     variant="soft"
@@ -410,6 +420,7 @@ export default function ProjectDetailsPage() {
                   >
                     Delete
                   </Button>
+                )}
                 </Box>
                 <Modal
                   aria-labelledby="delete-confirmation-dialog-title"
@@ -437,9 +448,11 @@ export default function ProjectDetailsPage() {
                       <Button variant="outlined" color="neutral" onClick={() => setIsDeleteModalOpen(false)}>
                         Cancel
                       </Button>
+                     
                       <Button variant="solid" color="danger" onClick={() => { deleteProject(project.project_id); setIsDeleteModalOpen(false); }}>
                         Delete
                       </Button>
+                      
                     </Box>
                   </ModalDialog>
                 </Modal>

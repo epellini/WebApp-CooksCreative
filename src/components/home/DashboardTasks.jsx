@@ -173,7 +173,6 @@ const DashboardTasks = ({ projectid }) => {
             md: "block",
             lg: "block",
             xl: "block",
-            maxWidth: "1600px",
             mx: "auto",
             borderRadius: "sm",
             px: { xs: 2, md: 6 },
@@ -188,10 +187,10 @@ const DashboardTasks = ({ projectid }) => {
       >
           {/* </TabList> */}
 
-          <Sheet sx={{ height: 270, overflow: "auto" }}>
+          <Sheet sx={{ height: 470, overflow: "auto" }}>
             <Table
               borderAxis="x"
-              sixe="md"
+              size="md"
               stickyHeader
               hoverRow
               variant="plain"
@@ -199,12 +198,12 @@ const DashboardTasks = ({ projectid }) => {
               {/* TABLE HEAD BEGINS HERE */}
               <thead>
                 <tr>
-                  <th style={{ width: 25, padding: "12px 12px" }}>
+                  <th style={{ width: 200, padding: "12px 12px" }}>
                     Task Name
                   </th>
                   <th
                     style={{
-                      width: 25,
+                      width: 200,
                       padding: "12px 6px",
                       textAlign: "center",
                     }}
@@ -213,7 +212,7 @@ const DashboardTasks = ({ projectid }) => {
                   </th>
                   <th
                     style={{
-                      width: 25,
+                      width: 200,
                       padding: "12px 6px",
                       textAlign: "center",
                     }}

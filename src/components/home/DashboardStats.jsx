@@ -4,12 +4,11 @@ import { supabaseClient } from "../../supabase-client"; // Import the supabase c
 import { PieChart } from "@mui/x-charts/PieChart";
 import { BarChart } from "@mui/x-charts/BarChart"; // Make sure to import BarChart
 
-
 import {
   experimental_extendTheme as materialExtendTheme,
   Experimental_CssVarsProvider as MaterialCssVarsProvider,
   THEME_ID as MATERIAL_THEME_ID,
-} from '@mui/material/styles';
+} from "@mui/material/styles";
 
 const DashboardStats = () => {
   const materialTheme = materialExtendTheme();
@@ -27,7 +26,9 @@ const DashboardStats = () => {
     }, {});
 
     projects.forEach((project) => {
-      const statusName = statuses.find(status => status.status_id === project.status_id)?.name;
+      const statusName = statuses.find(
+        (status) => status.status_id === project.status_id
+      )?.name;
       if (statusName) {
         statusCounts[statusName]++;
       }
@@ -42,14 +43,16 @@ const DashboardStats = () => {
 
   // Function to format month names
   const getMonthName = (monthIndex) => {
-    return new Date(0, monthIndex, 1).toLocaleString("default", { month: "long" });
+    return new Date(0, monthIndex, 1).toLocaleString("default", {
+      month: "long",
+    });
   };
 
   // Function to group projects by month
   const groupProjectsByMonth = (projects) => {
     const projectCounts = projects.reduce((acc, project) => {
-      const month = new Date(project.created_date).getMonth();
-      const year = new Date(project.created_date).getFullYear();
+      const month = new Date(project.end_date).getMonth();
+      const year = new Date(project.end_date).getFullYear();
       const monthYear = `${getMonthName(month)} ${year}`;
       acc[monthYear] = (acc[monthYear] || 0) + 1;
       return acc;
@@ -66,9 +69,15 @@ const DashboardStats = () => {
   async function fetchTasksAndProjects() {
     setLoading(true);
     try {
-      const { data: tasksData, error: tasksError } = await supabaseClient.from("tasks").select("*");
-      const { data: projectsData, error: projectsError } = await supabaseClient.from("projects").select("*");
-      const { data: statusesData, error: statusesError } = await supabaseClient.from("status").select("*");
+      const { data: tasksData, error: tasksError } = await supabaseClient
+        .from("tasks")
+        .select("*");
+      const { data: projectsData, error: projectsError } = await supabaseClient
+        .from("projects")
+        .select("*");
+      const { data: statusesData, error: statusesError } = await supabaseClient
+        .from("status")
+        .select("*");
 
       if (tasksError) throw tasksError;
       if (projectsError) throw projectsError;
@@ -99,75 +108,69 @@ const DashboardStats = () => {
   return (
     <MaterialCssVarsProvider theme={{ [MATERIAL_THEME_ID]: materialTheme }}>
       <Stack spacing={2} direction="column" alignItems="center">
-        <Box sx={{ 
-            display: 'flex', 
-            flexDirection: 'column', 
-            alignItems: 'center', 
-            gap: 1, 
-            p: 2, 
-            border: '1px solid', 
-            borderColor: 'divider', 
-            borderRadius: 'md', 
-            width: '100%', 
-            maxWidth: 'sm' 
-          }}>
-          <Typography component="div" sx={{ fontWeight: 'bold', fontSize: '1.25rem' }}>
-            Total Projects: <span style={{ fontSize: '1.5rem' }}>{projects.length}</span>
-          </Typography>
-          <Typography component="div" sx={{ fontWeight: 'bold', fontSize: '1.25rem' }}>
-            Total Tasks: <span style={{ fontSize: '1.5rem' }}>{tasks.length}</span>
-          </Typography>
-        </Box>
-
         {/* PieChart */}
-        <Box sx={{ 
-            p: 2, 
-            border: '1px solid', 
-            borderColor: 'divider', 
-            borderRadius: 'md', 
-            width: '100%', 
-            maxWidth: 'md',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center'
-          }}>
-          <PieChart
-            series={[
-              {
-                data: projectStatusCounts,
-                innerRadius: 30,
-                outerRadius: 90,
-                paddingAngle: 5,
-                cornerRadius: 5,
-              },
-            ]}
-            width={400}
-            height={200}
-          />
+        <Box
+          sx={{
+            p: 2,
+            border: "1px solid",
+            borderColor: "divider",
+            borderRadius: "md",
+            width: "100%",
+            maxWidth: "md",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          {projects.length > 0 && (
+            <PieChart
+              series={[
+                {
+                  data: projectStatusCounts,
+                  innerRadius: 15,
+                  outerRadius: 45,
+                  paddingAngle: 2.5,
+                  cornerRadius: 2.5,
+                },
+              ]}
+              width={300}
+              height={100}
+            />
+          )}
         </Box>
-
         {/* BarChart */}
-        <Box sx={{ 
-            p: 2, 
-            border: '1px solid', 
-            borderColor: 'divider', 
-            borderRadius: 'md', 
-            width: '100%', 
-            maxWidth: 'lg',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center'
-          }}>
-          <BarChart
-            dataset={projectsByMonth}
-            yAxis={[{ scaleType: 'band', dataKey: 'month' }]}
-            series={[{ dataKey: 'projects', label: 'Projects by Month', valueFormatter }]}
-            layout="horizontal"
-            width={500}
-            height={280}
-            margin={{ left: 100 }}
-          />
+        {projectsByMonth.length > 0 && (
+        <Box
+          sx={{
+            p: 2,
+            border: "1px solid",
+            borderColor: "divider",
+            borderRadius: "md",
+            width: "100%",
+            maxWidth: "lg",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+            <BarChart
+              dataset={projectsByMonth}
+              yAxis={[{ scaleType: "band", dataKey: "month" }]}
+              series={[
+                {
+                  dataKey: "projects",
+                  label: "Projects by Month",
+                  valueFormatter,
+                },
+              ]}
+              layout="horizontal"
+              width={500}
+              height={225}
+              margin={{ left: 100 }}
+            />
         </Box>
+          )}
+
       </Stack>
     </MaterialCssVarsProvider>
   );
