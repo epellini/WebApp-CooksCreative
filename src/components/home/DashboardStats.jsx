@@ -127,6 +127,7 @@ const DashboardStats = () => {
               series={[
                 {
                   data: projectStatusCounts,
+                  
                   innerRadius: 15,
                   outerRadius: 45,
                   paddingAngle: 2.5,
